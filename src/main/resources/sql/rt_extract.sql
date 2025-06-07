@@ -1,0 +1,319 @@
+begin
+EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_LANGUAGE= ''AMERICAN''';
+insert into ZEN_B2B_JSON_SO_TMP (SEQ_ID,SENDER_CODE,RECEIVER_CODE,STATUS,DIRECTION,DOC_DATETIME,LAST_UPDATE_DATE,CREATION_DATE,USER_NO,ID,ORDER_NO,INV_SPLIT,INVOICE_NO,INVOICE_DATE,EXP_SHIP_DATE,CUST_NO,DEPT,CUST_NAME,INVOICE_ADDRESS,SHIP_TO_NO,DELIVERY_ADDRESS,SHIP_TO_CONTACT,SHIP_TO_PHONE,ZT_PART_NO,CUST_PART_NO,CUSTOMER_PO,SHIP_NOTICE,SHIP_NOTES,STATUS1,BRAND,QUANTITY,UNIT_PRICE,AMOUNT,CUST_PO,CUST_PO2,CUST_POLINE,CUST_PN,CUST_PN2,ITEM_DESC,ITEM_MODE,ORDER_LINE_MEMO,UNIT_WEIGHT,WEIGHT_UOM_CODE,FROM_SUBINVENTORY_CODE,SEGMENT1,SEGMENT2,KIND,SUPPLIER_PARTNO,INV_AND_PAC,CUST_PART_NO2,PO_REMARK,ORI_PO_NO,RMA_NUMBER,ORD_TYPE,QC_TYPE) 
+select ZEN_B2B_JSON_SEQ.nextval,SENDER_CODE,RECEIVER_CODE,STATUS,DIRECTION,DOC_DATETIME,LAST_UPDATE_DATE,CREATION_DATE,USER_NO,ID,ORDER_NO,INV_SPLIT,INVOICE_NO,INVOICE_DATE,EXP_SHIP_DATE,CUST_NO,DEPT,CUST_NAME,INVOICE_ADDRESS,SHIP_TO_NO,DELIVERY_ADDRESS,SHIP_TO_CONTACT,SHIP_TO_PHONE,ZT_PART_NO,CUST_PART_NO,CUSTOMER_PO,SHIP_NOTICE,SHIP_NOTES,STATUS1,BRAND,QUANTITY,UNIT_PRICE,AMOUNT,CUST_PO,CUST_PO2,CUST_POLINE,CUST_PN,CUST_PN2,ITEM_DESC,ITEM_MODE,ORDER_LINE_MEMO,UNIT_WEIGHT,WEIGHT_UOM_CODE,FROM_SUBINVENTORY_CODE,SEGMENT1,SEGMENT2,KIND,SUPPLIER_PARTNO,INV_AND_PAC,CUST_PART_NO2,PO_REMARK,ORI_PO_NO,RMA_NUMBER,ORD_TYPE,QC_TYPE
+from (
+     SELECT DISTINCT
+     'ZEN' as SENDER_CODE,
+     'FEILIKS' as RECEIVER_CODE,
+      CASE 
+        WHEN RT.RMA_REFERENCE IS NULL -- RMA_NUMBER
+        OR PH.SEGMENT1||'-'||PL.LINE_NUM IS NULL -- ORI_PO_NO
+        OR WS.INVOICENO IS NULL -- INVOICE_NO
+        OR RT.TRANSACTION_DATE IS NULL -- INVOICE_DATE / EXP_SHIP_DATE
+        OR PV.VENDOR_NAME IS NULL -- CUST_NAME
+        OR zpr.F_SHIP_TO_ADRESS IS NULL -- INVOICE_ADDRESS / DELIVERY_ADDRESS
+        OR zpr.F_SHIP_TO_CONTACT IS NULL -- SHIP_TO_CONTACT
+        OR zpr.F_SHIP_TO_PHONE IS NULL -- SHIP_TO_PHONE
+        OR MSI.SEGMENT1 IS NULL -- ZT_PART_NO
+        OR PVSA.VENDOR_SITE_CODE IS NULL -- BRAND
+        OR RT.PRIMARY_QUANTITY IS NULL -- QUANTITY
+        OR RT.PO_UNIT_PRICE IS NULL -- UNIT_PRICE
+        OR RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE IS NULL -- AMOUNT
+        OR MSI.ATTRIBUTE1 IS NULL -- ITEM_MODE
+        OR rt2.FROM_SUBINVENTORY IS NULL -- FROM_SUBINVENTORY_CODE
+        OR mil.segment1 IS NULL -- SEGMENT1
+        OR mil.segment2 IS NULL -- SEGMENT2
+        THEN 'N'
+        ELSE 'W'
+      END as STATUS,
+      'OUT' as DIRECTION,
+      TO_CHAR(RT.TRANSACTION_DATE, 'yyyy-MM-dd HH:mm:ss') as DOC_DATETIME,
+      TO_CHAR(sysdate, 'yyyy-MM-dd HH:mm:ss') as LAST_UPDATE_DATE,
+      TO_CHAR(sysdate, 'yyyy-MM-dd HH:mm:ss') as CREATION_DATE,
+      'admin' as USER_NO,
+      WS.INVOICENO || '-' || RT.TRANSACTION_ID as ID,
+      '' as ORDER_NO,
+      '' as INV_SPLIT,
+      WS.INVOICENO as INVOICE_NO,
+      TO_CHAR(TRUNC(RT.TRANSACTION_DATE), 'yyyy/mm/dd') as INVOICE_DATE,
+      TO_CHAR(TRUNC(RT.TRANSACTION_DATE) + 1, 'yyyy/mm/dd') as EXP_SHIP_DATE,
+      '' as CUST_NO,
+      '' as DEPT,
+      PV.VENDOR_NAME as CUST_NAME,
+      zpr.F_SHIP_TO_ADRESS as INVOICE_ADDRESS,
+      '' as SHIP_TO_NO,
+      zpr.F_SHIP_TO_ADRESS as DELIVERY_ADDRESS,
+      zpr.F_SHIP_TO_CONTACT as SHIP_TO_CONTACT,
+      zpr.F_SHIP_TO_PHONE as SHIP_TO_PHONE,
+      MSI.SEGMENT1 as ZT_PART_NO,
+      '' as CUST_PART_NO,
+      '' as CUSTOMER_PO,
+      '' as SHIP_NOTICE,
+      '' as SHIP_NOTES,
+      'Approved' as STATUS1,
+      PVSA.VENDOR_SITE_CODE as BRAND,
+      RT.PRIMARY_QUANTITY as QUANTITY,
+      TO_CHAR(RT.PO_UNIT_PRICE,'FM9999999999999990.99999999999999999999') as UNIT_PRICE,
+      RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE as AMOUNT,
+      '' as CUST_PO,
+      '' as CUST_PO2,
+      '' as CUST_POLINE,
+      '' as CUST_PN,
+      '' as CUST_PN2,
+      '' as ITEM_DESC,
+      MSI.ATTRIBUTE1 as ITEM_MODE,
+      '' as ORDER_LINE_MEMO,
+      '' as UNIT_WEIGHT,
+      '' as WEIGHT_UOM_CODE,
+      rt2.FROM_SUBINVENTORY as FROM_SUBINVENTORY_CODE,
+      mil.segment1 as SEGMENT1,
+      mil.segment2 as SEGMENT2,
+      '進貨退出單' as KIND,
+      MSI.SEGMENT1 as SUPPLIER_PARTNO,
+      '' as INV_AND_PAC,
+      '' as CUST_PART_NO2,
+      '' as PO_REMARK,
+      PH.SEGMENT1||'-'||PL.LINE_NUM as ORI_PO_NO,
+      RT.RMA_REFERENCE as RMA_NUMBER,
+      '0' as ORD_TYPE,
+      'TY' as QC_TYPE,
+      RT.SHIPMENT_HEADER_ID, -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+      RT.SHIPMENT_LINE_ID -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+     FROM RCV_SHIPMENT_HEADERS@zenprod RCH,
+       RCV_TRANSACTIONS@zenprod RT,
+       PO_VENDORS@zenprod PV,
+       PO_VENDOR_SITES_ALL@zenprod PVSA,
+       PO_HEADERS_ALL@zenprod PH,
+       PO_LINES_ALL@zenprod PL,
+       MTL_SYSTEM_ITEMS_B@zenprod MSI,
+       AP_TERMS@zenprod ATS,
+       RCV_SHIPMENT_LINES@zenprod RSL,  --add by peggy 2015/10/16
+       RCV_TRANSACTIONS@zenprod RT2,
+       MTL_ITEM_LOCATIONS@zenprod mil,
+       zenwms.WMS_SHIPPING@hr WS,
+       zenwms.WMS_SHIPPING_D@hr WSD,
+       ZEN_PO_RETURN_LINE_T@zenprod zpr,
+       ZEN_PO_RETURN_HEADER_T@zenprod zprh
+     WHERE 1=1
+        --  AND rt.ORGANIZATION_ID = 8
+        AND RT.SHIPMENT_HEADER_ID  = RCH.SHIPMENT_HEADER_ID 
+        AND RT.TRANSACTION_TYPE = 'RETURN TO VENDOR'
+        AND RT.VENDOR_ID = PV.VENDOR_ID
+        AND PVSA.VENDOR_ID = RT.VENDOR_ID
+        AND PVSA.VENDOR_SITE_ID = RT.VENDOR_SITE_ID
+        AND RT.PO_HEADER_ID = PH.PO_HEADER_ID
+        AND PH.TERMS_ID = ATS.TERM_ID
+        AND PH.PO_HEADER_ID = PL.PO_HEADER_ID
+        AND PL.PO_LINE_ID = RT.PO_LINE_ID
+        --AND PL.ITEM_ID = MSI.INVENTORY_ITEM_ID          disable by peggy 2015/10/16
+        --AND RT.ORGANIZATION_ID = MSI.ORGANIZATION_ID    disable by peggy 2015/10/16
+        AND RSL.ITEM_ID = MSI.INVENTORY_ITEM_ID            --add by peggy 2015/10/16 改為實際退貨item
+        AND RSL.TO_ORGANIZATION_ID = MSI.ORGANIZATION_ID   --add by peggy 2015/10/16 改為實際退貨item
+        AND RSL.SHIPMENT_LINE_ID = RT.SHIPMENT_LINE_ID     --add by peggy 2015/10/16 改為實際退貨item   
+        and RT2.GROUP_ID =RT.GROUP_ID
+        AND RT2.PO_LINE_ID=RT.PO_LINE_ID
+        AND RT2.FROM_SUBINVENTORY IS NOT NULL
+        AND RT2.SHIPMENT_HEADER_ID = RT.SHIPMENT_HEADER_ID
+        AND RT2.SHIPMENT_LINE_ID   = RT.SHIPMENT_LINE_ID
+        AND NVL(RT2.ATTRIBUTE6,0) = NVL(RT.ATTRIBUTE6,0) --add by peggy 2018/05/30 解決同時退貨多個倉別
+        AND RT2.PO_LINE_LOCATION_ID = RT.PO_LINE_LOCATION_ID --add by peggy 2018/05/30 解決同時退貨多個倉別
+        AND RT2.TRANSACTION_TYPE = 'RETURN TO RECEIVING'
+        and mil.INVENTORY_LOCATION_ID = rt2.FROM_LOCATOR_ID         
+        --   AND RT.RMA_REFERENCE = '240608'
+        AND WS.P_NO = WSD.P_NO
+        AND WSD.DELIVERNO = RT.RMA_REFERENCE
+        AND RT2.FROM_SUBINVENTORY = '外存倉'
+        AND (mil.segment1 like '%飛力達%' OR mil.segment2 like '%飛力達%')
+        and zpr.po_header_id = ph.po_header_id
+        and zpr.po_line_id = pl.po_line_id
+        and RT.PO_LINE_LOCATION_ID = zpr.PO_LINE_LOCATION_ID
+        and zpr.RETURN_NO = zprh.RETURN_NO
+        and zprh.RMA_NUM = rt.RMA_REFERENCE
+        and zpr.STATUS <> 'Cancelled' -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+        --AND TRUNC(RT.TRANSACTION_DATE) + 1 >= TRUNC(sysdate) --for正式上線第一週(手動執行)
+        AND TRUNC(RT.TRANSACTION_DATE) + 1 BETWEEN TRUNC(sysdate) - 20 AND TRUNC(sysdate) + 20 --for正式上線一週後(自動化)
+        AND NOT EXISTS(
+            SELECT 1
+            FROM ZEN_B2B_JSON_SO 
+            WHERE 
+                  ID = WS.INVOICENO || '-' || RT.TRANSACTION_ID
+            AND (STATUS = 
+                CASE 
+                WHEN RT.RMA_REFERENCE IS NULL -- RMA_NUMBER
+                OR PH.SEGMENT1||'-'||PL.LINE_NUM IS NULL -- ORI_PO_NO
+                OR WS.INVOICENO IS NULL -- INVOICE_NO
+                OR RT.TRANSACTION_DATE IS NULL -- INVOICE_DATE / EXP_SHIP_DATE
+                OR PV.VENDOR_NAME IS NULL -- CUST_NAME
+                OR zpr.F_SHIP_TO_ADRESS IS NULL -- INVOICE_ADDRESS / DELIVERY_ADDRESS
+                OR zpr.F_SHIP_TO_CONTACT IS NULL -- SHIP_TO_CONTACT
+                OR zpr.F_SHIP_TO_PHONE IS NULL -- SHIP_TO_PHONE
+                OR MSI.SEGMENT1 IS NULL -- ZT_PART_NO
+                OR PVSA.VENDOR_SITE_CODE IS NULL -- BRAND
+                OR RT.PRIMARY_QUANTITY IS NULL -- QUANTITY
+                OR RT.PO_UNIT_PRICE IS NULL -- UNIT_PRICE
+                OR RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE IS NULL -- AMOUNT
+                OR MSI.ATTRIBUTE1 IS NULL -- ITEM_MODE
+                OR rt2.FROM_SUBINVENTORY IS NULL -- FROM_SUBINVENTORY_CODE
+                OR mil.segment1 IS NULL -- SEGMENT1
+                OR mil.segment2 IS NULL -- SEGMENT2
+                THEN 'N'
+                ELSE 'W'
+                END OR STATUS = 'S')
+        )
+     union all
+     SELECT DISTINCT
+     'ZEN' as SENDER_CODE,
+     'FEILIKS' as RECEIVER_CODE,
+      CASE 
+        WHEN rt.attribute13 IS NULL -- RMA_NUMBER
+        OR PH.SEGMENT1||'-'||PL.LINE_NUM IS NULL -- ORI_PO_NO
+        OR WS.INVOICENO IS NULL -- INVOICE_NO
+        OR RT.TRANSACTION_DATE IS NULL -- INVOICE_DATE / EXP_SHIP_DATE
+        OR PV.VENDOR_NAME IS NULL -- CUST_NAME
+        OR zpr.F_SHIP_TO_ADRESS IS NULL -- INVOICE_ADDRESS / DELIVERY_ADDRESS
+        OR zpr.F_SHIP_TO_CONTACT IS NULL -- SHIP_TO_CONTACT
+        OR zpr.F_SHIP_TO_PHONE IS NULL -- SHIP_TO_PHONE
+        OR MSI.SEGMENT1 IS NULL -- ZT_PART_NO
+        OR PVSA.VENDOR_SITE_CODE IS NULL -- BRAND
+        OR RT.PRIMARY_QUANTITY IS NULL -- QUANTITY
+        OR RT.PO_UNIT_PRICE IS NULL -- UNIT_PRICE
+        OR (-1)*RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE IS NULL -- AMOUNT
+        OR MSI.ATTRIBUTE1 IS NULL -- ITEM_MODE
+        OR RT.SUBINVENTORY IS NULL -- FROM_SUBINVENTORY_CODE
+        OR mil.segment1 IS NULL -- SEGMENT1
+        OR mil.segment2 IS NULL -- SEGMENT2
+        THEN 'N'
+        ELSE 'W'
+      END as STATUS,
+      'OUT' as DIRECTION,
+      TO_CHAR(RT.TRANSACTION_DATE, 'yyyy-MM-dd HH:mm:ss') as DOC_DATETIME,
+      TO_CHAR(sysdate, 'yyyy-MM-dd HH:mm:ss') as LAST_UPDATE_DATE,
+      TO_CHAR(sysdate, 'yyyy-MM-dd HH:mm:ss') as CREATION_DATE,
+      'admin' as USER_NO,
+      WS.INVOICENO || '-' || RT.TRANSACTION_ID as ID,
+      '' as ORDER_NO,
+      '' as INV_SPLIT,
+      WS.INVOICENO as INVOICE_NO,
+      TO_CHAR(TRUNC(RT.TRANSACTION_DATE), 'yyyy/mm/dd') as INVOICE_DATE,
+      TO_CHAR(TRUNC(RT.TRANSACTION_DATE) + 1, 'yyyy/mm/dd') as EXP_SHIP_DATE,
+      '' as CUST_NO,
+      '' as DEPT,
+      PV.VENDOR_NAME as CUST_NAME,
+      zpr.F_SHIP_TO_ADRESS as INVOICE_ADDRESS,
+      '' as SHIP_TO_NO,
+      zpr.F_SHIP_TO_ADRESS as DELIVERY_ADDRESS,
+      zpr.F_SHIP_TO_CONTACT as SHIP_TO_CONTACT,
+      zpr.F_SHIP_TO_PHONE as SHIP_TO_PHONE,
+      MSI.SEGMENT1 as ZT_PART_NO,
+      '' as CUST_PART_NO,
+      '' as CUSTOMER_PO,
+      '' as SHIP_NOTICE,
+      '' as SHIP_NOTES,
+      'Approved' as STATUS1,
+      PVSA.VENDOR_SITE_CODE as BRAND,
+      (-1)*RT.PRIMARY_QUANTITY as QUANTITY,
+      TO_CHAR(RT.PO_UNIT_PRICE,'FM9999999999999990.99999999999999999999') as UNIT_PRICE,
+      (-1)*RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE as AMOUNT,
+      '' as CUST_PO,
+      '' as CUST_PO2,
+      '' as CUST_POLINE,
+      '' as CUST_PN,
+      '' as CUST_PN2,
+      '' as ITEM_DESC,
+      MSI.ATTRIBUTE1 as ITEM_MODE,
+      '' as ORDER_LINE_MEMO,
+      '' as UNIT_WEIGHT,
+      '' as WEIGHT_UOM_CODE,
+      RT.SUBINVENTORY as FROM_SUBINVENTORY_CODE,
+      mil.segment1 as SEGMENT1,
+      mil.segment2 as SEGMENT2,
+      '進貨退出單' as KIND,
+      MSI.SEGMENT1 as SUPPLIER_PARTNO,
+      '' as INV_AND_PAC,
+      '' as CUST_PART_NO2,
+      '' as PO_REMARK,
+      PH.SEGMENT1||'-'||PL.LINE_NUM as ORI_PO_NO,
+      rt.attribute13 as RMA_NUMBER,
+      '0' as ORD_TYPE,
+      'TY' as QC_TYPE,
+      RT.SHIPMENT_HEADER_ID, -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+      RT.SHIPMENT_LINE_ID -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+     FROM RCV_SHIPMENT_HEADERS@zenprod RCH,
+       RCV_TRANSACTIONS@zenprod RT,
+       PO_VENDORS@zenprod PV,
+       PO_VENDOR_SITES_ALL@zenprod PVSA,
+       PO_HEADERS_ALL@zenprod PH,
+       PO_LINES_ALL@zenprod PL,
+       MTL_SYSTEM_ITEMS_B@zenprod MSI,
+       AP_TERMS@zenprod ATS,
+       RCV_SHIPMENT_LINES@zenprod RSL,   --add by peggy 2015/10/16
+       MTL_ITEM_LOCATIONS@zenprod mil,
+       zenwms.WMS_SHIPPING@hr WS,
+       zenwms.WMS_SHIPPING_D@hr WSD,
+       ZEN_PO_RETURN_LINE_T@zenprod zpr,
+       ZEN_PO_RETURN_HEADER_T@zenprod zprh
+     WHERE 1=1
+        --AND RCH.RECEIPT_NUM = 491376954
+        --AND RCH.RECEIPT_NUM = :P_RECEIPT_NUM
+        --AND RT.RMA_REFERENCE = nvl(:P_RMA_NUM,RT.RMA_REFERENCE)
+        --  AND rt.ORGANIZATION_ID = 8
+        AND RT.SHIPMENT_HEADER_ID  = RCH.SHIPMENT_HEADER_ID 
+        AND RT.TRANSACTION_TYPE = 'DELIVER'
+        AND RT.VENDOR_ID = PV.VENDOR_ID
+        AND PVSA.VENDOR_ID = RT.VENDOR_ID
+        AND PVSA.VENDOR_SITE_ID = RT.VENDOR_SITE_ID
+        AND RT.PO_HEADER_ID = PH.PO_HEADER_ID
+        AND PH.TERMS_ID = ATS.TERM_ID
+        AND PH.PO_HEADER_ID = PL.PO_HEADER_ID
+        AND PL.PO_LINE_ID = RT.PO_LINE_ID
+        --AND PL.ITEM_ID = MSI.INVENTORY_ITEM_ID          disable by peggy 2015/10/16
+        --AND RT.ORGANIZATION_ID = MSI.ORGANIZATION_ID    disable by peggy 2015/10/16
+        AND RSL.ITEM_ID = MSI.INVENTORY_ITEM_ID            --add by peggy 2015/10/16 改為實際退貨item
+        AND RSL.TO_ORGANIZATION_ID = MSI.ORGANIZATION_ID   --add by peggy 2015/10/16 改為實際退貨item
+        AND RSL.SHIPMENT_LINE_ID = RT.SHIPMENT_LINE_ID     --add by peggy 2015/10/16 改為實際退貨item       
+        and rt.LOCATOR_ID = mil.INVENTORY_LOCATION_ID (+)
+        AND RT.SUBINVENTORY = '外存倉'
+        AND (mil.segment1 like '%飛力達%' OR mil.segment2 like '%飛力達%')
+        -- AND rt.attribute13 = '240608'
+        AND WS.P_NO = WSD.P_NO
+        AND WSD.DELIVERNO = rt.attribute13
+        and zpr.po_header_id = ph.po_header_id
+        and zpr.po_line_id = pl.po_line_id
+        and RT.PO_LINE_LOCATION_ID = zpr.PO_LINE_LOCATION_ID
+        and zpr.RETURN_NO = zprh.RETURN_NO
+        and zprh.RMA_NUM = rt.RMA_REFERENCE
+        and zpr.STATUS <> 'Cancelled' -- 20250303 Jeanny Modify : 報修申請單(202503030008)-解決會撈到重複資料的Bug
+        --AND TRUNC(RT.TRANSACTION_DATE) + 1 >= TRUNC(sysdate) --for正式上線第一週(手動執行)
+        AND TRUNC(RT.TRANSACTION_DATE) + 1 BETWEEN TRUNC(sysdate) - 1 AND TRUNC(sysdate) + 1 --for正式上線一週後(自動化)
+        AND NOT EXISTS(
+            SELECT 1
+            FROM ZEN_B2B_JSON_SO 
+            WHERE 
+                  ID = WS.INVOICENO || '-' || RT.TRANSACTION_ID
+            AND (STATUS = 
+                CASE 
+                WHEN rt.attribute13 IS NULL -- RMA_NUMBER
+                OR PH.SEGMENT1||'-'||PL.LINE_NUM IS NULL -- ORI_PO_NO
+                OR WS.INVOICENO IS NULL -- INVOICE_NO
+                OR RT.TRANSACTION_DATE IS NULL -- INVOICE_DATE / EXP_SHIP_DATE
+                OR PV.VENDOR_NAME IS NULL -- CUST_NAME
+                OR zpr.F_SHIP_TO_ADRESS IS NULL -- INVOICE_ADDRESS / DELIVERY_ADDRESS
+                OR zpr.F_SHIP_TO_CONTACT IS NULL -- SHIP_TO_CONTACT
+                OR zpr.F_SHIP_TO_PHONE IS NULL -- SHIP_TO_PHONE
+                OR MSI.SEGMENT1 IS NULL -- ZT_PART_NO
+                OR PVSA.VENDOR_SITE_CODE IS NULL -- BRAND
+                OR RT.PRIMARY_QUANTITY IS NULL -- QUANTITY
+                OR RT.PO_UNIT_PRICE IS NULL -- UNIT_PRICE
+                OR (-1)*RT.PRIMARY_QUANTITY * RT.PO_UNIT_PRICE IS NULL -- AMOUNT
+                OR MSI.ATTRIBUTE1 IS NULL -- ITEM_MODE
+                OR RT.SUBINVENTORY IS NULL -- FROM_SUBINVENTORY_CODE
+                OR mil.segment1 IS NULL -- SEGMENT1
+                OR mil.segment2 IS NULL -- SEGMENT2
+                THEN 'N'
+                ELSE 'W'
+                END OR STATUS = 'S')
+        )
+order by RMA_NUMBER, ID 
+);
+end;  

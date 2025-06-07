@@ -1,4 +1,4 @@
-package com.znt.outbound_api;
+package com.znt.outbound;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
