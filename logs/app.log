@@ -1,0 +1,1044 @@
+2025-06-11T13:30:52.109+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 6756 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T13:30:52.112+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T13:30:54.754+08:00  INFO 6756 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T13:30:54.754+08:00  INFO 6756 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T13:30:54.899+08:00  INFO 6756 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T13:30:55.652+08:00  INFO 6756 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T13:30:55.747+08:00  INFO 6756 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T13:30:55.816+08:00  INFO 6756 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T13:30:56.406+08:00  INFO 6756 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T13:30:57.422+08:00  INFO 6756 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@b5312df
+2025-06-11T13:30:57.426+08:00  INFO 6756 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T13:30:57.504+08:00  WARN 6756 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T13:30:57.793+08:00  INFO 6756 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T13:30:58.338+08:00  INFO 6756 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T13:30:58.638+08:00  WARN 6756 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T13:30:59.416+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.258 seconds (process running for 8.941)
+2025-06-11T13:30:59.424+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T13:30:59.424+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T13:30:59.549+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T13:30:59.553+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T13:31:19.062+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T13:31:19.063+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T13:31:22.761+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T13:31:22.762+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T13:31:39.052+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T13:31:39.056+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T13:31:42.272+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T13:31:42.273+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T13:31:44.117+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T13:31:44.126+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T13:31:44.126129200] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 48 筆
+2025-06-11T13:31:44.127+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 48 筆資料至暫存表，準備載入正式表...
+2025-06-11T13:31:44.128+08:00  INFO 6756 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T13:31:44.136+08:00  INFO 6756 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 48 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T13:31:44.137+08:00  INFO 6756 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T13:31:44.144+08:00  INFO 6756 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T13:31:44.148+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T13:31:44.149+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T13:31:44.156+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T13:31:44.157+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T13:31:44.165+08:00  INFO 6756 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T13:31:44.166+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 任務...
+2025-06-11T13:31:44.171+08:00  INFO 6756 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T13:31:44.220+08:00  INFO 6756 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 175 筆待映射的訂單標頭。
+2025-06-11T13:31:46.202+08:00  INFO 6756 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 175 筆訂單。簽章已產生。
+2025-06-11T13:31:46.217+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 175 個訂單標頭。
+2025-06-11T13:31:46.251+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T13:31:46.253+08:00  INFO 6756 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T13:33:11.651+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 29568 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T13:33:11.653+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T13:33:14.832+08:00  INFO 29568 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T13:33:14.832+08:00  INFO 29568 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T13:33:14.984+08:00  INFO 29568 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T13:33:15.690+08:00  INFO 29568 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T13:33:15.762+08:00  INFO 29568 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T13:33:15.812+08:00  INFO 29568 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T13:33:16.369+08:00  INFO 29568 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T13:33:17.386+08:00  INFO 29568 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@5f409872
+2025-06-11T13:33:17.390+08:00  INFO 29568 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T13:33:17.459+08:00  WARN 29568 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T13:33:17.663+08:00  INFO 29568 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T13:33:18.189+08:00  INFO 29568 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T13:33:18.480+08:00  WARN 29568 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T13:33:19.159+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.505 seconds (process running for 9.101)
+2025-06-11T13:33:19.169+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T13:33:19.171+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T13:33:19.299+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T13:33:19.300+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T13:33:37.618+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T13:33:37.619+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T13:33:39.344+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T13:33:39.348+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T13:33:56.150+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T13:33:56.151+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T13:33:58.072+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T13:33:58.073+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T13:34:00.079+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T13:34:00.090+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T13:34:00.090410500] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 0 筆
+2025-06-11T13:34:00.091+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 暫存表中無新資料。
+2025-06-11T13:34:00.092+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T13:34:00.095+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T13:34:00.099+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T13:34:00.103+08:00  INFO 29568 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T13:34:00.103+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 任務...
+2025-06-11T13:34:00.103+08:00  INFO 29568 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T13:34:00.162+08:00  INFO 29568 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 175 筆待映射的訂單標頭。
+2025-06-11T13:34:02.520+08:00  INFO 29568 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 175 筆訂單。簽章已產生。
+2025-06-11T13:34:02.532+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 175 個訂單標頭。
+2025-06-11T13:34:02.564+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T13:34:02.565+08:00  INFO 29568 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T14:25:41.663+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 31028 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T14:25:41.667+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T14:25:44.354+08:00  INFO 31028 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T14:25:44.358+08:00  INFO 31028 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T14:25:44.547+08:00  INFO 31028 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T14:25:45.327+08:00  INFO 31028 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T14:25:45.487+08:00  INFO 31028 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T14:25:45.566+08:00  INFO 31028 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T14:25:46.244+08:00  INFO 31028 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T14:25:47.217+08:00  INFO 31028 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@2b395581
+2025-06-11T14:25:47.221+08:00  INFO 31028 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T14:25:47.289+08:00  WARN 31028 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T14:25:47.469+08:00  INFO 31028 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T14:25:48.023+08:00  INFO 31028 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T14:25:48.308+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T14:25:48.347+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T14:25:48.540+08:00  WARN 31028 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T14:25:49.273+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.47 seconds (process running for 9.317)
+2025-06-11T14:25:49.287+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T14:25:49.289+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T14:25:49.434+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T14:25:49.436+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T14:26:10.530+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T14:26:10.531+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T14:26:12.909+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T14:26:12.910+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T14:26:33.461+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T14:26:33.462+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T14:26:35.821+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T14:26:35.822+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T14:26:38.088+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T14:26:38.097+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T14:26:38.097029900] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 6 筆
+2025-06-11T14:26:38.099+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 6 筆資料至暫存表，準備載入正式表...
+2025-06-11T14:26:38.100+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T14:26:38.104+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 6 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T14:26:38.105+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T14:26:38.111+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T14:26:38.118+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T14:26:38.120+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T14:26:38.125+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T14:26:38.126+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T14:26:38.134+08:00  INFO 31028 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T14:26:38.134+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T14:26:38.139+08:00  INFO 31028 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T14:26:38.189+08:00  INFO 31028 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 179 筆待映射的訂單標頭。
+2025-06-11T14:26:40.018+08:00  INFO 31028 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 179 筆訂單。簽章已產生。
+2025-06-11T14:26:40.029+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 179 個訂單標頭。
+2025-06-11T14:26:40.063+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T14:26:40.064+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : 準備發送請求至 URL: https://api-beta.feiliks-hn.com/order
+2025-06-11T14:26:40.073+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: ryOuRiJuwxk6QbdcEC+S+A== 建立 B2B 封套...
+2025-06-11T14:26:40.092+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 15995
+2025-06-11T14:26:43.324+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T14:26:43.326+08:00  INFO 31028 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"签名非法","data":null,"results":null}
+2025-06-11T14:26:43.327+08:00  INFO 31028 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T14:35:13.627+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 39808 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T14:35:13.631+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T14:35:16.677+08:00  INFO 39808 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T14:35:16.677+08:00  INFO 39808 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T14:35:16.871+08:00  INFO 39808 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T14:35:17.532+08:00  INFO 39808 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T14:35:17.627+08:00  INFO 39808 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T14:35:17.704+08:00  INFO 39808 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T14:35:18.229+08:00  INFO 39808 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T14:35:19.183+08:00  INFO 39808 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@7ed7ae
+2025-06-11T14:35:19.186+08:00  INFO 39808 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T14:35:19.244+08:00  WARN 39808 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T14:35:19.403+08:00  INFO 39808 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T14:35:19.984+08:00  INFO 39808 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T14:35:20.205+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T14:35:20.242+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T14:35:20.427+08:00  WARN 39808 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T14:35:21.244+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.383 seconds (process running for 8.959)
+2025-06-11T14:35:21.253+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T14:35:21.255+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T14:35:21.408+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T14:35:21.410+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T14:35:38.323+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T14:35:38.324+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T14:35:39.776+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T14:35:39.777+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T14:35:55.766+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T14:35:55.767+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T14:35:57.849+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T14:35:57.850+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T14:35:59.697+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T14:35:59.703+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T14:35:59.703881700] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 1 筆
+2025-06-11T14:35:59.704+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 1 筆資料至暫存表，準備載入正式表...
+2025-06-11T14:35:59.705+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T14:35:59.716+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 1 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T14:35:59.717+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T14:35:59.723+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T14:35:59.734+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T14:35:59.735+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T14:35:59.744+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T14:35:59.746+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T14:35:59.755+08:00  INFO 39808 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T14:35:59.756+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T14:35:59.763+08:00  INFO 39808 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T14:35:59.818+08:00  INFO 39808 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 180 筆待映射的訂單標頭。
+2025-06-11T14:36:01.797+08:00  INFO 39808 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 180 筆訂單。簽章已產生。
+2025-06-11T14:36:01.815+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 180 個訂單標頭。
+2025-06-11T14:36:01.867+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T14:36:01.868+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : 準備發送請求至 URL: https://api-beta.feiliks-hn.com/order
+2025-06-11T14:36:01.873+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: ZDExY2M0ZmM1YmVkZmFlMzIyYTJiOTRiMzE3NWYwYmQ= 建立 B2B 封套...
+2025-06-11T14:36:01.893+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 15996
+2025-06-11T14:40:25.417+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T14:40:25.420+08:00  INFO 39808 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"创建订单时出现异常: Failed to invoke the method pushWxMessage in the service com.feiliks.hn.log.service.IPushWxMessageService. Tried 1 times of the providers [10.0.7.231:20896] (1/1) from the registry zk-cs.beta-service:2181 on the consumer 10.0.7.3 using the dubbo version ord. Last error is: Invoke remote method timeout. method: pushWxMessage, provider: dubbo://10.0.7.231:20896/com.feiliks.hn.log.service.IPushWxMessageService?anyhost=true&application=jyjd&check=false&default.check=false&default.retries=0&default.timeout=5000&dubbo=log&generic=false&interface=com.feiliks.hn.log.service.IPushWxMessageService&methods=pushWxMessage&owner=feiliks&payload=1048576000&pid=1&register.ip=10.0.7.3&remote.timestamp=1749101552280&revision=ord&side=consumer&timestamp=1749460985299, cause: Waiting server-side response timeout. start time: 2025-06-11 14:40:51.631, end time: 2025-06-11 14:40:56.633, client elapsed: 0 ms, server elapsed: 5001 ms, timeout: 5000 ms, request: Request [id=31105, version=2.0.0, twoway=true, event=false, broken=false, data=RpcInvocation [methodName=pushWxMessage, parameterTypes=[class java.lang.String, class java.lang.String, class java.util.Date, class java.lang.Integer], arguments=[ORD5, 7549564809380864, Wed Jun 11 14:40:51 GMT+08:00 2025, 1], attachments={path=com.feiliks.hn.log.service.IPushWxMessageService, interface=com.feiliks.hn.log.service.IPushWxMessageService, version=0.0.0, timeout=5000}]], channel: /10.0.7.3:57416 -> /10.0.7.231:20896","data":null,"results":null}
+2025-06-11T14:40:25.423+08:00  INFO 39808 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T15:03:54.954+08:00  INFO 43248 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 43248 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T15:03:54.959+08:00  INFO 43248 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T15:03:57.774+08:00  INFO 43248 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T15:03:57.780+08:00  INFO 43248 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T15:03:58.041+08:00  INFO 43248 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T15:03:58.857+08:00  INFO 43248 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T15:03:59.008+08:00  INFO 43248 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T15:03:59.087+08:00  INFO 43248 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T15:03:59.724+08:00  INFO 43248 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T15:04:00.579+08:00  INFO 43248 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@6ba060af
+2025-06-11T15:04:00.583+08:00  INFO 43248 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T15:04:00.650+08:00  WARN 43248 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T15:04:00.842+08:00  INFO 43248 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T15:04:01.397+08:00  INFO 43248 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T15:04:01.638+08:00  INFO 43248 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T15:04:01.669+08:00  INFO 43248 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T15:04:01.865+08:00  WARN 43248 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T15:04:02.465+08:00  WARN 43248 --- [outbound-api] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-06-11T15:04:02.475+08:00  INFO 43248 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-11T15:04:02.540+08:00  INFO 43248 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-06-11T15:04:02.621+08:00 ERROR 43248 --- [outbound-api] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 18080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 18080 or configure this application to listen on another port.
+
+2025-06-11T15:04:12.351+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 28544 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T15:04:12.355+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T15:04:15.261+08:00  INFO 28544 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T15:04:15.261+08:00  INFO 28544 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T15:04:15.416+08:00  INFO 28544 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T15:04:16.262+08:00  INFO 28544 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T15:04:16.380+08:00  INFO 28544 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T15:04:16.450+08:00  INFO 28544 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T15:04:17.154+08:00  INFO 28544 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T15:04:18.199+08:00  INFO 28544 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@2b395581
+2025-06-11T15:04:18.202+08:00  INFO 28544 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T15:04:18.267+08:00  WARN 28544 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T15:04:18.447+08:00  INFO 28544 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T15:04:18.961+08:00  INFO 28544 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T15:04:19.182+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T15:04:19.215+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T15:04:19.421+08:00  WARN 28544 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T15:04:20.039+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.502 seconds (process running for 9.015)
+2025-06-11T15:04:20.049+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T15:04:20.050+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T15:04:20.171+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T15:04:20.172+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T15:04:36.000+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T15:04:36.002+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T15:04:37.053+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T15:04:37.053+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T15:04:54.717+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T15:04:54.718+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T15:04:56.694+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T15:04:56.695+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T15:04:58.406+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T15:04:58.415+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T15:04:58.415300600] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 324 筆
+2025-06-11T15:04:58.417+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 324 筆資料至暫存表，準備載入正式表...
+2025-06-11T15:04:58.418+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:04:58.451+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 324 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:04:58.453+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T15:04:58.458+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T15:04:58.481+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T15:04:58.482+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T15:04:58.488+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T15:04:58.490+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T15:04:58.496+08:00  INFO 28544 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T15:04:58.497+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T15:04:58.500+08:00  INFO 28544 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T15:04:58.545+08:00  INFO 28544 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 131 筆待映射的訂單標頭。
+2025-06-11T15:05:00.124+08:00  INFO 28544 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 131 筆訂單。簽章已產生。
+2025-06-11T15:05:00.146+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 131 個訂單標頭。
+2025-06-11T15:05:00.186+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T15:05:00.188+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : 準備發送請求至 URL: https://api-beta.feiliks-hn.com/order
+2025-06-11T15:05:00.196+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: ZjE3ODU5MTdkZTdlNjRlNzg2NmVjYWRlNDQ0NDc3MDM= 建立 B2B 封套...
+2025-06-11T15:05:00.214+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 15997
+2025-06-11T15:05:23.357+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T15:05:23.360+08:00  INFO 28544 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 100:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100106\n\n校验信息 101:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100107\n\n校验信息 102:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100109\n\n校验信息 103:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110002\n\n校验信息 70:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100034\n\n校验信息 71:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100038\n\n校验信息 74:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100046\n\n校验信息 75:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100047\n\n校验信息 72:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100041\n\n校验信息 73:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100043\n\n校验信息 78:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100060\n\n校验信息 79:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100061\n\n校验信息 76:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100056\n\n校验信息 77:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100058\n\n校验信息 60:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100001\n\n校验信息 63:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100005\n\n校验信息 64:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100023\n\n校验信息 61:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100002\n\n校验信息 62:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100004\n\n校验信息 67:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100026\n\n校验信息 68:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100032\n\n校验信息 65:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100024\n\n校验信息 66:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100025\n\n校验信息 69:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100033\n\n校验信息 52:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090070\n\n校验信息 53:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090071\n\n校验信息 50:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090068\n\n校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MI202500562\n\n校验信息 51:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090069\n\n校验信息 1:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV202506110011\n\n校验信息 56:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090085\n\n校验信息 2:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100006\n\n校验信息 57:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090089\n\n校验信息 3:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100009\n\n校验信息 54:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090074\n\n校验信息 4:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506110005\n\n校验信息 55:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090078\n\n校验信息 58:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090090\n\n校验信息 59:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090092\n\n校验信息 41:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090051\n\n校验信息 42:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090052\n\n校验信息 40:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090050\n\n校验信息 45:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090057\n\n校验信息 46:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090058\n\n校验信息 43:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090055\n\n校验信息 44:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090056\n\n校验信息 49:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090067\n\n校验信息 47:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090063\n\n校验信息 48:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090064\n\n校验信息 30:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060091\n\n校验信息 31:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060097\n\n校验信息 34:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090018\n\n校验信息 35:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090036\n\n校验信息 32:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090001\n\n校验信息 33:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090003\n\n校验信息 38:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090039\n\n校验信息 39:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090047\n\n校验信息 36:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090037\n\n校验信息 37:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090038\n\n校验信息 5:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100001\n\n校验信息 6:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100002\n\n校验信息 7:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100022\n\n校验信息 8:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100041\n\n校验信息 9:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100044\n\n校验信息 130:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506100001\n\n校验信息 20:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050088\n\n校验信息 23:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060008\n\n校验信息 126:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090008\n\n校验信息 24:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060022\n\n校验信息 127:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506100005\n\n校验信息 21:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050090\n\n校验信息 128:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506110011\n\n校验信息 22:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060005\n\n校验信息 129:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506090001\n\n校验信息 27:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060064\n\n校验信息 28:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060065\n\n校验信息 25:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060025\n\n校验信息 26:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060046\n\n校验信息 29:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060069\n\n校验信息 123:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2505270001\n\n校验信息 124:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2506050001\n\n校验信息 125:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090001\n\n校验信息 92:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100084\n\n校验信息 93:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100085\n\n校验信息 90:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100081\n\n校验信息 91:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100082\n\n校验信息 96:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100096\n\n校验信息 97:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100100\n\n校验信息 94:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100094\n\n校验信息 95:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100095\n\n校验信息 115:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110046\n\n校验信息 116:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110048\n\n校验信息 10:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100045\n\n校验信息 98:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100103\n\n校验信息 117:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110049\n\n校验信息 11:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110035\n\n校验信息 99:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100105\n\n校验信息 118:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110057\n\n校验信息 19:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050042\n\n校验信息 111:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110021\n\n校验信息 112:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110033\n\n校验信息 113:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110035\n\n校验信息 114:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110044\n\n校验信息 81:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100071\n\n校验信息 82:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100072\n\n校验信息 80:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100062\n\n校验信息 110:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110017\n\n校验信息 85:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100076\n\n校验信息 108:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110012\n\n校验信息 86:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100077\n\n校验信息 109:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110013\n\n校验信息 83:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100073\n\n校验信息 84:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100074\n\n校验信息 89:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100080\n\n校验信息 104:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110008\n\n校验信息 105:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110009\n\n校验信息 87:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100078\n\n校验信息 106:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110010\n\n校验信息 88:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100079\n\n校验信息 107:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110011","data":null,"results":null}
+2025-06-11T15:05:23.374+08:00  INFO 28544 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T15:12:39.434+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 38232 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T15:12:39.442+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T15:12:42.216+08:00  INFO 38232 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T15:12:42.216+08:00  INFO 38232 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T15:12:42.408+08:00  INFO 38232 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T15:12:43.538+08:00  INFO 38232 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T15:12:43.735+08:00  INFO 38232 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T15:12:43.845+08:00  INFO 38232 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T15:12:44.607+08:00  INFO 38232 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T15:12:45.695+08:00  INFO 38232 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@2b395581
+2025-06-11T15:12:45.699+08:00  INFO 38232 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T15:12:45.797+08:00  WARN 38232 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T15:12:46.106+08:00  INFO 38232 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T15:12:46.676+08:00  INFO 38232 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T15:12:46.847+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T15:12:46.882+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T15:12:47.107+08:00  WARN 38232 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T15:12:47.831+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 9.702 seconds (process running for 10.264)
+2025-06-11T15:12:47.845+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T15:12:47.847+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T15:12:48.077+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T15:12:48.080+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T15:13:04.701+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T15:13:04.703+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T15:13:05.220+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T15:13:05.220+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T15:13:22.755+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T15:13:22.756+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T15:13:24.764+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T15:13:24.765+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T15:13:26.528+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T15:13:26.535+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T15:13:26.535929300] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 20 筆
+2025-06-11T15:13:26.536+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 20 筆資料至暫存表，準備載入正式表...
+2025-06-11T15:13:26.537+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:13:26.544+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 20 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:13:26.545+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T15:13:26.549+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T15:13:26.554+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T15:13:26.555+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T15:13:26.560+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T15:13:26.561+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T15:13:26.566+08:00  INFO 38232 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T15:13:26.567+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T15:13:26.570+08:00  INFO 38232 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T15:13:26.604+08:00  INFO 38232 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 133 筆待映射的訂單標頭。
+2025-06-11T15:13:27.838+08:00  INFO 38232 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 133 筆訂單。簽章已產生。
+2025-06-11T15:13:27.850+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 133 個訂單標頭。
+2025-06-11T15:13:27.911+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T15:13:27.912+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : 準備發送請求至 URL: https://api-beta.feiliks-hn.com/order
+2025-06-11T15:13:27.920+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: NGM1YmNkMjlmYmQ2YWRlNTYzZTVkNWRmZjhiNTMwODI= 建立 B2B 封套...
+2025-06-11T15:13:27.933+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 15998
+2025-06-11T15:13:44.860+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T15:13:44.863+08:00  INFO 38232 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 100:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100103\n\n校验信息 101:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100105\n\n校验信息 102:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100106\n\n校验信息 103:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100107\n\n校验信息 70:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100032\n\n校验信息 71:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100033\n\n校验信息 74:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100041\n\n校验信息 75:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100043\n\n校验信息 72:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100034\n\n校验信息 73:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100038\n\n校验信息 78:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100056\n\n校验信息 79:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100058\n\n校验信息 76:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100046\n\n校验信息 77:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100047\n\n校验信息 60:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090090\n\n校验信息 63:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100002\n\n校验信息 64:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100004\n\n校验信息 61:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090092\n\n校验信息 62:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100001\n\n校验信息 67:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100024\n\n校验信息 68:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100025\n\n校验信息 65:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100005\n\n校验信息 66:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100023\n\n校验信息 69:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100026\n\n校验信息 52:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090068\n\n校验信息 53:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090069\n\n校验信息 50:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090064\n\n校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MI202500562\n\n校验信息 51:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090067\n\n校验信息 1:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV202506110011\n\n校验信息 56:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090074\n\n校验信息 2:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100006\n\n校验信息 57:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090078\n\n校验信息 3:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100009\n\n校验信息 54:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090070\n\n校验信息 4:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506110005\n\n校验信息 55:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090071\n\n校验信息 58:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090085\n\n校验信息 59:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090089\n\n校验信息 41:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090047\n\n校验信息 42:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090050\n\n校验信息 40:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090039\n\n校验信息 45:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090055\n\n校验信息 46:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090056\n\n校验信息 43:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090051\n\n校验信息 44:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090052\n\n校验信息 49:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090063\n\n校验信息 47:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090057\n\n校验信息 48:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090058\n\n校验信息 30:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060065\n\n校验信息 31:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060069\n\n校验信息 34:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090001\n\n校验信息 35:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090003\n\n校验信息 32:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060091\n\n校验信息 33:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060097\n\n校验信息 38:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090037\n\n校验信息 39:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090038\n\n校验信息 36:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090018\n\n校验信息 37:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090036\n\n校验信息 5:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100001\n\n校验信息 6:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100002\n\n校验信息 7:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100022\n\n校验信息 8:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100041\n\n校验信息 9:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100044\n\n校验信息 130:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506110011\n\n校验信息 131:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506090001\n\n校验信息 132:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506100001\n\n校验信息 23:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050090\n\n校验信息 126:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2506050001\n\n校验信息 24:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060005\n\n校验信息 127:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090001\n\n校验信息 21:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050042\n\n校验信息 128:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090008\n\n校验信息 22:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050088\n\n校验信息 129:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506100005\n\n校验信息 27:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060025\n\n校验信息 28:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060046\n\n校验信息 25:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060008\n\n校验信息 26:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060022\n\n校验信息 29:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060064\n\n校验信息 122:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110068\n\n校验信息 123:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110071\n\n校验信息 124:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110073\n\n校验信息 125:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2505270001\n\n校验信息 92:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100081\n\n校验信息 93:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100082\n\n校验信息 90:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100079\n\n校验信息 120:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110057\n\n校验信息 91:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100080\n\n校验信息 121:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110067\n\n校验信息 96:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100094\n\n校验信息 119:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110049\n\n校验信息 97:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100095\n\n校验信息 94:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100084\n\n校验信息 95:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100085\n\n校验信息 12:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110042\n\n校验信息 115:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110035\n\n校验信息 13:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110043\n\n校验信息 116:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110044\n\n校验信息 10:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100045\n\n校验信息 98:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100096\n\n校验信息 117:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110046\n\n校验信息 11:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110035\n\n校验信息 99:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100100\n\n校验信息 118:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110048\n\n校验信息 16:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110046\n\n校验信息 17:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110047\n\n校验信息 14:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110044\n\n校验信息 15:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110045\n\n校验信息 18:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110048\n\n校验信息 111:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110013\n\n校验信息 112:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110017\n\n校验信息 113:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110021\n\n校验信息 114:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110033\n\n校验信息 81:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100061\n\n校验信息 82:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100062\n\n校验信息 80:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100060\n\n校验信息 110:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110012\n\n校验信息 85:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100073\n\n校验信息 108:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110010\n\n校验信息 86:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100074\n\n校验信息 109:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110011\n\n校验信息 83:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100071\n\n校验信息 84:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100072\n\n校验信息 89:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100078\n\n校验信息 104:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100109\n\n校验信息 105:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110002\n\n校验信息 87:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100076\n\n校验信息 106:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110008\n\n校验信息 88:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100077\n\n校验信息 107:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110009","data":null,"results":null}
+2025-06-11T15:13:44.892+08:00  INFO 38232 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T15:46:35.301+08:00  INFO 37316 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 37316 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T15:46:35.305+08:00  INFO 37316 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T15:46:38.452+08:00  INFO 37316 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T15:46:38.456+08:00  INFO 37316 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T15:46:38.661+08:00  INFO 37316 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T15:46:39.396+08:00  INFO 37316 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T15:46:39.501+08:00  INFO 37316 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T15:46:39.557+08:00  INFO 37316 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T15:46:40.141+08:00  INFO 37316 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T15:46:41.017+08:00  INFO 37316 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@5ef2cbe6
+2025-06-11T15:46:41.021+08:00  INFO 37316 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T15:46:41.087+08:00  WARN 37316 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T15:46:41.488+08:00  INFO 37316 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T15:46:42.377+08:00  INFO 37316 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T15:46:42.627+08:00  INFO 37316 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T15:46:42.662+08:00  INFO 37316 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T15:46:42.788+08:00  WARN 37316 --- [outbound-api] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'dbExtractRunner' defined in file [C:\Users\jeanny_chiu\znt-outbound-api\target\classes\com\znt\outbound\runner\DbExtractRunner.class]: Unsatisfied dependency expressed through constructor parameter 5: Error creating bean with name 'apiService' defined in file [C:\Users\jeanny_chiu\znt-outbound-api\target\classes\com\znt\outbound\service\ApiService.class]: Unsatisfied dependency expressed through constructor parameter 5: Error creating bean with name 'statusNotificationService': Injection of autowired dependencies failed
+2025-06-11T15:46:42.796+08:00  INFO 37316 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-11T15:46:42.851+08:00  INFO 37316 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-06-11T15:46:42.859+08:00  INFO 37316 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-06-11T15:46:42.909+08:00 ERROR 37316 --- [outbound-api] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'dbExtractRunner' defined in file [C:\Users\jeanny_chiu\znt-outbound-api\target\classes\com\znt\outbound\runner\DbExtractRunner.class]: Unsatisfied dependency expressed through constructor parameter 5: Error creating bean with name 'apiService' defined in file [C:\Users\jeanny_chiu\znt-outbound-api\target\classes\com\znt\outbound\service\ApiService.class]: Unsatisfied dependency expressed through constructor parameter 5: Error creating bean with name 'statusNotificationService': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1222) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1188) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.7.jar:6.2.7]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.7.jar:6.2.7]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1362) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1351) ~[spring-boot-3.5.0.jar:3.5.0]
+	at com.znt.outbound.OutboundApiApplication.main(OutboundApiApplication.java:10) ~[classes/:na]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'apiService' defined in file [C:\Users\jeanny_chiu\znt-outbound-api\target\classes\com\znt\outbound\service\ApiService.class]: Unsatisfied dependency expressed through constructor parameter 5: Error creating bean with name 'statusNotificationService': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1682) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1628) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.7.jar:6.2.7]
+	... 21 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'statusNotificationService': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1459) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:606) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1682) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1628) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.7.jar:6.2.7]
+	... 34 common frames omitted
+Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'spring.mail.username' in value "${spring.mail.username}"
+	at org.springframework.util.PlaceholderResolutionException.withValue(PlaceholderResolutionException.java:81) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.PlaceholderParser$ParsedValue.resolve(PlaceholderParser.java:423) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.PlaceholderParser.replacePlaceholders(PlaceholderParser.java:128) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.PropertyPlaceholderHelper.parseStringValue(PropertyPlaceholderHelper.java:118) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.PropertyPlaceholderHelper.replacePlaceholders(PropertyPlaceholderHelper.java:114) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.core.env.AbstractPropertyResolver.doResolvePlaceholders(AbstractPropertyResolver.java:293) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.core.env.AbstractPropertyResolver.resolveRequiredPlaceholders(AbstractPropertyResolver.java:264) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.context.support.PropertySourcesPlaceholderConfigurer.lambda$processProperties$0(PropertySourcesPlaceholderConfigurer.java:185) ~[spring-context-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.resolveEmbeddedValue(AbstractBeanFactory.java:971) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1650) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1628) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:785) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:768) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146) ~[spring-beans-6.2.7.jar:6.2.7]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509) ~[spring-beans-6.2.7.jar:6.2.7]
+	... 45 common frames omitted
+
+2025-06-11T15:48:56.002+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 38980 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T15:48:56.006+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T15:48:58.311+08:00  INFO 38980 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T15:48:58.311+08:00  INFO 38980 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T15:48:58.434+08:00  INFO 38980 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T15:48:59.094+08:00  INFO 38980 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T15:48:59.217+08:00  INFO 38980 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T15:48:59.275+08:00  INFO 38980 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T15:48:59.757+08:00  INFO 38980 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T15:49:00.547+08:00  INFO 38980 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@d84418a
+2025-06-11T15:49:00.551+08:00  INFO 38980 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T15:49:00.609+08:00  WARN 38980 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T15:49:00.721+08:00  INFO 38980 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T15:49:01.105+08:00  INFO 38980 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T15:49:01.283+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T15:49:01.312+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T15:49:01.547+08:00  WARN 38980 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T15:49:02.095+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 6.736 seconds (process running for 7.187)
+2025-06-11T15:49:02.105+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T15:49:02.106+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T15:49:02.227+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T15:49:02.229+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T15:49:19.734+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T15:49:19.736+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T15:49:20.033+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T15:49:20.033+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T15:49:38.270+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T15:49:38.271+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T15:49:40.105+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T15:49:40.105+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T15:49:41.794+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T15:49:41.801+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T15:49:41.801090100] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 23 筆
+2025-06-11T15:49:41.802+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 23 筆資料至暫存表，準備載入正式表...
+2025-06-11T15:49:41.803+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:49:41.808+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 23 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T15:49:41.809+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T15:49:41.814+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T15:49:41.818+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T15:49:41.819+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T15:49:41.824+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T15:49:41.825+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T15:49:41.830+08:00  INFO 38980 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T15:49:41.830+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T15:49:41.834+08:00  INFO 38980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T15:49:41.873+08:00  INFO 38980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 138 筆待映射的訂單標頭。
+2025-06-11T15:49:43.201+08:00  INFO 38980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 138 筆訂單。簽章已產生。
+2025-06-11T15:49:43.214+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 138 個訂單標頭。
+2025-06-11T15:49:43.263+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T15:49:43.272+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: NGRjYjc3MDA3OWZjY2M3Mzk5ZjAwM2EyNGE1NWM3ZGY= 建立 B2B 封套...
+2025-06-11T15:49:43.285+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 15999
+2025-06-11T15:50:03.550+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T15:50:03.552+08:00  INFO 38980 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 100:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100103\n\n校验信息 101:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100105\n\n校验信息 102:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100106\n\n校验信息 103:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100107\n\n校验信息 70:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100032\n\n校验信息 71:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100033\n\n校验信息 74:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100041\n\n校验信息 75:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100043\n\n校验信息 72:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100034\n\n校验信息 73:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100038\n\n校验信息 78:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100056\n\n校验信息 79:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100058\n\n校验信息 76:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100046\n\n校验信息 77:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100047\n\n校验信息 60:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090090\n\n校验信息 63:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100002\n\n校验信息 64:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100004\n\n校验信息 61:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090092\n\n校验信息 62:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100001\n\n校验信息 67:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100024\n\n校验信息 68:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100025\n\n校验信息 65:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100005\n\n校验信息 66:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100023\n\n校验信息 69:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100026\n\n校验信息 52:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090068\n\n校验信息 53:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090069\n\n校验信息 50:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090064\n\n校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MI202500562\n\n校验信息 51:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090067\n\n校验信息 1:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV202506110011\n\n校验信息 56:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090074\n\n校验信息 2:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100006\n\n校验信息 57:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090078\n\n校验信息 3:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100009\n\n校验信息 54:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090070\n\n校验信息 4:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506110005\n\n校验信息 55:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090071\n\n校验信息 58:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090085\n\n校验信息 59:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090089\n\n校验信息 41:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090047\n\n校验信息 42:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090050\n\n校验信息 40:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090039\n\n校验信息 45:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090055\n\n校验信息 46:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090056\n\n校验信息 43:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090051\n\n校验信息 44:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090052\n\n校验信息 49:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090063\n\n校验信息 47:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090057\n\n校验信息 48:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090058\n\n校验信息 30:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060065\n\n校验信息 31:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060069\n\n校验信息 34:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090001\n\n校验信息 137:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506100001\n\n校验信息 35:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090003\n\n校验信息 32:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060091\n\n校验信息 33:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060097\n\n校验信息 38:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090037\n\n校验信息 39:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090038\n\n校验信息 36:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090018\n\n校验信息 37:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090036\n\n校验信息 5:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100001\n\n校验信息 133:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090008\n\n校验信息 6:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100002\n\n校验信息 134:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506100005\n\n校验信息 7:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100022\n\n校验信息 135:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506110011\n\n校验信息 8:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100041\n\n校验信息 136:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506090001\n\n校验信息 9:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100044\n\n校验信息 130:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2505270001\n\n校验信息 131:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2506050001\n\n校验信息 132:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090001\n\n校验信息 20:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110050\n\n校验信息 23:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050090\n\n校验信息 24:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060005\n\n校验信息 21:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050042\n\n校验信息 22:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050088\n\n校验信息 27:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060025\n\n校验信息 28:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060046\n\n校验信息 25:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060008\n\n校验信息 26:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060022\n\n校验信息 29:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060064\n\n校验信息 122:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110068\n\n校验信息 123:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110071\n\n校验信息 124:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110073\n\n校验信息 92:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100081\n\n校验信息 93:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100082\n\n校验信息 90:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100079\n\n校验信息 120:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110057\n\n校验信息 91:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100080\n\n校验信息 121:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110067\n\n校验信息 96:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100094\n\n校验信息 119:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110049\n\n校验信息 97:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100095\n\n校验信息 94:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100084\n\n校验信息 95:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100085\n\n校验信息 12:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110042\n\n校验信息 115:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110035\n\n校验信息 13:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110043\n\n校验信息 116:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110044\n\n校验信息 10:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100045\n\n校验信息 98:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100096\n\n校验信息 117:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110046\n\n校验信息 11:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110035\n\n校验信息 99:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100100\n\n校验信息 118:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110048\n\n校验信息 16:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110046\n\n校验信息 17:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110047\n\n校验信息 14:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110044\n\n校验信息 15:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110045\n\n校验信息 18:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110048\n\n校验信息 19:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110049\n\n校验信息 111:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110013\n\n校验信息 112:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110017\n\n校验信息 113:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110021\n\n校验信息 114:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110033\n\n校验信息 81:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100061\n\n校验信息 82:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100062\n\n校验信息 80:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100060\n\n校验信息 110:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110012\n\n校验信息 85:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100073\n\n校验信息 108:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110010\n\n校验信息 86:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100074\n\n校验信息 109:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110011\n\n校验信息 83:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100071\n\n校验信息 84:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100072\n\n校验信息 89:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100078\n\n校验信息 104:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100109\n\n校验信息 105:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110002\n\n校验信息 87:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100076\n\n校验信息 106:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110008\n\n校验信息 88:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100077\n\n校验信息 107:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110009","data":null,"results":null}
+2025-06-11T15:50:03.677+08:00 ERROR 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 執行 JSON Mapping 或 API 呼叫任務時發生錯誤。
+
+org.springframework.jdbc.UncategorizedSQLException: PreparedStatementCallback; uncategorized SQLException for SQL [UPDATE ZEN_B2B_ENVELOPE SET TRANS_FLAG = ?, REF_NO1 = ?, LAST_UPDATE_DATE = ? WHERE SEQ_ID = ?]; SQL state [72000]; error code [12899]; ORA-12899: value too large for column "B2B"."ZEN_B2B_ENVELOPE"."REF_NO1" (actual: 208, maximum: 100)
+
+https://docs.oracle.com/error-help/db/ora-12899/
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1557) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:972) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1016) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1026) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at com.znt.outbound.service.StatusUpdateService.updateStatus(StatusUpdateService.java:32) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.7.jar:6.2.7]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.7.jar:6.2.7]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.7.jar:6.2.7]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.7.jar:6.2.7]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.7.jar:6.2.7]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.7.jar:6.2.7]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:728) ~[spring-aop-6.2.7.jar:6.2.7]
+	at com.znt.outbound.service.StatusUpdateService$$SpringCGLIB$$0.updateStatus(<generated>) ~[classes/:na]
+	at com.znt.outbound.service.ApiService.sendRequest(ApiService.java:76) ~[classes/:na]
+	at com.znt.outbound.runner.DbExtractRunner.run(DbExtractRunner.java:85) ~[classes/:na]
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:789) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:86) ~[spring-core-6.2.7.jar:6.2.7]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:797) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:788) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:773) ~[spring-boot-3.5.0.jar:3.5.0]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(Unknown Source) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(Unknown Source) ~[na:na]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:773) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:325) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1362) ~[spring-boot-3.5.0.jar:3.5.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1351) ~[spring-boot-3.5.0.jar:3.5.0]
+	at com.znt.outbound.OutboundApiApplication.main(OutboundApiApplication.java:10) ~[classes/:na]
+Caused by: java.sql.SQLException: ORA-12899: value too large for column "B2B"."ZEN_B2B_ENVELOPE"."REF_NO1" (actual: 208, maximum: 100)
+
+https://docs.oracle.com/error-help/db/ora-12899/
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:715) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:615) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4C8Oall.processError(T4C8Oall.java:1372) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4CTTIfun.receive(T4CTTIfun.java:972) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4CTTIfun.doRPC(T4CTTIfun.java:237) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4C8Oall.doOALL(T4C8Oall.java:524) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:298) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForRows(T4CPreparedStatement.java:1510) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OracleStatement.executeSQLStatement(OracleStatement.java:2020) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1633) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3973) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OraclePreparedStatement.doExecuteLargeUpdate(OraclePreparedStatement.java:4339) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeLargeUpdate(OraclePreparedStatement.java:4316) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeUpdate(OraclePreparedStatement.java:4291) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at oracle.jdbc.driver.OraclePreparedStatementWrapper.executeUpdate(OraclePreparedStatementWrapper.java:1007) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61) ~[HikariCP-6.3.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java) ~[HikariCP-6.3.0.jar:na]
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:977) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658) ~[spring-jdbc-6.2.7.jar:6.2.7]
+	... 36 common frames omitted
+Caused by: oracle.jdbc.OracleDatabaseException: ORA-12899: value too large for column "B2B"."ZEN_B2B_ENVELOPE"."REF_NO1" (actual: 208, maximum: 100)
+
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:723) ~[ojdbc11-23.8.0.25.04.jar:23.8.0.25.04]
+	... 54 common frames omitted
+
+2025-06-11T15:50:03.695+08:00  INFO 38980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:01:53.778+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 14204 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:01:53.783+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:01:56.805+08:00  INFO 14204 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:01:56.809+08:00  INFO 14204 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:01:56.984+08:00  INFO 14204 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:01:57.700+08:00  INFO 14204 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:01:57.870+08:00  INFO 14204 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:01:57.931+08:00  INFO 14204 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:01:58.568+08:00  INFO 14204 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:01:59.368+08:00  INFO 14204 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@d84418a
+2025-06-11T16:01:59.372+08:00  INFO 14204 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:01:59.436+08:00  WARN 14204 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:01:59.599+08:00  INFO 14204 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:02:00.069+08:00  INFO 14204 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:02:00.299+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:02:00.338+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:02:00.593+08:00  WARN 14204 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:02:01.343+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.457 seconds (process running for 9.145)
+2025-06-11T16:02:01.351+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:02:01.353+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:02:01.500+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:02:01.501+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:02:17.555+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:02:17.555+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:02:17.847+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:02:17.848+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:02:34.434+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:02:34.434+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:02:36.358+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:02:36.359+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:02:38.047+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:02:38.056+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:02:38.056014] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 5 筆
+2025-06-11T16:02:38.057+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 5 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:02:38.058+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:02:38.064+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 5 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:02:38.065+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:02:38.072+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:02:38.076+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:02:38.077+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:02:38.081+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:02:38.082+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:02:38.086+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:02:38.087+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:02:38.090+08:00  INFO 14204 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:02:38.133+08:00  INFO 14204 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 141 筆待映射的訂單標頭。
+2025-06-11T16:02:39.638+08:00  INFO 14204 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 141 筆訂單。簽章已產生。
+2025-06-11T16:02:39.650+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 141 個訂單標頭。
+2025-06-11T16:02:39.685+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:02:39.691+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: MzZhODgwOTQyMzk2Mzc5ZGIyNDNkNDFkNmQwNWZhZDA= 建立 B2B 封套...
+2025-06-11T16:02:39.705+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16000
+2025-06-11T16:02:55.949+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:02:55.951+08:00  INFO 14204 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 100:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100103\n\n校验信息 101:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100105\n\n校验信息 102:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100106\n\n校验信息 103:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100107\n\n校验信息 70:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100032\n\n校验信息 71:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100033\n\n校验信息 74:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100041\n\n校验信息 75:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100043\n\n校验信息 72:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100034\n\n校验信息 73:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100038\n\n校验信息 78:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100056\n\n校验信息 79:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100058\n\n校验信息 76:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100046\n\n校验信息 77:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100047\n\n校验信息 60:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090090\n\n校验信息 63:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100002\n\n校验信息 64:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100004\n\n校验信息 61:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090092\n\n校验信息 62:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100001\n\n校验信息 67:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100024\n\n校验信息 68:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100025\n\n校验信息 65:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100005\n\n校验信息 66:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100023\n\n校验信息 69:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100026\n\n校验信息 52:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090068\n\n校验信息 53:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090069\n\n校验信息 50:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090064\n\n校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MI202500562\n\n校验信息 51:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090067\n\n校验信息 1:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV202506110011\n\n校验信息 56:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090074\n\n校验信息 2:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100006\n\n校验信息 57:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090078\n\n校验信息 3:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100009\n\n校验信息 54:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090070\n\n校验信息 4:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506110005\n\n校验信息 55:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090071\n\n校验信息 58:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090085\n\n校验信息 59:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090089\n\n校验信息 41:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090047\n\n校验信息 42:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090050\n\n校验信息 40:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090039\n\n校验信息 45:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090055\n\n校验信息 46:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090056\n\n校验信息 43:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090051\n\n校验信息 44:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090052\n\n校验信息 49:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090063\n\n校验信息 47:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090057\n\n校验信息 48:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090058\n\n校验信息 140:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506100001\n\n校验信息 30:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060065\n\n校验信息 31:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060069\n\n校验信息 34:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090001\n\n校验信息 137:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506100005\n\n校验信息 35:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090003\n\n校验信息 138:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506110011\n\n校验信息 32:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060091\n\n校验信息 139:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506090001\n\n校验信息 33:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060097\n\n校验信息 38:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090037\n\n校验信息 39:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090038\n\n校验信息 36:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090018\n\n校验信息 37:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090036\n\n校验信息 5:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100001\n\n校验信息 133:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2505270001\n\n校验信息 6:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100002\n\n校验信息 134:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2506050001\n\n校验信息 7:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100022\n\n校验信息 135:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090001\n\n校验信息 8:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100041\n\n校验信息 136:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090008\n\n校验信息 9:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100044\n\n校验信息 20:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110050\n\n校验信息 23:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050090\n\n校验信息 126:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110088\n\n校验信息 24:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060005\n\n校验信息 127:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110092\n\n校验信息 21:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050042\n\n校验信息 128:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110093\n\n校验信息 22:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050088\n\n校验信息 129:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110094\n\n校验信息 27:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060025\n\n校验信息 28:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060046\n\n校验信息 25:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060008\n\n校验信息 26:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060022\n\n校验信息 29:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060064\n\n校验信息 122:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110068\n\n校验信息 123:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110071\n\n校验信息 124:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110073\n\n校验信息 125:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110087\n\n校验信息 92:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100081\n\n校验信息 93:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100082\n\n校验信息 90:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100079\n\n校验信息 120:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110057\n\n校验信息 91:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100080\n\n校验信息 121:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110067\n\n校验信息 96:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100094\n\n校验信息 119:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110049\n\n校验信息 97:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100095\n\n校验信息 94:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100084\n\n校验信息 95:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100085\n\n校验信息 12:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110042\n\n校验信息 115:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110035\n\n校验信息 13:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110043\n\n校验信息 116:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110044\n\n校验信息 10:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100045\n\n校验信息 98:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100096\n\n校验信息 117:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110046\n\n校验信息 11:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110035\n\n校验信息 99:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100100\n\n校验信息 118:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110048\n\n校验信息 16:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110046\n\n校验信息 17:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110047\n\n校验信息 14:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110044\n\n校验信息 15:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110045\n\n校验信息 18:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110048\n\n校验信息 19:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110049\n\n校验信息 111:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110013\n\n校验信息 112:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110017\n\n校验信息 113:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110021\n\n校验信息 114:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110033\n\n校验信息 81:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100061\n\n校验信息 82:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100062\n\n校验信息 80:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100060\n\n校验信息 110:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110012\n\n校验信息 85:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100073\n\n校验信息 108:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110010\n\n校验信息 86:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100074\n\n校验信息 109:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110011\n\n校验信息 83:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100071\n\n校验信息 84:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100072\n\n校验信息 89:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100078\n\n校验信息 104:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100109\n\n校验信息 105:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110002\n\n校验信息 87:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100076\n\n校验信息 106:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110008\n\n校验信息 88:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100077\n\n校验信息 107:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110009","data":null,"results":null}
+2025-06-11T16:02:56.005+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16000, TRANS_FLAG: F
+2025-06-11T16:02:56.013+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 5 筆訂單狀態更新為 'F'
+2025-06-11T16:02:56.030+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16000 發送狀態通知郵件。
+2025-06-11T16:02:56.316+08:00  INFO 14204 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16000 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:02:56.317+08:00  INFO 14204 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:09:31.924+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 22948 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:09:31.928+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:09:34.615+08:00  INFO 22948 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:09:34.615+08:00  INFO 22948 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:09:34.775+08:00  INFO 22948 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:09:35.435+08:00  INFO 22948 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:09:35.539+08:00  INFO 22948 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:09:35.594+08:00  INFO 22948 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:09:36.090+08:00  INFO 22948 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:09:36.868+08:00  INFO 22948 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@9205c0a
+2025-06-11T16:09:36.872+08:00  INFO 22948 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:09:36.939+08:00  WARN 22948 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:09:37.142+08:00  INFO 22948 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:09:37.661+08:00  INFO 22948 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:09:37.845+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:09:37.869+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:09:38.117+08:00  WARN 22948 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:09:38.862+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 7.691 seconds (process running for 8.198)
+2025-06-11T16:09:38.875+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:09:38.877+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:09:39.030+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:09:39.032+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:09:58.616+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:09:58.616+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:09:58.921+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:09:58.921+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:10:20.893+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:10:20.894+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:10:22.818+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:10:22.819+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:10:24.734+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:10:24.743+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:10:24.743241300] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 5 筆
+2025-06-11T16:10:24.744+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 5 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:10:24.744+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:10:24.750+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 5 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:10:24.750+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:10:24.756+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:10:24.760+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:10:24.761+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:10:24.768+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:10:24.769+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:10:24.775+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:10:24.776+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:10:24.779+08:00  INFO 22948 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:10:24.815+08:00  INFO 22948 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 141 筆待映射的訂單標頭。
+2025-06-11T16:10:26.272+08:00  INFO 22948 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 141 筆訂單。簽章已產生。
+2025-06-11T16:10:26.287+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 141 個訂單標頭。
+2025-06-11T16:10:26.322+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:10:26.329+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: MzZhODgwOTQyMzk2Mzc5ZGIyNDNkNDFkNmQwNWZhZDA= 建立 B2B 封套...
+2025-06-11T16:10:26.343+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16001
+2025-06-11T16:10:45.481+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:10:45.484+08:00  INFO 22948 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 100:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100103\n\n校验信息 101:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100105\n\n校验信息 102:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100106\n\n校验信息 103:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100107\n\n校验信息 70:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100032\n\n校验信息 71:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100033\n\n校验信息 74:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100041\n\n校验信息 75:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100043\n\n校验信息 72:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100034\n\n校验信息 73:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100038\n\n校验信息 78:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100056\n\n校验信息 79:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100058\n\n校验信息 76:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100046\n\n校验信息 77:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100047\n\n校验信息 60:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090090\n\n校验信息 63:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100002\n\n校验信息 64:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100004\n\n校验信息 61:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090092\n\n校验信息 62:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100001\n\n校验信息 67:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100024\n\n校验信息 68:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100025\n\n校验信息 65:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100005\n\n校验信息 66:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100023\n\n校验信息 69:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100026\n\n校验信息 52:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090068\n\n校验信息 53:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090069\n\n校验信息 50:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090064\n\n校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MI202500562\n\n校验信息 51:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090067\n\n校验信息 1:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV202506110011\n\n校验信息 56:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090074\n\n校验信息 2:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100006\n\n校验信息 57:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090078\n\n校验信息 3:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506100009\n\n校验信息 54:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090070\n\n校验信息 4:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: MV2506110005\n\n校验信息 55:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090071\n\n校验信息 58:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090085\n\n校验信息 59:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090089\n\n校验信息 41:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090047\n\n校验信息 42:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090050\n\n校验信息 40:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090039\n\n校验信息 45:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090055\n\n校验信息 46:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090056\n\n校验信息 43:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090051\n\n校验信息 44:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090052\n\n校验信息 49:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090063\n\n校验信息 47:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090057\n\n校验信息 48:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090058\n\n校验信息 140:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506100001\n\n校验信息 30:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060065\n\n校验信息 31:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060069\n\n校验信息 34:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090001\n\n校验信息 137:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506100005\n\n校验信息 35:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090003\n\n校验信息 138:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506110011\n\n校验信息 32:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060091\n\n校验信息 139:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST2506090001\n\n校验信息 33:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060097\n\n校验信息 38:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090037\n\n校验信息 39:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090038\n\n校验信息 36:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090018\n\n校验信息 37:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506090036\n\n校验信息 5:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100001\n\n校验信息 133:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2505270001\n\n校验信息 6:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100002\n\n校验信息 134:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: RT2506050001\n\n校验信息 7:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100022\n\n校验信息 135:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090001\n\n校验信息 8:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100041\n\n校验信息 136:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: ST202506090008\n\n校验信息 9:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100044\n\n校验信息 130:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110096\n\n校验信息 131:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110102\n\n校验信息 132:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110105\n\n校验信息 20:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110050\n\n校验信息 23:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050090\n\n校验信息 126:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110088\n\n校验信息 24:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060005\n\n校验信息 127:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110092\n\n校验信息 21:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050042\n\n校验信息 128:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110093\n\n校验信息 22:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506050088\n\n校验信息 129:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110094\n\n校验信息 27:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060025\n\n校验信息 28:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060046\n\n校验信息 25:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060008\n\n校验信息 26:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060022\n\n校验信息 29:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506060064\n\n校验信息 122:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110068\n\n校验信息 123:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110071\n\n校验信息 124:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110073\n\n校验信息 125:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110087\n\n校验信息 92:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100081\n\n校验信息 93:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100082\n\n校验信息 90:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100079\n\n校验信息 120:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110057\n\n校验信息 91:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100080\n\n校验信息 121:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110067\n\n校验信息 96:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100094\n\n校验信息 119:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110049\n\n校验信息 97:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100095\n\n校验信息 94:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100084\n\n校验信息 95:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100085\n\n校验信息 12:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110042\n\n校验信息 115:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110035\n\n校验信息 13:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110043\n\n校验信息 116:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110044\n\n校验信息 10:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506100045\n\n校验信息 98:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100096\n\n校验信息 117:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110046\n\n校验信息 11:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110035\n\n校验信息 99:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100100\n\n校验信息 118:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110048\n\n校验信息 16:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110046\n\n校验信息 17:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110047\n\n校验信息 14:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110044\n\n校验信息 15:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110045\n\n校验信息 18:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110048\n\n校验信息 19:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM202506110049\n\n校验信息 111:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110013\n\n校验信息 112:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110017\n\n校验信息 113:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110021\n\n校验信息 114:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110033\n\n校验信息 81:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100061\n\n校验信息 82:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100062\n\n校验信息 80:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100060\n\n校验信息 110:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110012\n\n校验信息 85:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100073\n\n校验信息 108:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110010\n\n校验信息 86:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100074\n\n校验信息 109:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110011\n\n校验信息 83:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100071\n\n校验信息 84:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100072\n\n校验信息 89:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100078\n\n校验信息 104:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100109\n\n校验信息 105:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110002\n\n校验信息 87:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100076\n\n校验信息 106:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110008\n\n校验信息 88:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506100077\n\n校验信息 107:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110009","data":null,"results":null}
+2025-06-11T16:10:45.537+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16001, TRANS_FLAG: F
+2025-06-11T16:10:45.542+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 5 筆訂單狀態更新為 'F'
+2025-06-11T16:10:45.559+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16001 發送狀態通知郵件。
+2025-06-11T16:10:45.878+08:00  INFO 22948 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16001 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:10:45.880+08:00  INFO 22948 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:20:02.629+08:00  INFO 42864 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 42864 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:20:02.634+08:00  INFO 42864 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:20:05.898+08:00  INFO 42864 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:20:05.900+08:00  INFO 42864 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:20:06.042+08:00  INFO 42864 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:20:06.679+08:00  INFO 42864 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:20:06.774+08:00  INFO 42864 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:20:06.825+08:00  INFO 42864 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:20:07.406+08:00  INFO 42864 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:20:08.432+08:00  INFO 42864 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@74d22ddd
+2025-06-11T16:20:08.435+08:00  INFO 42864 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:20:08.506+08:00  WARN 42864 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:20:08.715+08:00  INFO 42864 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:20:09.329+08:00  INFO 42864 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:20:09.600+08:00  INFO 42864 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:20:09.639+08:00  INFO 42864 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:20:10.095+08:00  WARN 42864 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:20:10.912+08:00  WARN 42864 --- [outbound-api] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-06-11T16:20:10.922+08:00  INFO 42864 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-11T16:20:10.983+08:00  INFO 42864 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-06-11T16:20:11.086+08:00 ERROR 42864 --- [outbound-api] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 18080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 18080 or configure this application to listen on another port.
+
+2025-06-11T16:20:18.139+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 43692 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:20:18.142+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:20:20.876+08:00  INFO 43692 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:20:20.879+08:00  INFO 43692 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:20:21.026+08:00  INFO 43692 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:20:21.681+08:00  INFO 43692 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:20:21.783+08:00  INFO 43692 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:20:21.845+08:00  INFO 43692 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:20:22.421+08:00  INFO 43692 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:20:23.331+08:00  INFO 43692 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@4fe2dd02
+2025-06-11T16:20:23.335+08:00  INFO 43692 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:20:23.402+08:00  WARN 43692 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:20:23.597+08:00  INFO 43692 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:20:24.076+08:00  INFO 43692 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:20:24.287+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:20:24.324+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:20:24.564+08:00  WARN 43692 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:20:25.275+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 7.889 seconds (process running for 8.544)
+2025-06-11T16:20:25.285+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:20:25.286+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:20:25.429+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:20:25.431+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:20:45.389+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:20:45.391+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:20:45.799+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:20:45.800+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:21:04.308+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:21:04.308+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:21:06.179+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:21:06.180+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:21:07.889+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:21:07.902+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:21:07.902723400] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 2 筆
+2025-06-11T16:21:07.903+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 2 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:21:07.904+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:21:07.910+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 2 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:21:07.910+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:21:07.916+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:21:07.920+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:21:07.924+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:21:07.928+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:21:07.928+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:21:07.953+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:21:07.957+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:21:07.961+08:00  INFO 43692 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:21:07.971+08:00  INFO 43692 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 1 筆待映射的訂單標頭。
+2025-06-11T16:21:08.118+08:00  INFO 43692 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 1 筆訂單。簽章已產生。
+2025-06-11T16:21:08.122+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 1 個訂單標頭。
+2025-06-11T16:21:08.130+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:21:08.137+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: NTRhM2JhM2FkMzYwMGZhMTY0MzFiNjEwMDlhMjYzYTI= 建立 B2B 封套...
+2025-06-11T16:21:08.194+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16002
+2025-06-11T16:21:11.457+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:21:11.459+08:00  INFO 43692 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":true,"code":null,"msg":null,"data":"订单创建成功","results":null}
+2025-06-11T16:21:11.517+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16002, TRANS_FLAG: S
+2025-06-11T16:21:11.531+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 2 筆訂單狀態更新為 'S'
+2025-06-11T16:21:11.541+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16002 發送狀態通知郵件。
+2025-06-11T16:21:11.844+08:00  INFO 43692 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16002 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:21:11.845+08:00  INFO 43692 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:35:46.425+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 40980 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:35:46.434+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:35:49.192+08:00  INFO 40980 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:35:49.196+08:00  INFO 40980 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:35:49.362+08:00  INFO 40980 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:35:49.993+08:00  INFO 40980 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:35:50.085+08:00  INFO 40980 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:35:50.150+08:00  INFO 40980 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:35:50.706+08:00  INFO 40980 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:35:51.760+08:00  INFO 40980 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@d84418a
+2025-06-11T16:35:51.764+08:00  INFO 40980 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:35:51.836+08:00  WARN 40980 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:35:52.190+08:00  INFO 40980 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:35:52.750+08:00  INFO 40980 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:35:52.921+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:35:52.951+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:35:53.189+08:00  WARN 40980 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:35:53.774+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.33 seconds (process running for 8.85)
+2025-06-11T16:35:53.782+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:35:53.784+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:35:53.917+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:35:53.921+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:36:10.689+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:36:10.690+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:36:10.988+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:36:10.989+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:36:27.982+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:36:27.982+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:36:29.834+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:36:29.835+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:36:31.545+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:36:31.552+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:36:31.552610600] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 1 筆
+2025-06-11T16:36:31.553+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 1 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:36:31.554+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:36:31.559+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 1 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:36:31.560+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:36:31.565+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:36:31.610+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:36:31.611+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:36:31.618+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:36:31.619+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:36:31.626+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:36:31.627+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:36:31.631+08:00  INFO 40980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:36:31.678+08:00  INFO 40980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 1 筆待映射的訂單標頭。
+2025-06-11T16:36:31.807+08:00  INFO 40980 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 1 筆訂單。簽章已產生。
+2025-06-11T16:36:31.809+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 1 個訂單標頭。
+2025-06-11T16:36:31.815+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:36:31.819+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: YTM3ZmRiNGRmODJiYjY5Mjk3NzY5NDliZjg5YzIzMGI= 建立 B2B 封套...
+2025-06-11T16:36:31.872+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16003
+2025-06-11T16:36:35.824+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:36:35.827+08:00  INFO 40980 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":true,"code":null,"msg":null,"data":"订单创建成功","results":null}
+2025-06-11T16:36:35.884+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16003, TRANS_FLAG: S
+2025-06-11T16:36:35.896+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 1 筆訂單狀態更新為 'S'
+2025-06-11T16:36:35.906+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16003 發送狀態通知郵件。
+2025-06-11T16:36:36.198+08:00  INFO 40980 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16003 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:36:36.198+08:00  INFO 40980 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:41:38.668+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 27700 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:41:38.673+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:41:41.794+08:00  INFO 27700 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:41:41.796+08:00  INFO 27700 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:41:42.030+08:00  INFO 27700 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:41:42.820+08:00  INFO 27700 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:41:42.923+08:00  INFO 27700 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:41:42.972+08:00  INFO 27700 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:41:43.510+08:00  INFO 27700 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:41:44.426+08:00  INFO 27700 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@d84418a
+2025-06-11T16:41:44.426+08:00  INFO 27700 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:41:44.489+08:00  WARN 27700 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:41:44.660+08:00  INFO 27700 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:41:45.138+08:00  INFO 27700 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:41:45.315+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:41:45.347+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:41:45.641+08:00  WARN 27700 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:41:46.416+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 8.525 seconds (process running for 9.125)
+2025-06-11T16:41:46.426+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:41:46.427+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:41:46.586+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:41:46.588+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:42:03.526+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:42:03.527+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:42:03.813+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:42:03.814+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:42:20.149+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:42:20.150+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:42:22.088+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:42:22.089+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:42:23.800+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:42:23.808+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:42:23.808516200] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 1 筆
+2025-06-11T16:42:23.808+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 1 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:42:23.809+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:42:23.814+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 1 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:42:23.815+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:42:23.819+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:42:23.824+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:42:23.825+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:42:23.831+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:42:23.832+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:42:23.838+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:42:23.839+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:42:23.841+08:00  INFO 27700 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:42:23.852+08:00  INFO 27700 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 1 筆待映射的訂單標頭。
+2025-06-11T16:42:23.962+08:00  INFO 27700 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 1 筆訂單。簽章已產生。
+2025-06-11T16:42:23.964+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 1 個訂單標頭。
+2025-06-11T16:42:23.969+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:42:23.973+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: YTM3ZmRiNGRmODJiYjY5Mjk3NzY5NDliZjg5YzIzMGI= 建立 B2B 封套...
+2025-06-11T16:42:23.986+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16004
+2025-06-11T16:42:25.179+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:42:25.183+08:00  INFO 27700 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110111","data":null,"results":null}
+2025-06-11T16:42:25.227+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16004, TRANS_FLAG: F
+2025-06-11T16:42:25.236+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 1 筆訂單狀態更新為 'F'
+2025-06-11T16:42:25.247+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16004 發送狀態通知郵件。
+2025-06-11T16:42:25.538+08:00  INFO 27700 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16004 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:42:25.539+08:00  INFO 27700 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T16:48:13.429+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 7764 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T16:48:13.437+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T16:48:16.514+08:00  INFO 7764 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T16:48:16.514+08:00  INFO 7764 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T16:48:16.702+08:00  INFO 7764 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T16:48:17.631+08:00  INFO 7764 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T16:48:17.801+08:00  INFO 7764 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T16:48:17.879+08:00  INFO 7764 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T16:48:18.630+08:00  INFO 7764 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T16:48:19.651+08:00  INFO 7764 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@d84418a
+2025-06-11T16:48:19.655+08:00  INFO 7764 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T16:48:19.728+08:00  WARN 7764 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T16:48:19.967+08:00  INFO 7764 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T16:48:20.537+08:00  INFO 7764 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T16:48:20.765+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T16:48:20.804+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T16:48:21.039+08:00  WARN 7764 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T16:48:21.862+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 9.28 seconds (process running for 10.194)
+2025-06-11T16:48:21.903+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T16:48:21.906+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T16:48:22.114+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T16:48:22.116+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T16:48:38.357+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T16:48:38.358+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T16:48:38.648+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T16:48:38.649+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T16:48:55.333+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T16:48:55.334+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T16:48:57.201+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T16:48:57.202+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T16:48:58.957+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T16:48:58.965+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.GenericExtractService      : [2025-06-11T16:48:58.965856500] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 1 筆
+2025-06-11T16:48:58.967+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 1 筆資料至暫存表，準備載入正式表...
+2025-06-11T16:48:58.968+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:48:58.978+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功將 1 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T16:48:58.979+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T16:48:58.984+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T16:48:58.988+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T16:48:58.988+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T16:48:58.994+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T16:48:58.995+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T16:48:59.002+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T16:48:59.002+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T16:48:59.009+08:00  INFO 7764 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T16:48:59.019+08:00  INFO 7764 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 查詢到 1 筆待映射的訂單標頭。
+2025-06-11T16:48:59.123+08:00  INFO 7764 --- [outbound-api] [main] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 1 筆訂單。簽章已產生。
+2025-06-11T16:48:59.126+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 1 個訂單標頭。
+2025-06-11T16:48:59.133+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T16:48:59.139+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: YTM3ZmRiNGRmODJiYjY5Mjk3NzY5NDliZjg5YzIzMGI= 建立 B2B 封套...
+2025-06-11T16:48:59.149+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16005
+2025-06-11T16:49:00.574+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T16:49:00.577+08:00  INFO 7764 --- [outbound-api] [main] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110111","data":null,"results":null}
+2025-06-11T16:49:00.628+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16005, TRANS_FLAG: F
+2025-06-11T16:49:00.637+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 1 筆訂單狀態更新為 'F'
+2025-06-11T16:49:00.650+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16005 發送狀態通知郵件。
+2025-06-11T16:49:00.942+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16005 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T16:49:00.944+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
