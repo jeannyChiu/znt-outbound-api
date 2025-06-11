@@ -1042,3 +1042,69 @@ Identify and stop the process that's listening on port 18080 or configure this a
 2025-06-11T16:49:00.650+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16005 發送狀態通知郵件。
 2025-06-11T16:49:00.942+08:00  INFO 7764 --- [outbound-api] [main] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16005 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
 2025-06-11T16:49:00.944+08:00  INFO 7764 --- [outbound-api] [main] c.znt.outbound.runner.DbExtractRunner    : >>> 所有任務執行完畢。
+2025-06-11T17:01:01.855+08:00  INFO 30856 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Starting OutboundApiApplication using Java 21.0.7 with PID 30856 (C:\Users\jeanny_chiu\znt-outbound-api\target\classes started by jeanny_chiu in C:\Users\jeanny_chiu\znt-outbound-api)
+2025-06-11T17:01:01.863+08:00  INFO 30856 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-06-11T17:01:04.623+08:00  INFO 30856 --- [outbound-api] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-11T17:01:04.623+08:00  INFO 30856 --- [outbound-api] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-11T17:01:04.759+08:00  INFO 30856 --- [outbound-api] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-11T17:01:05.873+08:00  INFO 30856 --- [outbound-api] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-11T17:01:06.034+08:00  INFO 30856 --- [outbound-api] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-06-11T17:01:06.119+08:00  INFO 30856 --- [outbound-api] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-11T17:01:06.802+08:00  INFO 30856 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-11T17:01:07.639+08:00  INFO 30856 --- [outbound-api] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@44abdb1f
+2025-06-11T17:01:07.643+08:00  INFO 30856 --- [outbound-api] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-11T17:01:07.723+08:00  WARN 30856 --- [outbound-api] [main] org.hibernate.orm.deprecation            : HHH90000025: OracleDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-06-11T17:01:07.937+08:00  INFO 30856 --- [outbound-api] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 19.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-11T17:01:08.516+08:00  INFO 30856 --- [outbound-api] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-11T17:01:08.711+08:00  INFO 30856 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : 正在從資料庫載入 API 設定...
+2025-06-11T17:01:08.742+08:00  INFO 30856 --- [outbound-api] [main] c.znt.outbound.service.ApiConfigService  : API 設定載入成功。URL: https://api-beta.feiliks-hn.com/order, Part Code: D3101D1148, Secret Key: (已隱藏)
+2025-06-11T17:01:08.964+08:00  WARN 30856 --- [outbound-api] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-11T17:01:09.718+08:00  INFO 30856 --- [outbound-api] [main] c.znt.outbound.OutboundApiApplication    : Started OutboundApiApplication in 9.457 seconds (process running for 10.123)
+2025-06-11T17:15:00.007+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : ========== 開始執行排程任務 ==========
+2025-06-11T17:15:00.008+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 開始執行資料庫抽取與載入任務...
+2025-06-11T17:15:00.008+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.
+2025-06-11T17:15:00.070+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Temp table cleaned successfully.
+2025-06-11T17:15:00.071+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Executing script: mi_extract.sql in a new transaction.
+2025-06-11T17:15:19.154+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Finished and committed script: mi_extract.sql
+2025-06-11T17:15:19.156+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Executing script: mv_extract.sql in a new transaction.
+2025-06-11T17:15:19.475+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Finished and committed script: mv_extract.sql
+2025-06-11T17:15:19.477+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Executing script: om_extract.sql in a new transaction.
+2025-06-11T17:15:36.794+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Finished and committed script: om_extract.sql
+2025-06-11T17:15:36.795+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Executing script: rt_extract.sql in a new transaction.
+2025-06-11T17:15:39.177+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Finished and committed script: rt_extract.sql
+2025-06-11T17:15:39.178+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Executing script: st_extract.sql in a new transaction.
+2025-06-11T17:15:41.157+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : Finished and committed script: st_extract.sql
+2025-06-11T17:15:41.167+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.GenericExtractService      : [2025-06-11T17:15:41.167139100] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 1 筆
+2025-06-11T17:15:41.169+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 已抽取 1 筆資料至暫存表，準備載入正式表...
+2025-06-11T17:15:41.170+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.LoadService     : 開始將資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T17:15:41.195+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.LoadService     : 成功將 1 筆資料從 ZEN_B2B_JSON_SO_TMP 寫入 ZEN_B2B_JSON_SO。
+2025-06-11T17:15:41.197+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.LoadService     : 開始清理 ZEN_B2B_JSON_SO 中的過時 'N' 狀態紀錄...
+2025-06-11T17:15:41.205+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.LoadService     : 成功清理了 0 筆過時的 'N' 狀態紀錄。
+2025-06-11T17:15:41.212+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 資料載入任務完成。
+2025-06-11T17:15:41.214+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.NotificationService        : 開始檢查並寄送錯誤通知郵件...
+2025-06-11T17:15:41.223+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.NotificationService        : 沒有狀態為 'N' 的錯誤資料，無需寄送通知。
+2025-06-11T17:15:41.225+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.PreMappingCheckService     : >>> 正在檢查是否有狀態為 'W' 的待處理資料...
+2025-06-11T17:15:41.232+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.PreMappingCheckService     : >>> 發現待處理資料，準備執行下一步。
+2025-06-11T17:15:41.233+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 準備開始執行 JSON Mapping 與 API 呼叫任務...
+2025-06-11T17:15:41.238+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.outbound.service.JsonMappingService  : 正在執行查詢以獲取待映射的訂單標頭。
+2025-06-11T17:15:41.252+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.outbound.service.JsonMappingService  : 查詢到 1 筆待映射的訂單標頭。
+2025-06-11T17:15:41.475+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.outbound.service.JsonMappingService  : 建立請求完成，共包含 1 筆訂單。簽章已產生。
+2025-06-11T17:15:41.479+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 成功映射 1 個訂單標頭。
+2025-06-11T17:15:41.492+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> 測試用的 JSON 已寫入檔案: C:\Users\jeanny_chiu\znt-outbound-api\target\generated-json-test.json
+2025-06-11T17:15:41.500+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.service.EnvelopeService   : 正在為 conversation_id: YTM3ZmRiNGRmODJiYjY5Mjk3NzY5NDliZjg5YzIzMGI= 建立 B2B 封套...
+2025-06-11T17:15:41.512+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.service.EnvelopeService   : B2B 封套建立成功。 SEQ_ID: 16006
+2025-06-11T17:15:44.376+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.ApiService      : API 請求成功。狀態碼: 200 OK
+2025-06-11T17:15:44.378+08:00  INFO 30856 --- [outbound-api] [scheduling-1] com.znt.outbound.service.ApiService      : API 回應 Body: {"success":false,"code":null,"msg":"校验信息 0:\n校验结果: 对应单证号+子单号不能重复使用;\n对应单证号: OM2506110111","data":null,"results":null}
+2025-06-11T17:15:44.432+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.StatusUpdateService        : ZEN_B2B_ENVELOPE 表狀態已更新。SEQ_ID: 16006, TRANS_FLAG: F
+2025-06-11T17:15:44.438+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.StatusUpdateService        : ZEN_B2B_JSON_SO 表狀態已更新。共 1 筆訂單狀態更新為 'F'
+2025-06-11T17:15:44.448+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.StatusNotificationService  : 準備為 SEQ_ID: 16006 發送狀態通知郵件。
+2025-06-11T17:15:44.739+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.z.o.service.StatusNotificationService  : 已成功為 SEQ_ID: 16006 發送狀態通知郵件至: Edwin_Huang@zenitron.com.tw, jeanny_chiu@zenitron.com.tw
+2025-06-11T17:15:44.741+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : >>> API 呼叫任務已提交。
+2025-06-11T17:15:44.741+08:00  INFO 30856 --- [outbound-api] [scheduling-1] c.znt.outbound.runner.DbExtractRunner    : ========== 排程任務執行結束 ==========

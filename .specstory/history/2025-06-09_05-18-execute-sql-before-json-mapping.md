@@ -5542,7 +5542,486 @@ _**Assistant**_
 太棒了！很高興聽到問題終於都解決了！
 
 我們一起從頭到尾梳理了整個流程，從 API 呼叫、狀態更新、資料清理，到後續的郵件通知，並解決了途中遇到的幾個細節問題：
-*   **欄位長度錯誤**：移除了對 `REF_NO1` 的更新
+*   **欄位長度錯誤**：移除了對 `REF_NO1` 的更新。
+*   **依賴注入失敗**：修正了郵件服務的設定。
+*   **郵件主旨和內容**：調整成您期望的格式，並加上了環境標示。
+*   **日期格式問題**：針對 `TIMESTAMP` 和 `VARCHAR2` 兩種不同欄位型別，採用了最適合的寫入方式，確保格式的正確性。
+
+現在程式的邏輯應該相當完整且健壯了。
+
+如果後續還有任何需要調整或新增的功能，隨時都可以再找我！很高興能與您合作。
+
+---
+
+_**User**_
+
+@Codebase 我要怎麼設定排程在每週一到六的早上8:15開始每30分ˋ鐘執行一次?
+比如 8:15下一次就是8:45再下一次就是9:15
+
+---
+
+_**Assistant**_
+
+
+
+---
+
+好的，為您的應用程式設定排程是一個非常常見且重要的需求。這可以透過 Spring Boot 的 `@Scheduled` 註解來輕鬆實現。
+
+我將引導您完成設定排程的兩個主要步驟：
+1.  **啟用排程功能**：在您的主應用程式類別加上一個註解。
+2.  **修改執行器**：將您現有的 `DbExtractRunner` 從「啟動時執行一次」的模式，改為「依排程重複執行」的模式。
+
+### 1. 啟用排程功能
+
+首先，您需要告訴 Spring Boot 啟用排程掃描。請找到您的主應用程式進入點（通常是檔名為 `...Application.java` 的檔案），並在上面加上 `@EnableScheduling` 註解。
+
+如果您不確定是哪個檔案，可以建立一個新的 `src/main/java/com/znt/outbound/OutboundApiApplication.java` 檔案，內容如下：
+
+```java:src/main/java/com/znt/outbound/OutboundApiApplication.java
+package com.znt.outbound;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling // <-- 新增此註解以啟用排程功能
+public class OutboundApiApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(OutboundApiApplication.class, args);
+    }
+
+}
+```
+*(如果這個檔案已經存在，您只需要在 `@SpringBootApplication` 下方加上 `@EnableScheduling` 即可)*
+
+### 2. 設定排程任務
+
+接下來，我們需要修改 `DbExtractRunner`，讓它不再是啟動時執行一次的 `CommandLineRunner`，而是變成一個由排程觸發的元件。
+
+我將為您修改 `DbExtractRunner.java`：
+*   移除 `implements CommandLineRunner`。
+*   將原本的 `run` 方法改為一個新的方法，例如 `executeScheduledTask`。
+*   在該方法上加上 `@Scheduled` 註解，並設定您需要的 **Cron 表達式**。
+*   為了排程的穩定性，我會用一個大的 `try-catch` 區塊把所有邏輯包起來，確保即使某次執行發生意外錯誤，也不會導致整個排程停止。
+
+**Cron 表達式說明**
+
+您希望的排程是「每週一到六，從早上 8:15 開始，每 30 分鐘執行一次」。對應的 Cron 表達式為：`0 15/30 8-23 * * MON-SAT`
+
+*   `0`: 在每分鐘的第 0 秒觸發。
+*   `15/30`: 從第 15 分鐘開始，每 30 分鐘觸發一次（即 :15 和 :45）。
+*   `8-23`: 在每天的 8 點到 23 點之間觸發。
+*   `*`: 每個月。
+*   `*`: 每個月的每一天。
+*   `MON-SAT`: 星期一到星期六。
+
+以下是修改後的 `DbExtractRunner.java`：
+
+```java:src/main/java/com/znt/outbound/runner/DbExtractRunner.java
+package com.znt.outbound.runner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.znt.outbound.model.FeiliksRequest;
+import com.znt.outbound.service.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DbExtractRunner {
+
+    private final GenericExtractService extractService;
+    private final LoadService loadService;
+    private final NotificationService notificationService;
+    private final PreMappingCheckService preMappingCheckService;
+    private final JsonMappingService jsonMappingService;
+    private final ApiService apiService;
+    private final ObjectMapper objectMapper;
+    private final EnvelopeService envelopeService;
+    private final StatusUpdateService statusUpdateService;
+
+    @Scheduled(cron = "0 15/30 8-23 * * MON-SAT", zone = "Asia/Taipei")
+    public void executeScheduledTask() {
+        log.info("========== 開始執行排程任務 ==========");
+        try {
+            log.info(">>> 開始執行資料庫抽取與載入任務...");
+            int extractedCount = extractService.extract();
+
+            if (extractedCount > 0) {
+                log.info(">>> 已抽取 {} 筆資料至暫存表，準備載入正式表...", extractedCount);
+                loadService.loadFromTmpToMain();
+                log.info(">>> 資料載入任務完成。");
+            } else {
+                log.info(">>> 暫存表中無新資料。");
+            }
+
+            // 無論是否有新資料，都檢查並寄送錯誤通知
+            try {
+                notificationService.sendErrorNotifications();
+            } catch (Exception e) {
+                log.error(">>> 執行郵件通知任務時發生嚴重錯誤。", e);
+            }
+
+            // 檢查是否有狀態為 'W' 的待處理資料
+            if (!preMappingCheckService.hasRecordsToProcess()) {
+                log.info(">>> 沒有需要 Mapping 的資料，本次排程提前結束。");
+                return;
+            }
+
+            log.info(">>> 準備開始執行 JSON Mapping 與 API 呼叫任務...");
+            FeiliksRequest feiliksRequest = jsonMappingService.createRequest();
+            if (feiliksRequest.getOrders() != null && !feiliksRequest.getOrders().isEmpty()) {
+                apiService.sendRequest(feiliksRequest);
+                log.info(">>> JSON Mapping 與 API 呼叫任務完成。");
+            } else {
+                log.info(">>> 經過 Mapping 後，沒有可發送的訂單資料。");
+            }
+
+        } catch (Exception e) {
+            log.error(">>> 排程任務執行期間發生未預期的嚴重錯誤。", e);
+        } finally {
+            log.info("========== 排程任務執行結束 ==========");
+        }
+    }
+}
+```
+
+完成以上修改並重新啟動您的應用程式後，它將不再是執行一次就結束，而是會成為一個背景服務，並根據您設定的排程，在每週一至週六的 8:15、8:45、9:15... 等時間點自動執行您的資料處理流程。
+
+---
+
+_**User**_
+
+補充一下最晚是到20:45
+
+---
+
+_**Assistant**_
+
+
+
+---
+
+好的，收到您的補充說明！將最晚的執行時間設定到 20:45。
+
+這只需要對我們剛才討論的 Cron 表達式做一個小小的調整。
+
+### Cron 表達式更新
+
+*   原本的表達式：`0 15/30 8-23 * * MON-SAT` (執行到 23:45)
+*   **更新後的表達式**：`0 15/30 8-20 * * MON-SAT`
+
+這個新的表達式中的 `8-20` 表示「在 8 點到 20 點之間」的每個小時。這將確保：
+*   在 `20:15` 和 `20:45` 會正常執行。
+*   從 `21:00` 開始，就不再滿足小時的條件，因此不會觸發任務。
+
+這完全符合您「最晚到 20:45」的需求。
+
+### 更新後的程式碼
+
+我將根據這個新的排程時間，為您提供一份完整的、可以直接使用的 `DbExtractRunner.java`。這份程式碼已經將原本「啟動時執行一次」的邏輯，轉換為「依排程重複執行」的模式。
+
+```java:src/main/java/com/znt/outbound/runner/DbExtractRunner.java
+package com.znt.outbound.runner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.znt.outbound.service.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DbExtractRunner {
+
+    private final GenericExtractService extractService;
+    private final LoadService loadService;
+    private final NotificationService notificationService;
+    private final PreMappingCheckService preMappingCheckService;
+    private final JsonMappingService jsonMappingService;
+    private final ApiService apiService;
+    private final ObjectMapper objectMapper;
+    private final EnvelopeService envelopeService;
+    private final StatusUpdateService statusUpdateService;
+
+    /**
+     * 排程任務：每週一至週六，從 08:15 到 20:45，每 30 分鐘執行一次。
+     * Cron: 秒 分 時 日 月 週
+     * 0 15/30 8-20 * * MON-SAT
+     */
+    @Scheduled(cron = "0 15/30 8-20 * * MON-SAT", zone = "Asia/Taipei")
+    public void executeScheduledTask() {
+        log.info("========== 開始執行排程任務 ==========");
+        try {
+            log.info(">>> 開始執行資料庫抽取與載入任務...");
+            int extractedCount = extractService.extract();
+
+            if (extractedCount > 0) {
+                log.info(">>> 已抽取 {} 筆資料至暫存表，準備載入正式表...", extractedCount);
+                loadService.loadFromTmpToMain();
+                log.info(">>> 資料載入任務完成。");
+            } else {
+                log.info(">>> 暫存表中無新資料。");
+            }
+
+            // 無論是否有新資料，都檢查並寄送錯誤通知
+            try {
+                notificationService.sendErrorNotifications();
+            } catch (Exception e) {
+                log.error(">>> 執行郵件通知任務時發生嚴重錯誤。", e);
+            }
+
+            // 檢查是否有狀態為 'W' 的待處理資料
+            if (!preMappingCheckService.hasRecordsToProcess()) {
+                log.info(">>> 沒有需要 Mapping 的資料，本次排程提前結束。");
+                return;
+            }
+
+            log.info(">>> 準備開始執行 JSON Mapping 與 API 呼叫任務...");
+            var request = jsonMappingService.buildRequest();
+            if (request != null && request.getData() != null && !request.getData().getOrders().isEmpty()) {
+                int orderCount = request.getData().getOrders().size();
+                log.info(">>> 成功映射 {} 個訂單標頭。", orderCount);
+
+                // 將產生的 request 物件序列化為 JSON 字串
+                String jsonForTest = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(request);
+
+                // 將 JSON 寫入檔案以供除錯
+                try {
+                    Path outputPath = Paths.get("target/generated-json-test.json");
+                    Files.createDirectories(outputPath.getParent());
+                    Files.writeString(outputPath, jsonForTest, StandardCharsets.UTF_8);
+                    log.info(">>> 測試用的 JSON 已寫入檔案: {}", outputPath.toAbsolutePath());
+                } catch (IOException e) {
+                    log.error(">>> 無法將測試 JSON 寫入檔案。", e);
+                }
+
+                apiService.sendRequest(request);
+                log.info(">>> API 呼叫任務已提交。");
+
+            } else {
+                log.info(">>> 經過 Mapping 後，沒有可發送的訂單資料。");
+            }
+
+        } catch (Exception e) {
+            log.error(">>> 排程任務執行期間發生未預期的嚴重錯誤。", e);
+        } finally {
+            log.info("========== 排程任務執行結束 ==========");
+        }
+    }
+}
+```
+
+### 變更摘要：
+
+1.  **移除 `implements CommandLineRunner`**：這個類別不再是啟動時執行的任務。
+2.  **新增 `@Scheduled` 註解**：在 `executeScheduledTask` 方法上加上了 `@Scheduled`，並使用了更新後的 Cron 表達式。
+3.  **增加 `zone` 屬性**：明確指定時區為 `Asia/Taipei`，避免因伺服器時區設定不同而導致執行時間不符預期的問題。
+4.  **增強穩定性**：將所有邏輯包在 `try-catch-finally` 區塊中，確保即使單次任務失敗，也不會影響後續的排程。
+
+現在您的應用程式已經設定好，可以按照您期望的時間精確地執行了。
+
+---
+
+_**User**_
+
+那我接下來要怎麼部屬到公司的伺服器上?
+
+---
+
+_**Assistant**_
+
+
+
+---
+
+好的，這是一個非常關鍵的步驟！將開發好的應用程式部署到正式伺服器上執行，是整個專案的最後一哩路。
+
+我將為您提供一個完整、詳細的步驟指南，涵蓋從打包到在伺服器上作為服務運行的所有環節。
+
+---
+
+### 部署流程概覽
+
+整個部署流程可以分為以下幾個主要步驟：
+
+1.  **打包應用程式**：將您的 Java 原始碼編譯並打包成一個可執行的 `.jar` 檔案。
+2.  **設定正式環境配置**：建立一個專為正式伺服器使用的設定檔，例如指定正式資料庫的 IP 位址。
+3.  **上傳檔案到伺服器**：將打包好的 `.jar` 檔案和設定檔上傳到您的公司伺服器。
+4.  **在伺服器上執行**：以正確的方式啟動您的應用程式。
+5.  **設定為系統服務 (推薦)**：讓您的應用程式在伺服器開機時自動啟動，並在意外關閉時自動重啟，確保服務的穩定性。
+
+---
+
+### 步驟一：打包您的 Spring Boot 應用程式
+
+您的專案很可能是使用 Maven 或 Gradle 來管理的。最常見的是 Maven。您只需要在您專案的根目錄（也就是 `pom.xml` 所在的目錄）下，執行打包指令。
+
+打開您電腦的終端機或命令提示字元 (Command Prompt)，進入專案根目錄，然後執行以下指令：
+
+```bash
+mvn clean package -DskipTests
+```
+
+*   `mvn clean package`：這是 Maven 的標準指令，`clean` 會清除舊的打包檔案，`package` 會編譯您的程式碼並打包。
+*   `-DskipTests`：這個參數會跳過單元測試，可以加快打包速度。
+
+執行成功後，您會在專案目錄下的 `target` 資料夾裡找到一個 `.jar` 檔案，檔名通常會是像 `outbound-api-0.0.1-SNAPSHOT.jar` 這樣的格式。**這個 .jar 檔就是您需要部署的核心檔案。**
+
+---
+
+### 步驟二：設定正式環境 (Production) 的設定檔
+
+您的 `application.properties` 中設定的是測試資料庫 (`10.1.1.15`)。在部署到正式伺服器時，您需要讓程式連線到正式資料庫 (`10.1.1.144`)。Spring Boot 提供了非常優雅的「**Profiles**」機制來處理這個問題。
+
+1.  **建立正式設定檔**：
+    在 `src/main/resources` 目錄下，複製一份 `application.properties`，並將其重新命名為 `application-prod.properties`。（`prod` 是 "production" 的縮寫）
+
+2.  **修改 `application-prod.properties`**：
+    打開這個新的 `application-prod.properties` 檔案，將資料庫的 URL 修改為正式環境的位址。其他設定如果正式環境與測試環境不同，也一併在此修改。
+
+    ```properties:src/main/resources/application-prod.properties
+    # 正式環境 (Production) 的資料庫連線資訊
+    spring.datasource.url=jdbc:oracle:thin:@10.1.1.144:1521:B2BDB
+    spring.datasource.username=b2b
+    spring.datasource.password=b2b # 建議使用更安全的方式管理密碼
+    
+    # ... 其他可能需要修改的正式環境設定 ...
+    ```
+
+完成這一步後，請**重新執行步驟一的 `mvn clean package` 指令**，確保新的 `application-prod.properties` 檔案也被打包進 `.jar` 檔中。
+
+---
+
+### 步驟三：上傳檔案到伺服器
+
+現在，您需要將打包好的 `.jar` 檔上傳到您的公司伺服器。
+
+假設您的伺服器是一台 Linux 伺服器，您可以使用 `scp` (Secure Copy) 指令或 WinSCP 這類圖形化工具來上傳。
+
+*   **要上傳的檔案**：位於您本機 `target/` 目錄下的 `outbound-api-0.0.1-SNAPSHOT.jar` 檔案。
+*   **目標位置**：在伺服器上建立一個專門的目錄來存放您的應用程式，例如 `/opt/znt-outbound-api/`。
+
+---
+
+### 步驟四：在伺服器上執行應用程式
+
+登入到您的伺服器後，進入您剛剛上傳檔案的目錄 (例如 `/opt/znt-outbound-api/`)。
+
+執行以下指令來啟動您的應用程式：
+
+```bash
+java -jar -Dspring.profiles.active=prod outbound-api-0.0.1-SNAPSHOT.jar
+```
+
+*   `java -jar ...`：執行一個可執行的 `.jar` 檔案。
+*   `-Dspring.profiles.active=prod`：**這是最關鍵的一步！** 這個參數告訴 Spring Boot 要啟用名為 `prod` 的 Profile，也就是去讀取 `application-prod.properties` 裡的設定。
+
+這樣執行後，您會看到程式的啟動日誌，它現在連線的就是您的正式資料庫了。但是，這樣執行有一個缺點：**當您關閉 SSH 連線時，程式就會停止**。為了讓它能在背景持續運行，請看下一步。
+
+---
+
+### 步驟五：設定為系統服務 (強烈推薦)
+
+為了讓您的應用程式能夠長期穩定運行，最好的方式是將它設定為一個系統服務。這樣伺服器重開機後它會自動啟動，如果程式意外崩潰，系統也可以嘗試自動重啟它。
+
+#### 情境 A：如果您的伺服器是 Linux (例如 CentOS, Ubuntu)
+
+現代 Linux 系統大多使用 `systemd` 來管理服務。
+
+1.  **建立服務設定檔**：
+    在 `/etc/systemd/system/` 目錄下建立一個新的檔案，名為 `znt-outbound-api.service`。
+
+    ```bash
+    sudo nano /etc/systemd/system/znt-outbound-api.service
+    ```
+
+2.  **編輯服務檔案**：
+    將以下內容貼入檔案中。請務必確認 `User`、`WorkingDirectory` 和 `ExecStart` 中的路徑和檔名是正確的。
+
+    ```ini
+    [Unit]
+    Description=ZNT Outbound API Service
+    After=network.target
+
+    [Service]
+    User=your_linux_user      # 執行此程式的 Linux 使用者名稱
+    WorkingDirectory=/opt/znt-outbound-api/  # 您的 .jar 檔所在的目錄
+    ExecStart=/usr/bin/java -jar -Dspring.profiles.active=prod /opt/znt-outbound-api/outbound-api-0.0.1-SNAPSHOT.jar
+    SuccessExitStatus=143
+    Restart=always
+    RestartSec=10
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+3.  **管理服務**：
+    *   重新載入 systemd 設定：`sudo systemctl daemon-reload`
+    *   啟動您的服務：`sudo systemctl start znt-outbound-api`
+    *   檢查服務狀態：`sudo systemctl status znt-outbound-api` (您可以在這裡看到日誌輸出)
+    *   設定開機自動啟動：`sudo systemctl enable znt-outbound-api`
+    *   停止服務：`sudo systemctl stop znt-outbound-api`
+    *   即時查看日誌：`sudo journalctl -u znt-outbound-api -f`
+
+#### 情境 B：如果您的伺服器是 Windows
+
+在 Windows 上，您可以使用一個名為 **WinSW (Windows Service Wrapper)** 的小工具。
+
+1.  **下載 WinSW**：到 [WinSW 的 GitHub 發布頁面](https://github.com/winsw/winsw/releases) 下載最新的 `WinSW-x64.exe` 檔案。
+2.  **準備檔案**：
+    *   在伺服器上建立目錄，例如 `C:\Services\znt-outbound-api`。
+    *   將您的 `.jar` 檔 (例如 `outbound-api.jar`) 放到這個目錄裡。
+    *   將下載的 `WinSW-x64.exe` 也放到這個目錄裡，並將它重新命名為 `znt-outbound-api-service.exe`。
+3.  **建立設定檔**：
+    在同一個目錄下，建立一個與 `exe` 檔同名的 `znt-outbound-api-service.xml` 檔案。
+
+    ```xml
+    <service>
+      <id>znt-outbound-api</id>
+      <name>ZNT Outbound API Service</name>
+      <description>This service runs the ZNT Outbound API application.</description>
+      <executable>java</executable>
+      <arguments>-Dspring.profiles.active=prod -jar "C:\Services\znt-outbound-api\outbound-api.jar"</arguments>
+      <logmode>rotate</logmode>
+    </service>
+    ```
+
+4.  **安裝與管理服務**：
+    *   打開「以系統管理員身分執行的命令提示字元」。
+    *   進入服務目錄：`cd C:\Services\znt-outbound-api`
+    *   安裝服務：`znt-outbound-api-service.exe install`
+    *   啟動服務：`znt-outbound-api-service.exe start`
+    *   停止服務：`znt-outbound-api-service.exe stop`
+    *   解除安裝：`znt-outbound-api-service.exe uninstall`
+
+完成這些步驟後，您的排程應用程式就成功部署並在伺服器上穩定運行了！
+
+---
+
+_**User**_
+
+@Codebase 在部屬之前有一個問題想先詢問，app.log可以分天不同檔案嗎?
+
+---
+
+_**Assistant**_
+
+
 
 ---
 

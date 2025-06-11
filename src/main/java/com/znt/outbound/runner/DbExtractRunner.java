@@ -11,7 +11,7 @@ import com.znt.outbound.service.EnvelopeService;
 import com.znt.outbound.service.StatusUpdateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,10 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Component      
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class DbExtractRunner implements CommandLineRunner {
+public class DbExtractRunner {
 
     private final GenericExtractService extractService;
     private final LoadService loadService;
@@ -35,36 +35,42 @@ public class DbExtractRunner implements CommandLineRunner {
     private final EnvelopeService envelopeService;
     private final StatusUpdateService statusUpdateService;
 
-    @Override
-    public void run(String... args) throws Exception {
-        log.info(">>> 開始執行資料庫抽取與載入任務...");
-        int extractedCount = extractService.extract();
-
-        if (extractedCount > 0) {
-            log.info(">>> 已抽取 {} 筆資料至暫存表，準備載入正式表...", extractedCount);
-            loadService.loadFromTmpToMain();
-            log.info(">>> 資料載入任務完成。");
-        } else {
-            log.info(">>> 暫存表中無新資料。");
-        }
-
-        // 無論是否有新資料，都檢查並寄送錯誤通知
+    /**
+     * 排程任務：每週一至週六，從 08:15 到 20:45，每 30 分鐘執行一次。
+     * Cron: 秒 分 時 日 月 週
+     * 0 15/30 8-20 * * MON-SAT
+     */
+    @Scheduled(cron = "0 15/30 8-20 * * MON-SAT", zone = "Asia/Taipei")
+    public void executeScheduledTask() {
+        log.info("========== 開始執行排程任務 ==========");
         try {
-            notificationService.sendErrorNotifications();
-        } catch (Exception e) {
-            log.error(">>> 執行郵件通知任務時發生嚴重錯誤。", e);
-        }
+            log.info(">>> 開始執行資料庫抽取與載入任務...");
+            int extractedCount = extractService.extract();
 
-        // 新增：檢查是否有狀態為 'W' 的待處理資料
-        if (!preMappingCheckService.hasRecordsToProcess()) {
-            log.info(">>> 所有任務執行完畢 (沒有需要 Mapping 的資料)。");
-            return; // 結束執行
-        }
+            if (extractedCount > 0) {
+                log.info(">>> 已抽取 {} 筆資料至暫存表，準備載入正式表...", extractedCount);
+                loadService.loadFromTmpToMain();
+                log.info(">>> 資料載入任務完成。");
+            } else {
+                log.info(">>> 暫存表中無新資料。");
+            }
 
-        log.info(">>> 準備開始執行 JSON Mapping 與 API 呼叫任務...");
-        try {
+            // 無論是否有新資料，都檢查並寄送錯誤通知
+            try {
+                notificationService.sendErrorNotifications();
+            } catch (Exception e) {
+                log.error(">>> 執行郵件通知任務時發生嚴重錯誤。", e);
+            }
+
+            // 檢查是否有狀態為 'W' 的待處理資料
+            if (!preMappingCheckService.hasRecordsToProcess()) {
+                log.info(">>> 沒有需要 Mapping 的資料，本次排程提前結束。");
+                return;
+            }
+
+            log.info(">>> 準備開始執行 JSON Mapping 與 API 呼叫任務...");
             var request = jsonMappingService.buildRequest();
-            if (request != null) {
+            if (request != null && request.getData() != null && !request.getData().getOrders().isEmpty()) {
                 int orderCount = request.getData().getOrders().size();
                 log.info(">>> 成功映射 {} 個訂單標頭。", orderCount);
 
@@ -81,15 +87,17 @@ public class DbExtractRunner implements CommandLineRunner {
                     log.error(">>> 無法將測試 JSON 寫入檔案。", e);
                 }
 
-                // 新增：呼叫 API Service 發送請求
                 apiService.sendRequest(request);
+                log.info(">>> API 呼叫任務已提交。");
 
-                // TODO: 根據 API 回應更新本地資料庫中這些訂單的狀態 (例如從 'W' 更新為 'S' 表示已發送)
+            } else {
+                log.info(">>> 經過 Mapping 後，沒有可發送的訂單資料。");
             }
-        } catch (Exception e) {
-            log.error(">>> 執行 JSON Mapping 或 API 呼叫任務時發生錯誤。", e);
-        }
 
-        log.info(">>> 所有任務執行完畢。");
+        } catch (Exception e) {
+            log.error(">>> 排程任務執行期間發生未預期的嚴重錯誤。", e);
+        } finally {
+            log.info("========== 排程任務執行結束 ==========");
+        }
     }
 }
