@@ -3,6 +3,7 @@ package com.znt.outbound.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,17 @@ import java.util.stream.Collectors;
 public class ApiConfigService {
 
     private final JdbcTemplate jdbcTemplate;
+
+    @Value("${logistics.provider.name:FEILIKS}")
+    private String providerName;
+
     private String partCode;
     private String secretKey;
     private String apiUrl;
 
     @PostConstruct
     public void init() {
-        log.info("正在從資料庫載入 API 設定...");
-        // 修正：從 TD_NAME 欄位讀取資料
+        log.info("正在為物流商 '{}' 從資料庫載入 API 設定...", providerName);
         String sql = "SELECT TD_NO, TD_NAME FROM ZEN_B2B_TAB_D WHERE T_NO = 'JSON_SYS_INFO'";
         try {
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
@@ -36,15 +40,17 @@ public class ApiConfigService {
                     row -> row.get("TD_NAME").toString()
                 ));
 
-            this.partCode = configMap.get("FEILIKS-APPID");
-            this.secretKey = configMap.get("FEILIKS-APPKEY");
-            this.apiUrl = configMap.get("FEILIKS-SO_URLT");
+            this.partCode = configMap.get(providerName + "-APPID");
+            this.secretKey = configMap.get(providerName + "-APPKEY");
+            this.apiUrl = configMap.get(providerName + "-SO_URLT");
 
             if (this.partCode == null || this.secretKey == null || this.apiUrl == null) {
-                log.error("在資料庫中找不到必要的 API 設定 (FEILIKS-APPID, FEILIKS-APPKEY, 或 FEILIKS-SO_URLT)。");
+                log.error("在資料庫中找不到 '{}' 的必要 API 設定 ({}-APPID, {}-APPKEY, 或 {}-SO_URLT)。",
+                          providerName, providerName, providerName, providerName);
                 throw new IllegalStateException("無法初始化 API 設定，請檢查 ZEN_B2B_TAB_D 資料表中的 TD_NAME 欄位。");
             }
-            log.info("API 設定載入成功。URL: {}, Part Code: {}, Secret Key: (已隱藏)", this.apiUrl, this.partCode);
+            log.info("API 設定載入成功。Provider: {}, URL: {}, Part Code: {}, Secret Key: (已隱藏)",
+                    providerName, this.apiUrl, this.partCode);
 
         } catch (Exception e) {
             log.error("從資料庫載入 API 設定失敗。", e);
