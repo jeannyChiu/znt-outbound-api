@@ -1,4 +1,4 @@
-package com.znt.outbound_api;
+package com.znt.outbound;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

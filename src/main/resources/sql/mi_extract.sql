@@ -119,7 +119,7 @@ WHERE
     AND msi.segment1 = c.PARTNO
     AND mmt.organization_id = msi.organization_id
     --AND TRUNC(mmt.transaction_date) + 1 >= TRUNC(sysdate)  --for正式上線第一週(手動執行)
-    AND TRUNC(mmt.transaction_date) + 1 BETWEEN TRUNC(sysdate) - 1 AND TRUNC(sysdate) + 1 --for正式上線一週後(自動化)
+    AND TRUNC(mmt.transaction_date) + 1 BETWEEN TRUNC(sysdate) - 20 AND TRUNC(sysdate) + 20 --for正式上線一週後(自動化)
     AND NOT EXISTS(
         SELECT 1
         FROM ZEN_B2B_JSON_SO 

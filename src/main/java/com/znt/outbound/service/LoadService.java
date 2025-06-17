@@ -45,6 +45,17 @@ public class LoadService {
                 int deletedRows = jdbcTemplate.update(cleanupSql);
                 log.info("成功清理了 {} 筆過時的 'N' 狀態紀錄。", deletedRows);
 
+                log.info("開始清理已有成功(S)紀錄的待處理(W)訂單...");
+                String deleteWaitingIfSuccessfulSql = """
+                    DELETE FROM ZEN_B2B_JSON_SO
+                    WHERE STATUS = 'W' AND INVOICE_NO IN (
+                        SELECT INVOICE_NO FROM ZEN_B2B_JSON_SO WHERE STATUS = 'S'
+                    )
+                    """;
+                int deletedWaitingRows = jdbcTemplate.update(deleteWaitingIfSuccessfulSql);
+                log.info("成功清理了 {} 筆已有成功紀錄的待處理訂單。", deletedWaitingRows);
+
+                return null;
             } catch (DataAccessException e) {
                 log.error("從 ZEN_B2B_JSON_SO_TMP 寫入或清理 ZEN_B2B_JSON_SO 時發生錯誤", e);
                 status.setRollbackOnly();
