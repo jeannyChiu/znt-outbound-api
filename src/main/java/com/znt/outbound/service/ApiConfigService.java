@@ -24,6 +24,10 @@ public class ApiConfigService {
     private String partCode;
     private String secretKey;
     private String apiUrl;
+    private String asnApiUrl;
+    private String loginApiUrl;
+    private String loginUsername;
+    private String loginPassword;
 
     @PostConstruct
     public void init() {
@@ -43,14 +47,19 @@ public class ApiConfigService {
             this.partCode = configMap.get(providerName + "-APPID");
             this.secretKey = configMap.get(providerName + "-APPKEY");
             this.apiUrl = configMap.get(providerName + "-SO_URLT");
+            this.asnApiUrl = configMap.get(providerName + "-ASN_URLT");
+            this.loginApiUrl = configMap.get(providerName + "-LOGIN_URLT");
+            this.loginUsername = configMap.get(providerName + "-LOGIN_USERNAME");
+            this.loginPassword = configMap.get(providerName + "-LOGIN_PASSWORD");
 
-            if (this.partCode == null || this.secretKey == null || this.apiUrl == null) {
-                log.error("在資料庫中找不到 '{}' 的必要 API 設定 ({}-APPID, {}-APPKEY, 或 {}-SO_URLT)。",
-                          providerName, providerName, providerName, providerName);
-                throw new IllegalStateException("無法初始化 API 設定，請檢查 ZEN_B2B_TAB_D 資料表中的 TD_NAME 欄位。");
+            if (this.partCode == null || this.secretKey == null) {
+                log.warn("物流商 '{}' 的部分 API 設定 (APPID 或 APPKEY) 未找到，部分功能可能受限。", providerName);
+                // 這不再是一個會中斷啟動的錯誤，因為某些 provider 可能不需要它
             }
-            log.info("API 設定載入成功。Provider: {}, URL: {}, Part Code: {}, Secret Key: (已隱藏)",
-                    providerName, this.apiUrl, this.partCode);
+            log.info("API 設定載入成功。Provider: {}, Part Code: {}",
+                    providerName, this.partCode);
+            log.info("SO_URL: {}, ASN_URL: {}, LOGIN_URL: {}", this.apiUrl, this.asnApiUrl, this.loginApiUrl);
+            log.info("Login Username: {}", this.loginUsername);
 
         } catch (Exception e) {
             log.error("從資料庫載入 API 設定失敗。", e);
@@ -77,5 +86,37 @@ public class ApiConfigService {
             throw new IllegalStateException("API URL 尚未從資料庫初始化。");
         }
         return apiUrl;
+    }
+
+    public String getAsnApiUrl() {
+        if (asnApiUrl == null) {
+            log.warn("ASN API URL 尚未從資料庫初始化或未設定。");
+        }
+        return asnApiUrl;
+    }
+
+    public String getLoginApiUrl() {
+        if (loginApiUrl == null) {
+            log.warn("Login API URL 尚未從資料庫初始化或未設定。");
+        }
+        return loginApiUrl;
+    }
+
+    public String getLoginUsername() {
+        if (loginUsername == null) {
+            log.error("Login Username 尚未從資料庫初始化。");
+        }
+        return loginUsername;
+    }
+
+    public String getLoginPassword() {
+        if (loginPassword == null) {
+            log.error("Login Password 尚未從資料庫初始化。");
+        }
+        return loginPassword;
+    }
+
+    public String getProviderName() {
+        return providerName;
     }
 } 
