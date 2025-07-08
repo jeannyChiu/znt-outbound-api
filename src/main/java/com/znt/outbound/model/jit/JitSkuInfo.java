@@ -1,6 +1,9 @@
 package com.znt.outbound.model.jit;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.znt.outbound.config.PlainDoubleSerializer;
 import lombok.Data;
 
 @Data
@@ -33,10 +36,12 @@ public class JitSkuInfo {
     private String coo;
 
     @JsonProperty("Gw")
-    private double gw;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double gw;
 
     @JsonProperty("Nw")
-    private double nw;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double nw;
 
     @JsonProperty("Uom")
     private String uom;
@@ -45,25 +50,27 @@ public class JitSkuInfo {
     private String abc;
 
     @JsonProperty("Moq")
-    private int moq;
+    private Integer moq;
 
     @JsonProperty("SafetyStock")
-    private int safetyStock;
+    private Integer safetyStock;
 
     @JsonProperty("Length")
-    private double length;
+    private Integer length;
 
     @JsonProperty("Width")
-    private double width;
+    private Integer width;
 
     @JsonProperty("Height")
-    private double height;
+    private Integer height;
 
     @JsonProperty("Cube")
-    private double cube;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double cube;
 
     @JsonProperty("Area")
-    private double area;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double area;
 
     @JsonProperty("Descriptions")
     private String descriptions;

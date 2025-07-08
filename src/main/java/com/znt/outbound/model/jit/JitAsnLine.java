@@ -1,6 +1,9 @@
 package com.znt.outbound.model.jit;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.znt.outbound.config.PlainDoubleSerializer;
 import lombok.Data;
 
 @Data
@@ -12,16 +15,19 @@ public class JitAsnLine {
     private JitSkuInfo skuInfo;
 
     @JsonProperty("QtyExpected")
-    private int qtyExpected;
+    private Integer qtyExpected;
 
     @JsonProperty("Nw")
-    private double nw;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double nw;
 
     @JsonProperty("Gw")
-    private double gw;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double gw;
 
     @JsonProperty("Cube")
-    private double cube;
+    @JsonSerialize(using = PlainDoubleSerializer.class)
+    private Double cube;
 
     @JsonProperty("Uom")
     private String uom;

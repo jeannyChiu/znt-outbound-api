@@ -34,13 +34,13 @@ public class JitAsnRequest {
     private String blNo;
 
     @JsonProperty("CaseCnt")
-    private int caseCnt;
+    private Integer caseCnt;
 
     @JsonProperty("PalletCnt")
-    private int palletCnt;
+    private Integer palletCnt;
 
     @JsonProperty("ContainerCnt")
-    private int containerCnt;
+    private Integer containerCnt;
 
     @JsonProperty("Descriptions")
     private String descriptions;

@@ -18,4 +18,4 @@ public class AppConfig {
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         return restTemplate;
     }
-} 
+}

@@ -7,8 +7,8 @@ import lombok.Data;
 public class JitLoginResponse {
 
     @JsonProperty("userName")
-    private boolean userNameSuccess; // 根據文件，此欄位為 boolean
+    private String userName; // 實際上是字串類型，不是boolean
 
     @JsonProperty("appToken")
     private String appToken;
-} 
+}
