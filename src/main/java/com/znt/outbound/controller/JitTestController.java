@@ -1,6 +1,7 @@
 package com.znt.outbound.controller;
 
 import com.znt.outbound.model.jit.JitAsnRequest;
+import com.znt.outbound.scheduler.JitAsnScheduledTask;
 import com.znt.outbound.service.JitAsnMappingService;
 import com.znt.outbound.service.JitAuthService;
 import com.znt.outbound.service.ApiConfigService;
@@ -29,6 +30,7 @@ public class JitTestController {
     private final JdbcTemplate jdbcTemplate;
     private final JitAuthService jitAuthService;
     private final ApiConfigService apiConfigService;
+    private final JitAsnScheduledTask jitAsnScheduledTask;
 
     /**
      * 健康檢查端點
@@ -407,16 +409,94 @@ public class JitTestController {
     public ResponseEntity<?> processAndSendJitAsn() {
         try {
             log.info("收到 JIT ASN 完整處理請求");
-            
+
             jitAsnMappingService.processAndSendJitAsn();
-            
+
             return ResponseEntity.ok()
                 .body(new TestResponse(true, "JIT ASN 處理完成，請查看日誌了解詳細結果", null));
-            
+
         } catch (Exception e) {
             log.error("JIT ASN 處理失敗", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "處理過程中發生錯誤: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 測試排程任務功能 - 手動觸發一次排程任務執行
+     * 用於驗證排程任務是否正常運作
+     */
+    @GetMapping("/test-scheduled-task")
+    public ResponseEntity<?> testScheduledTask() {
+        log.info("=== JIT ASN 排程任務測試開始 ===");
+        try {
+            long startTime = System.currentTimeMillis();
+
+            // 手動調用排程任務方法
+            jitAsnScheduledTask.executeJitAsnProcessing();
+
+            long executionTime = System.currentTimeMillis() - startTime;
+
+            log.info("排程任務測試完成，執行時間: {}ms", executionTime);
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true,
+                    "排程任務測試完成",
+                    String.format("執行時間: %dms，請查看日誌了解詳細執行結果", executionTime)));
+
+        } catch (Exception e) {
+            log.error("排程任務測試失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false,
+                    "排程任務測試失敗: " + e.getMessage(),
+                    "請檢查系統配置和資料庫連線"));
+        } finally {
+            log.info("=== JIT ASN 排程任務測試結束 ===");
+        }
+    }
+
+    /**
+     * 檢查排程任務狀態和配置資訊
+     */
+    @GetMapping("/scheduled-task-info")
+    public ResponseEntity<?> getScheduledTaskInfo() {
+        log.info("=== 查詢排程任務資訊 ===");
+        try {
+            // 收集排程任務相關資訊
+            java.util.Map<String, Object> taskInfo = new java.util.HashMap<>();
+
+            // 基本資訊
+            taskInfo.put("taskClass", jitAsnScheduledTask.getClass().getSimpleName());
+            taskInfo.put("cronExpression", "0 */5 * * * ?");
+            taskInfo.put("timezone", "Asia/Taipei");
+            taskInfo.put("description", "每5分鐘執行一次JIT ASN處理");
+
+            // 系統資訊
+            taskInfo.put("currentTime", java.time.LocalDateTime.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            taskInfo.put("jvmMemoryUsed", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024 + "MB");
+            taskInfo.put("activeThreads", Thread.activeCount());
+
+            // 下次執行時間計算（簡化版本）
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.LocalDateTime nextExecution = now.withSecond(0).withNano(0);
+            int currentMinute = now.getMinute();
+            int nextMinute = ((currentMinute / 5) + 1) * 5;
+            if (nextMinute >= 60) {
+                nextExecution = nextExecution.plusHours(1).withMinute(0);
+            } else {
+                nextExecution = nextExecution.withMinute(nextMinute);
+            }
+            taskInfo.put("estimatedNextExecution", nextExecution.format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "排程任務資訊查詢成功", taskInfo));
+
+        } catch (Exception e) {
+            log.error("查詢排程任務資訊失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "查詢排程任務資訊失敗: " + e.getMessage(), null));
         }
     }
 
