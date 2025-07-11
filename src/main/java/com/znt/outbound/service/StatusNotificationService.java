@@ -24,7 +24,7 @@ public class StatusNotificationService {
     @Value("${spring.datasource.url}")
     private String databaseUrl;
 
-    private record EnvelopeInfo(String receiverCode, String transFlag, String docId, String docNo) {}
+    private record EnvelopeInfo(String receiverCode, String transFlag, String docId, String docNo, String b2bMsgType, String conversationId) {}
 
     private String getEnglishStatus(String transFlag) {
         return switch (transFlag) {
@@ -50,12 +50,14 @@ public class StatusNotificationService {
 
         EnvelopeInfo envelopeInfo;
         try {
-            String envelopeSql = "SELECT RECEIVER_CODE, TRANS_FLAG, DOC_ID, DOC_NO FROM ZEN_B2B_ENVELOPE WHERE SEQ_ID = ?";
+            String envelopeSql = "SELECT RECEIVER_CODE, TRANS_FLAG, DOC_ID, DOC_NO, B2B_MSG_TYPE, CONVERSATION_ID FROM ZEN_B2B_ENVELOPE WHERE SEQ_ID = ?";
             envelopeInfo = jdbcTemplate.queryForObject(envelopeSql, (rs, rowNum) -> new EnvelopeInfo(
                     rs.getString("RECEIVER_CODE"),
                     rs.getString("TRANS_FLAG"),
                     rs.getString("DOC_ID"),
-                    rs.getString("DOC_NO")
+                    rs.getString("DOC_NO"),
+                    rs.getString("B2B_MSG_TYPE"),
+                    rs.getString("CONVERSATION_ID")
             ), seqId);
         } catch (EmptyResultDataAccessException e) {
             log.warn("在 ZEN_B2B_ENVELOPE 中找不到 SEQ_ID: {} 的紀錄，無法發送郵件。", seqId);
@@ -74,13 +76,31 @@ public class StatusNotificationService {
         // 組合郵件主旨和內文
         String subjectPrefix = getSubjectPrefix();
         String transFlagEnglish = getEnglishStatus(envelopeInfo.transFlag());
-        String originalSubject = String.format("Send Orders To [%s] %s ! (DOC_ID: %s)",
-                envelopeInfo.receiverCode(),
-                transFlagEnglish,
-                envelopeInfo.docNo());
+
+        // 根據 B2B_MSG_TYPE 決定郵件主旨格式
+        String originalSubject;
+        String textBody;
+
+        if ("ASN".equals(envelopeInfo.b2bMsgType())) {
+            // 入庫單 (ASN) 的郵件格式
+            originalSubject = String.format("Send Asn To [%s] %s ! (DOC_NO: %s)",
+                    envelopeInfo.receiverCode(),
+                    transFlagEnglish,
+                    envelopeInfo.docNo());
+
+            textBody = String.format("ExternalNo : %s\n***EDI系統自動通知請勿回覆!***",
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+        } else {
+            // 出庫單 (ORDERS) 的郵件格式 (保持原有格式)
+            originalSubject = String.format("Send Orders To [%s] %s ! (DOC_NO: %s)",
+                    envelopeInfo.receiverCode(),
+                    transFlagEnglish,
+                    envelopeInfo.docNo());
+
+            textBody = "***EDI系統自動通知請勿回覆!***";
+        }
+
         String subject = subjectPrefix + originalSubject;
-        
-        String textBody = "***EDI系統自動通知請勿回覆!***";
 
         // 發送郵件
         try {

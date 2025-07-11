@@ -1,6 +1,6 @@
 -- JIT ASN 資料查詢 SQL (單筆 EXTERNAL_NO 處理版本)
 -- 此 SQL 將 JIT_ASN_HEADER 和 JIT_ASN_LINE 表格進行 JOIN，
--- 查詢狀態為 'PENDING' 的入庫單資料，但每次只返回一個 EXTERNAL_NO 的所有明細行
+-- 查詢狀態為 'PENDING' 或 'FAILED' 的入庫單資料，但每次只返回一個 EXTERNAL_NO 的所有明細行
 -- 這樣確保符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalNo 資料」的限制
 
 SELECT
@@ -97,12 +97,12 @@ SELECT
 
 FROM B2B.JIT_ASN_HEADER h
 INNER JOIN B2B.JIT_ASN_LINE l ON h.HEADER_ID = l.HEADER_ID
-WHERE h.STATUS = 'PENDING'
+WHERE h.STATUS = 'PENDING' OR h.STATUS = 'FAILED'
   AND h.HEADER_ID = (
     -- 子查詢：取得第一個待處理的 HEADER_ID 
     -- 使用 MIN 確保每次都取得相同的第一筆，避免併發問題
     SELECT MIN(h2.HEADER_ID)
     FROM B2B.JIT_ASN_HEADER h2
-    WHERE h2.STATUS = 'PENDING'
+    WHERE h2.STATUS = 'PENDING' OR h2.STATUS = 'FAILED'
   )
 ORDER BY h.HEADER_ID, l.LINE_ID

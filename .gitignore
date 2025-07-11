@@ -31,9 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-logs/znt-outbound-api.2025-06-30.0.log.gz
-logs/znt-outbound-api.2025-07-01.0.log.gz
-logs/znt-outbound-api.2025-07-02.0.log.gz
-logs/znt-outbound-api.2025-07-03.0.log.gz
-logs/znt-outbound-api.log
-logs/znt-outbound-api.2025-07-08.0.log.gz
+logs/

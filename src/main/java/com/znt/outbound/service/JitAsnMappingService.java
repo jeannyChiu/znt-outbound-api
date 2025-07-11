@@ -31,6 +31,7 @@ public class JitAsnMappingService {
     private final JitApiClient jitApiClient;
     private final EnvelopeService envelopeService;
     private final ApiConfigService apiConfigService;
+    private final StatusNotificationService statusNotificationService;
 
     // 狀態常數定義
     private static final String STATUS_PENDING = "PENDING";
@@ -447,6 +448,10 @@ public class JitAsnMappingService {
                 envelopeService.updateEnvelopeStatus(seqId, "S"); // Success
                 updateAsnStatusWithRetry(externalNo, STATUS_COMPLETED, "成功發送到 JIT");
                 log.info("ASN (ExternalNo: {}) 成功發送到 JIT，HTTP Status: {}", externalNo, response.getStatusCode());
+
+                // 發送成功通知郵件
+                sendNotificationSafely(seqId, "成功");
+
                 return true;
             } else {
                 // 失敗情況
@@ -457,12 +462,30 @@ public class JitAsnMappingService {
                 envelopeService.updateEnvelopeStatus(seqId, "F"); // Failed
                 updateAsnStatusWithRetry(externalNo, STATUS_FAILED, errorMsg);
                 log.error("ASN (ExternalNo: {}) 發送失敗：{}", externalNo, errorMsg);
+
+                // 發送失敗通知郵件
+                sendNotificationSafely(seqId, "失敗");
+
                 return false;
             }
         } catch (Exception e) {
             log.error("處理 API 回應時發生異常，ExternalNo: {}", externalNo, e);
             cleanupOnError(externalNo, seqId, "結果處理", e);
             return false;
+        }
+    }
+
+    /**
+     * 安全地發送郵件通知，確保郵件發送失敗不會影響主要業務流程
+     */
+    private void sendNotificationSafely(String seqId, String statusDescription) {
+        try {
+            log.info("準備為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
+            statusNotificationService.sendNotification(seqId);
+            log.info("已成功為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
+        } catch (Exception e) {
+            // 郵件發送失敗不應該影響主要業務流程，只記錄錯誤
+            log.error("為 SEQ_ID: {} 發送 {} 通知郵件時發生錯誤，但不影響主要業務流程", seqId, statusDescription, e);
         }
     }
 
@@ -475,6 +498,8 @@ public class JitAsnMappingService {
             if (seqId != null) {
                 try {
                     envelopeService.updateEnvelopeStatus(seqId, "F");
+                    // 發送失敗通知郵件
+                    sendNotificationSafely(seqId, "失敗");
                 } catch (Exception e) {
                     log.error("清理封套狀態時發生錯誤，SEQ_ID: {}", seqId, e);
                 }
