@@ -1,5 +1,6 @@
 package com.znt.outbound.model.jit;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,6 +15,7 @@ public class JitAsnLineAttr {
     private String dateCode;
 
     @JsonProperty("ExpiredDt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private String expiredDt;
 
     @JsonProperty("Coo")

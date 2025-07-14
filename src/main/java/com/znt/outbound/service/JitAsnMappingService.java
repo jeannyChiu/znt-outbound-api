@@ -1049,7 +1049,7 @@ public class JitAsnMappingService {
     }
 
     /**
-     * 將 Timestamp 轉換為 ISO 8601 格式的字串
+     * 將 Timestamp 轉換為 ISO 8601 格式的字串 (YYYY-MM-DDTHH:mm:ss)
      */
     private String getTimestampAsIsoString(Map<String, Object> row, String columnName) {
         Object value = row.get(columnName);
@@ -1058,7 +1058,9 @@ public class JitAsnMappingService {
         }
         if (value instanceof Timestamp) {
             Timestamp timestamp = (Timestamp) value;
-            return timestamp.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            // 使用自定義格式，只保留到秒級精度，符合JIT規格要求
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            return timestamp.toLocalDateTime().format(formatter);
         }
         return value.toString();
     }
