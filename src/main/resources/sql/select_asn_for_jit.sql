@@ -27,6 +27,7 @@ SELECT
     -- Line 基本欄位 (來自 JIT_ASN_LINE)
     l.STORER_LINE_NO,
     l.QTY_EXPECTED,
+    l.ZONE_NAME,
     l.LINE_NW,
     l.LINE_GW,
     l.LINE_CUBE,

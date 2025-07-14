@@ -17,6 +17,9 @@ public class JitAsnLine {
     @JsonProperty("QtyExpected")
     private Integer qtyExpected;
 
+    @JsonProperty("ZoneName")
+    private String zoneName;
+
     @JsonProperty("Nw")
     @JsonSerialize(using = PlainDoubleSerializer.class)
     private Double nw;

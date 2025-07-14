@@ -231,7 +231,7 @@ public class JitTestController {
                     CATEGORY, SUB_CATEGORY, PRODUCT_LINE, UNIT_COO, UNIT_GW, UNIT_NW, UNIT_UOM,
                     ABC, MOQ, SAFETY_STOCK, LENGTH, WIDTH, HEIGHT, UNIT_CUBE, AREA,
                     UNIT_DESCRIPTIONS, UNIT_USER_DEF1, UNIT_USER_DEF2, UNIT_USER_DEF3, UNIT_USER_DEF4, UNIT_USER_DEF5,
-                    QTY_EXPECTED, LINE_NW, LINE_GW, LINE_CUBE, LINE_UOM,
+                    QTY_EXPECTED, ZONE_NAME, LINE_NW, LINE_GW, LINE_CUBE, LINE_UOM,
                     LINE_USER_DEF1, LINE_USER_DEF2, LINE_USER_DEF3, LINE_USER_DEF4, LINE_USER_DEF5, LINE_DESCRIPTIONS,
                     LOC, LPN, DATE_CODE, EXPIRED_DT, ATTR_COO, PACKAGE_TYPE, VLOT,
                     LOT_ATTR01, LOT_ATTR02, LOT_ATTR03, LOT_ATTR04, LOT_ATTR05
@@ -240,7 +240,7 @@ public class JitTestController {
                     '电子元器件', '集成电路', '嵌入式系统', 'TW', 0.01, 0.008, '个',
                     'A', 1000, 5000, 10, 10, 2, 0.0000002, 0.0001,
                     '工业级温度范围', 'ESD敏感', '无铅', '符合RoHS', '包装形式：卷带', '最小包装量：2500',
-                    10000, 80.0, 100.0, 0.25, '个',
+                    10000, 'ZSH基通.上海倉', 80.0, 100.0, 0.25, '个',
                     '批次A', '生产日期：2023W24', '供应商批次：ABC2306', '湿敏等级：3', '存储条件：干燥', '主控芯片',
                     'IC-A-01', 'LPN20230612001', '20231001', TO_TIMESTAMP('2026-06-11 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), '台湾', '卷带', 'VL230612001',
                     '无铅', '符合RoHS', '湿敏等级3', '温度范围：-40°C~85°C', '封装：LQFP64'

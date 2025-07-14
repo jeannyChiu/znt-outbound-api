@@ -764,6 +764,7 @@ public class JitAsnMappingService {
             // 設定 Line 層級的基本資訊
             line.setStorerLineNo(storerLineNo);
             line.setQtyExpected(getNullableIntValue(row, "QTY_EXPECTED"));
+            line.setZoneName(getStringValue(row, "ZONE_NAME"));
             line.setNw(getNullableDoubleValue(row, "LINE_NW"));
             line.setGw(getNullableDoubleValue(row, "LINE_GW"));
             line.setCube(getNullableDoubleValue(row, "LINE_CUBE"));

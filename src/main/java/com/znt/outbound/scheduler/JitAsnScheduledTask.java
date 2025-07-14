@@ -24,6 +24,13 @@ public class JitAsnScheduledTask {
      */
     @Scheduled(cron = "0 */5 * * * ?", zone = "Asia/Taipei")
     public void executeJitAsnProcessing() {
+        // 暫時停用排程 - 測試期間使用
+        boolean schedulingEnabled = false;
+        if (!schedulingEnabled) {
+            log.debug("JIT ASN 排程已暫停，跳過此次執行");
+            return;
+        }
+        
         String taskId = generateTaskId();
         long startTime = System.currentTimeMillis();
 
