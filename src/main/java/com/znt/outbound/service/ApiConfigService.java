@@ -25,6 +25,7 @@ public class ApiConfigService {
     private String secretKey;
     private String apiUrl;
     private String asnApiUrl;
+    private String moveTradeApiUrl;
     private String loginApiUrl;
     private String loginUsername;
     private String loginPassword;
@@ -48,6 +49,7 @@ public class ApiConfigService {
             this.secretKey = configMap.get(providerName + "-APPKEY");
             this.apiUrl = configMap.get(providerName + "-SO_URLT");
             this.asnApiUrl = configMap.get(providerName + "-ASN_URLT");
+            this.moveTradeApiUrl = configMap.get(providerName + "-MOVE_TRADE_URLT");
             this.loginApiUrl = configMap.get(providerName + "-LOGIN_URLT");
             this.loginUsername = configMap.get(providerName + "-LOGIN_USERNAME");
             this.loginPassword = configMap.get(providerName + "-LOGIN_PASSWORD");
@@ -58,7 +60,8 @@ public class ApiConfigService {
             }
             log.info("API 設定載入成功。Provider: {}, Part Code: {}",
                     providerName, this.partCode);
-            log.info("SO_URL: {}, ASN_URL: {}, LOGIN_URL: {}", this.apiUrl, this.asnApiUrl, this.loginApiUrl);
+            log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, LOGIN_URL: {}", 
+                    this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.loginApiUrl);
             log.info("Login Username: {}", this.loginUsername);
 
         } catch (Exception e) {
@@ -114,6 +117,13 @@ public class ApiConfigService {
             log.error("Login Password 尚未從資料庫初始化。");
         }
         return loginPassword;
+    }
+
+    public String getMoveTradeApiUrl() {
+        if (moveTradeApiUrl == null) {
+            log.warn("Move Trade API URL 尚未從資料庫初始化或未設定。");
+        }
+        return moveTradeApiUrl;
     }
 
     public String getProviderName() {

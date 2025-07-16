@@ -1,8 +1,11 @@
 package com.znt.outbound.controller;
 
 import com.znt.outbound.model.jit.JitAsnRequest;
+import com.znt.outbound.model.jit.JitInvMoveOrTradeRequest;
 import com.znt.outbound.scheduler.JitAsnScheduledTask;
+import com.znt.outbound.scheduler.JitInvMoveOrTradeScheduledTask;
 import com.znt.outbound.service.JitAsnMappingService;
+import com.znt.outbound.service.JitInvMoveOrTradeMappingService;
 import com.znt.outbound.service.JitAuthService;
 import com.znt.outbound.service.ApiConfigService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +30,12 @@ import java.util.Map;
 public class JitTestController {
 
     private final JitAsnMappingService jitAsnMappingService;
+    private final JitInvMoveOrTradeMappingService jitInvMoveOrTradeMappingService;
     private final JdbcTemplate jdbcTemplate;
     private final JitAuthService jitAuthService;
     private final ApiConfigService apiConfigService;
     private final JitAsnScheduledTask jitAsnScheduledTask;
+    private final JitInvMoveOrTradeScheduledTask jitInvMoveOrTradeScheduledTask;
 
     /**
      * 健康檢查端點
@@ -172,10 +177,23 @@ public class JitTestController {
             Integer pendingCount = jdbcTemplate.queryForObject(pendingCountSql, Integer.class);
             log.info("STATUS='PENDING' 的 Header 資料共有 {} 筆", pendingCount);
 
+            // 測試庫內移倉/交易表格
+            String invMoveHeaderCountSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_HEADER";
+            Integer invMoveHeaderCount = jdbcTemplate.queryForObject(invMoveHeaderCountSql, Integer.class);
+            log.info("JIT_MOVE_TRADE_HEADER 表格共有 {} 筆資料", invMoveHeaderCount);
+
+            String invMoveLineCountSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_LINE";
+            Integer invMoveLineCount = jdbcTemplate.queryForObject(invMoveLineCountSql, Integer.class);
+            log.info("JIT_MOVE_TRADE_LINE 表格共有 {} 筆資料", invMoveLineCount);
+
+            String invMovePendingCountSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = 'PENDING'";
+            Integer invMovePendingCount = jdbcTemplate.queryForObject(invMovePendingCountSql, Integer.class);
+            log.info("STATUS='PENDING' 的庫內移倉/交易 Header 資料共有 {} 筆", invMovePendingCount);
+
             return ResponseEntity.ok()
                 .body(new TestResponse(true, "資料庫連線測試成功",
-                    String.format("Header: %d 筆, Line: %d 筆, Pending: %d 筆",
-                        headerCount, lineCount, pendingCount)));
+                    String.format("ASN Header: %d 筆, ASN Line: %d 筆, ASN Pending: %d 筆, InvMove Header: %d 筆, InvMove Line: %d 筆, InvMove Pending: %d 筆",
+                        headerCount, lineCount, pendingCount, invMoveHeaderCount, invMoveLineCount, invMovePendingCount)));
 
         } catch (Exception e) {
             log.error("資料庫連線測試失敗", e);
@@ -497,6 +515,212 @@ public class JitTestController {
             log.error("查詢排程任務資訊失敗", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "查詢排程任務資訊失敗: " + e.getMessage(), null));
+        }
+    }
+
+    // ========== 庫內移倉/交易測試端點 ==========
+
+    /**
+     * 測試庫內移倉/交易資料映射功能
+     * 僅執行資料查詢和映射，不會發送到外部 API
+     */
+    @GetMapping("/test-inv-move-mapping")
+    public ResponseEntity<?> testJitInvMoveOrTradeMapping() {
+        log.info("=== JIT 庫內移倉/交易資料映射測試開始 ===");
+        try {
+            log.info("收到 JIT 庫內移倉/交易資料映射測試請求");
+
+            JitInvMoveOrTradeRequest result = jitInvMoveOrTradeMappingService.testDataMapping();
+
+            if (result != null) {
+                log.info("資料映射測試成功，準備回傳結果");
+                log.info("映射結果 - ExternalNo: {}, TradeType: {}, WhName: {}",
+                        result.getExternalNo(), result.getTradeType(), result.getWhName());
+                return ResponseEntity.ok()
+                    .body(new TestResponse(true, "庫內移倉/交易資料映射測試成功", result));
+            } else {
+                log.warn("沒有找到待處理的庫內移倉/交易資料或映射失敗");
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "沒有找到待處理的庫內移倉/交易資料或映射失敗", null));
+            }
+
+        } catch (Exception e) {
+            log.error("JIT 庫內移倉/交易資料映射測試失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "測試過程中發生錯誤: " + e.getMessage(), null));
+        } finally {
+            log.info("=== JIT 庫內移倉/交易資料映射測試結束 ===");
+        }
+    }
+
+    /**
+     * 查看將要發送到JIT的庫內移倉/交易JSON內容（不實際發送）
+     */
+    @GetMapping("/preview-inv-move-json")
+    public ResponseEntity<?> previewJitInvMoveOrTradeJson() {
+        log.info("=== 預覽庫內移倉/交易 JIT JSON 內容開始 ===");
+        try {
+            JitInvMoveOrTradeRequest result = jitInvMoveOrTradeMappingService.testDataMapping();
+
+            if (result != null) {
+                // 將物件轉換為JSON字串以便查看
+                com.fasterxml.jackson.databind.ObjectMapper objectMapper =
+                    new com.fasterxml.jackson.databind.ObjectMapper();
+                objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                String jsonString = objectMapper.writeValueAsString(result);
+
+                log.info("將要發送到JIT的庫內移倉/交易JSON內容:");
+                log.info(jsonString);
+
+                return ResponseEntity.ok()
+                    .body(new TestResponse(true, "庫內移倉/交易JSON預覽成功",
+                        "JSON內容: " + jsonString));
+            } else {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "沒有找到待處理的庫內移倉/交易資料", null));
+            }
+
+        } catch (Exception e) {
+            log.error("預覽庫內移倉/交易JSON失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "預覽過程中發生錯誤: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 預覽庫內移倉/交易 JIT JSON 內容結束 ===");
+        }
+    }
+
+    /**
+     * 執行完整的 JIT 庫內移倉/交易處理流程（包含發送到外部 API）
+     * 請謹慎使用，確保在測試環境中執行
+     */
+    @GetMapping("/process-and-send-inv-move")
+    public ResponseEntity<?> processAndSendJitInvMoveOrTrade() {
+        try {
+            log.info("收到 JIT 庫內移倉/交易完整處理請求");
+
+            jitInvMoveOrTradeMappingService.processAndSendJitInvMoveOrTrade();
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "JIT 庫內移倉/交易處理完成，請查看日誌了解詳細結果", null));
+
+        } catch (Exception e) {
+            log.error("JIT 庫內移倉/交易處理失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "處理過程中發生錯誤: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 檢查庫內移倉/交易健康狀態
+     */
+    @GetMapping("/health-inv-move")
+    public ResponseEntity<?> healthInvMoveOrTrade() {
+        log.info("收到庫內移倉/交易健康檢查請求");
+        try {
+            // 檢查是否有待處理的庫內移倉/交易資料
+            String pendingSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = 'PENDING'";
+            Integer pendingCount = jdbcTemplate.queryForObject(pendingSql, Integer.class);
+
+            // 檢查是否有失敗的庫內移倉/交易資料
+            String failedSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = 'FAILED'";
+            Integer failedCount = jdbcTemplate.queryForObject(failedSql, Integer.class);
+
+            // 檢查是否有成功的庫內移倉/交易資料
+            String completedSql = "SELECT COUNT(*) FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = 'COMPLETED'";
+            Integer completedCount = jdbcTemplate.queryForObject(completedSql, Integer.class);
+
+            java.util.Map<String, Object> healthInfo = new java.util.HashMap<>();
+            healthInfo.put("pendingCount", pendingCount);
+            healthInfo.put("failedCount", failedCount);
+            healthInfo.put("completedCount", completedCount);
+            healthInfo.put("currentTime", java.time.LocalDateTime.now());
+            healthInfo.put("serviceName", "JitInvMoveOrTradeMappingService");
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫內移倉/交易健康檢查完成", healthInfo));
+
+        } catch (Exception e) {
+            log.error("庫內移倉/交易健康檢查失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "健康檢查失敗: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 測試庫內移倉/交易排程任務功能 - 手動觸發一次排程任務執行
+     * 用於驗證排程任務是否正常運作
+     */
+    @GetMapping("/test-inv-move-scheduled-task")
+    public ResponseEntity<?> testInvMoveOrTradeScheduledTask() {
+        log.info("=== JIT 庫內移倉/交易排程任務測試開始 ===");
+        try {
+            long startTime = System.currentTimeMillis();
+
+            // 手動調用排程任務方法
+            jitInvMoveOrTradeScheduledTask.executeJitInvMoveOrTradeProcessing();
+
+            long executionTime = System.currentTimeMillis() - startTime;
+
+            log.info("庫內移倉/交易排程任務測試完成，執行時間: {}ms", executionTime);
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true,
+                    "庫內移倉/交易排程任務測試完成",
+                    String.format("執行時間: %dms，請查看日誌了解詳細執行結果", executionTime)));
+
+        } catch (Exception e) {
+            log.error("庫內移倉/交易排程任務測試失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false,
+                    "庫內移倉/交易排程任務測試失敗: " + e.getMessage(),
+                    "請檢查系統配置和資料庫連線"));
+        } finally {
+            log.info("=== JIT 庫內移倉/交易排程任務測試結束 ===");
+        }
+    }
+
+    /**
+     * 檢查庫內移倉/交易排程任務狀態和配置資訊
+     */
+    @GetMapping("/inv-move-scheduled-task-info")
+    public ResponseEntity<?> getInvMoveOrTradeScheduledTaskInfo() {
+        log.info("=== 查詢庫內移倉/交易排程任務資訊 ===");
+        try {
+            // 收集排程任務相關資訊
+            java.util.Map<String, Object> taskInfo = new java.util.HashMap<>();
+
+            // 基本資訊
+            taskInfo.put("taskClass", jitInvMoveOrTradeScheduledTask.getClass().getSimpleName());
+            taskInfo.put("cronExpression", "0 */5 * * * ?");
+            taskInfo.put("timezone", "Asia/Taipei");
+            taskInfo.put("description", "每5分鐘執行一次JIT庫內移倉/交易處理");
+
+            // 系統資訊
+            taskInfo.put("currentTime", java.time.LocalDateTime.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            taskInfo.put("jvmMemoryUsed", (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024 + "MB");
+            taskInfo.put("activeThreads", Thread.activeCount());
+
+            // 下次執行時間計算（簡化版本）
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.LocalDateTime nextExecution = now.withSecond(0).withNano(0);
+            int currentMinute = now.getMinute();
+            int nextMinute = ((currentMinute / 5) + 1) * 5;
+            if (nextMinute >= 60) {
+                nextExecution = nextExecution.plusHours(1).withMinute(0);
+            } else {
+                nextExecution = nextExecution.withMinute(nextMinute);
+            }
+            taskInfo.put("estimatedNextExecution", nextExecution.format(
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫內移倉/交易排程任務資訊查詢成功", taskInfo));
+
+        } catch (Exception e) {
+            log.error("查詢庫內移倉/交易排程任務資訊失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "查詢庫內移倉/交易排程任務資訊失敗: " + e.getMessage(), null));
         }
     }
 

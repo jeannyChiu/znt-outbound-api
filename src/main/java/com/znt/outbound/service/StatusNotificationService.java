@@ -90,6 +90,15 @@ public class StatusNotificationService {
 
             textBody = String.format("ExternalNo : %s\n***EDI系統自動通知請勿回覆!***",
                     envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+        } else if ("MOVE_TRADE".equals(envelopeInfo.b2bMsgType())) {
+            // 庫內移倉/交易的郵件格式
+            originalSubject = String.format("Send Inventory Move/Trade To [%s] %s ! (DOC_NO: %s)",
+                    envelopeInfo.receiverCode(),
+                    transFlagEnglish,
+                    envelopeInfo.docNo());
+
+            textBody = String.format("ExternalNo : %s\n交易類型 : 庫內移倉/交易\n***EDI系統自動通知請勿回覆!***",
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
         } else {
             // 出庫單 (ORDERS) 的郵件格式 (保持原有格式)
             originalSubject = String.format("Send Orders To [%s] %s ! (DOC_NO: %s)",
