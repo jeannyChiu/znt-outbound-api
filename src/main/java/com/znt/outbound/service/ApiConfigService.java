@@ -26,6 +26,7 @@ public class ApiConfigService {
     private String apiUrl;
     private String asnApiUrl;
     private String moveTradeApiUrl;
+    private String invLocApiUrl;
     private String loginApiUrl;
     private String loginUsername;
     private String loginPassword;
@@ -50,6 +51,7 @@ public class ApiConfigService {
             this.apiUrl = configMap.get(providerName + "-SO_URLT");
             this.asnApiUrl = configMap.get(providerName + "-ASN_URLT");
             this.moveTradeApiUrl = configMap.get(providerName + "-MOVE_TRADE_URLT");
+            this.invLocApiUrl = configMap.get(providerName + "-INV_LOC_URLT");
             this.loginApiUrl = configMap.get(providerName + "-LOGIN_URLT");
             this.loginUsername = configMap.get(providerName + "-LOGIN_USERNAME");
             this.loginPassword = configMap.get(providerName + "-LOGIN_PASSWORD");
@@ -60,8 +62,8 @@ public class ApiConfigService {
             }
             log.info("API 設定載入成功。Provider: {}, Part Code: {}",
                     providerName, this.partCode);
-            log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, LOGIN_URL: {}", 
-                    this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.loginApiUrl);
+            log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, INV_LOC_URL: {}, LOGIN_URL: {}", 
+                    this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.invLocApiUrl, this.loginApiUrl);
             log.info("Login Username: {}", this.loginUsername);
 
         } catch (Exception e) {
@@ -124,6 +126,13 @@ public class ApiConfigService {
             log.warn("Move Trade API URL 尚未從資料庫初始化或未設定。");
         }
         return moveTradeApiUrl;
+    }
+
+    public String getInvLocApiUrl() {
+        if (invLocApiUrl == null) {
+            log.warn("Inventory Location API URL 尚未從資料庫初始化或未設定。");
+        }
+        return invLocApiUrl;
     }
 
     public String getProviderName() {

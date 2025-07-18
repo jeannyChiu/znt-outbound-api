@@ -4,6 +4,7 @@ import com.znt.outbound.model.jit.JitAsnRequest;
 import com.znt.outbound.model.jit.JitInvMoveOrTradeRequest;
 import com.znt.outbound.scheduler.JitAsnScheduledTask;
 import com.znt.outbound.scheduler.JitInvMoveOrTradeScheduledTask;
+import com.znt.outbound.scheduler.JitInvLocScheduledTask;
 import com.znt.outbound.service.JitAsnMappingService;
 import com.znt.outbound.service.JitInvMoveOrTradeMappingService;
 import com.znt.outbound.service.JitInvLocService;
@@ -38,6 +39,7 @@ public class JitTestController {
     private final ApiConfigService apiConfigService;
     private final JitAsnScheduledTask jitAsnScheduledTask;
     private final JitInvMoveOrTradeScheduledTask jitInvMoveOrTradeScheduledTask;
+    private final JitInvLocScheduledTask jitInvLocScheduledTask;
 
     /**
      * 健康檢查端點
@@ -1009,6 +1011,121 @@ public class JitTestController {
             log.error("庫存查詢健康檢查失敗", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "健康檢查失敗: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 執行庫存查詢作業 (呼叫 JitInvLocService.queryInventoryLocation)
+     */
+    @GetMapping("/process-inventory-query")
+    public ResponseEntity<?> processInventoryQuery() {
+        log.info("=== 開始執行庫存查詢作業 ===");
+        try {
+            // 使用預設查詢條件 (所有參數為 null，查詢所有庫存)
+            String result = jitInvLocService.queryInventoryLocation(null, null, null, null);
+            
+            log.info("庫存查詢作業完成，結果: {}", result);
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢作業完成", result));
+                
+        } catch (Exception e) {
+            log.error("執行庫存查詢作業時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "庫存查詢作業失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 庫存查詢作業結束 ===");
+        }
+    }
+
+    /**
+     * 執行庫存查詢作業 (指定查詢條件)
+     */
+    @GetMapping("/process-inventory-query-with-params")
+    public ResponseEntity<?> processInventoryQueryWithParams() {
+        log.info("=== 開始執行庫存查詢作業 (指定條件) ===");
+        try {
+            // 使用指定的查詢條件進行測試
+            String whName = "GT";
+            String zoneName = "ZSH基通.上海倉";  // 可以設定為特定儲區，如 "基通.上海倉"
+            String storerAbbrName = "ZCSH";  // 查詢特定貨主
+            String sku = null;  // 可以設定為特定料號
+            
+            log.info("查詢條件: WhName={}, ZoneName={}, StorerAbbrName={}, Sku={}", 
+                    whName, zoneName, storerAbbrName, sku);
+            
+            String result = jitInvLocService.queryInventoryLocation(whName, zoneName, storerAbbrName, sku);
+            
+            log.info("庫存查詢作業完成，結果: {}", result);
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢作業完成", result));
+                
+        } catch (Exception e) {
+            log.error("執行庫存查詢作業時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "庫存查詢作業失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 庫存查詢作業結束 ===");
+        }
+    }
+
+    /**
+     * 測試庫存查詢排程任務
+     */
+    @GetMapping("/test-inventory-scheduled-task")
+    public ResponseEntity<?> testInventoryScheduledTask() {
+        log.info("=== 開始測試庫存查詢排程任務 ===");
+        try {
+            // 手動執行排程任務
+            jitInvLocScheduledTask.executeJitInventoryLocationQuery();
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢排程任務執行完成", 
+                    "排程任務已手動執行，請查看日誌獲取詳細結果"));
+                
+        } catch (Exception e) {
+            log.error("測試庫存查詢排程任務時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "排程任務執行失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 庫存查詢排程任務測試結束 ===");
+        }
+    }
+
+    /**
+     * 獲取庫存查詢排程任務資訊
+     */
+    @GetMapping("/inventory-scheduled-task-info")
+    public ResponseEntity<?> getInventoryScheduledTaskInfo() {
+        log.info("收到庫存查詢排程任務資訊查詢請求");
+        try {
+            java.util.Map<String, Object> taskInfo = new java.util.HashMap<>();
+            taskInfo.put("taskName", "JitInvLocScheduledTask");
+            taskInfo.put("description", "JIT 庫存查詢排程任務");
+            taskInfo.put("schedule", "每日凌晨 2:00 執行 (cron: 0 0 2 * * ?)");
+            taskInfo.put("timezone", "Asia/Taipei");
+            taskInfo.put("enabled", true);
+            taskInfo.put("queryCondition", "查詢所有庫存資料 (所有參數為 null)");
+            taskInfo.put("currentTime", java.time.LocalDateTime.now());
+            
+            // 檢查相關資料表狀態
+            String requestCountSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_REQUEST";
+            Integer requestCount = jdbcTemplate.queryForObject(requestCountSql, Integer.class);
+            
+            String invLocCountSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_LIST";
+            Integer invLocCount = jdbcTemplate.queryForObject(invLocCountSql, Integer.class);
+            
+            taskInfo.put("totalRequests", requestCount);
+            taskInfo.put("totalInventoryRecords", invLocCount);
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢排程任務資訊", taskInfo));
+                
+        } catch (Exception e) {
+            log.error("獲取庫存查詢排程任務資訊時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "獲取任務資訊失敗: " + e.getMessage(), null));
         }
     }
 

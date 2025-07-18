@@ -169,6 +169,54 @@ public class EnvelopeService {
     }
 
     @Transactional
+    public String createJitInvLocEnvelope(String requestId, String providerName) {
+        log.info("正在為 JIT 庫存查詢 (RequestId: {}) 建立 B2B 封套...", requestId);
+
+        String seqId = jdbcTemplate.queryForObject("SELECT TO_CHAR(B2B.ZEN_B2B_SEQ.NEXTVAL) FROM DUAL", String.class);
+        if (seqId == null) {
+            log.error("無法從序列 B2B.ZEN_B2B_SEQ 獲取新的 SEQ_ID。");
+            throw new IllegalStateException("無法獲取序列號。");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        String docNo = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String formattedTimestamp = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        String sql = "INSERT INTO ZEN_B2B_ENVELOPE (" +
+                     "SEQ_ID, SENDER_CODE, RECEIVER_CODE, SENDER_AP_ID, RECEIVER_AP_ID, " +
+                     "SENDER_GS_ID, RECEIVER_GS_ID, DOC_NO, DOC_ID, DIRECTION, " +
+                     "B2B_MSG_TYPE, DATASOURCE, DOC_DATETIME, TRANS_FLAG, CONVERSATION_ID, " +
+                     "CREATION_DATE, LAST_UPDATE_DATE" +
+                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))";
+        try {
+            jdbcTemplate.update(sql,
+                seqId,                  // SEQ_ID
+                "ZEN",                  // SENDER_CODE
+                providerName,           // RECEIVER_CODE (e.g., "JIT")
+                "ZEN",                  // SENDER_AP_ID
+                providerName,           // RECEIVER_AP_ID
+                "ZEN",                  // SENDER_GS_ID
+                providerName,           // RECEIVER_GS_ID (e.g., "JIT")
+                docNo,                  // DOC_NO
+                seqId,                  // DOC_ID
+                "OUT",                  // DIRECTION
+                "INV_LOC",              // B2B_MSG_TYPE (庫存查詢)
+                "API",                  // DATASOURCE
+                formattedTimestamp,     // DOC_DATETIME
+                "W",                    // TRANS_FLAG (Waiting)
+                requestId,              // CONVERSATION_ID (使用請求ID)
+                formattedTimestamp,     // CREATION_DATE
+                formattedTimestamp      // LAST_UPDATE_DATE
+            );
+            log.info("JIT 庫存查詢 B2B 封套建立成功。SEQ_ID: {}, RequestId: {}", seqId, requestId);
+            return seqId;
+        } catch (Exception e) {
+            log.error("寫入 JIT 庫存查詢封套到 ZEN_B2B_ENVELOPE 表時發生錯誤。", e);
+            throw new RuntimeException("無法建立 JIT 庫存查詢 B2B 封套記錄。", e);
+        }
+    }
+
+    @Transactional
     public void updateEnvelopeStatus(String seqId, String status) {
         if (seqId == null || status == null) {
             log.warn("SEQ_ID 或狀態為空，無法更新 B2B 封套狀態。");
