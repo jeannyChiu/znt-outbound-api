@@ -110,6 +110,12 @@ public class JitAsnMappingService {
     private void processAsnDataLoop(String operationId, String sql, ProcessingStatistics stats) {
         int consecutiveErrors = 0;
         final int maxConsecutiveErrors = 5;
+        
+        // 防止無限循環的機制
+        java.util.Set<String> recentlyFailedExternalNos = new java.util.HashSet<>();
+        String lastFailedExternalNo = null;
+        int sameDataFailCount = 0;
+        final int maxSameDataFails = 2; // 同一筆資料最多連續失敗2次就跳過
 
         while (true) {
             try {
@@ -144,6 +150,30 @@ public class JitAsnMappingService {
                 stats.processedCount++;
 
                 String externalNo = getStringValue(rows.get(0), "EXTERNAL_NO");
+                
+                // 檢查是否為剛剛失敗的相同資料
+                if (externalNo.equals(lastFailedExternalNo)) {
+                    sameDataFailCount++;
+                    log.warn("[{}] ExternalNo: {} 連續失敗第 {} 次", 
+                            operationId, externalNo, sameDataFailCount);
+                    
+                    if (sameDataFailCount >= maxSameDataFails) {
+                        log.warn("[{}] ExternalNo: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
+                                operationId, externalNo, sameDataFailCount);
+                        recentlyFailedExternalNos.add(externalNo);
+                        // 因為SQL查詢會持續返回相同的失敗資料，所以直接結束處理
+                        log.info("[{}] 剩餘資料為連續失敗的資料，本次處理結束", operationId);
+                        break; // 結束處理循環
+                    }
+                }
+                
+                // 如果是本次已經跳過的資料，直接跳過
+                if (recentlyFailedExternalNos.contains(externalNo)) {
+                    log.debug("[{}] ExternalNo: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalNo);
+                    log.info("[{}] 所有未跳過的資料已處理完畢，處理作業完成。", operationId);
+                    break; // 結束處理循環
+                }
+                
                 log.info("[{}] 開始處理第 {} 筆 ASN 資料，ExternalNo: {}",
                         operationId, stats.processedCount, externalNo);
 
@@ -156,10 +186,18 @@ public class JitAsnMappingService {
                     stats.successCount++;
                     log.info("[{}] ASN (ExternalNo: {}) 處理成功，耗時: {}ms",
                             operationId, externalNo, singleDuration);
+                    // 成功後重置失敗計數
+                    lastFailedExternalNo = null;
+                    sameDataFailCount = 0;
                 } else {
                     stats.failedCount++;
                     log.error("[{}] ASN (ExternalNo: {}) 處理失敗，耗時: {}ms",
                             operationId, externalNo, singleDuration);
+                    // 記錄失敗的 ExternalNo
+                    if (!externalNo.equals(lastFailedExternalNo)) {
+                        lastFailedExternalNo = externalNo;
+                        sameDataFailCount = 1;
+                    }
                 }
 
                 // 為避免過度頻繁的資料庫查詢，加入短暫延遲

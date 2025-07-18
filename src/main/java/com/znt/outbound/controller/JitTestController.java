@@ -6,6 +6,7 @@ import com.znt.outbound.scheduler.JitAsnScheduledTask;
 import com.znt.outbound.scheduler.JitInvMoveOrTradeScheduledTask;
 import com.znt.outbound.service.JitAsnMappingService;
 import com.znt.outbound.service.JitInvMoveOrTradeMappingService;
+import com.znt.outbound.service.JitInvLocService;
 import com.znt.outbound.service.JitAuthService;
 import com.znt.outbound.service.ApiConfigService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class JitTestController {
 
     private final JitAsnMappingService jitAsnMappingService;
     private final JitInvMoveOrTradeMappingService jitInvMoveOrTradeMappingService;
+    private final JitInvLocService jitInvLocService;
     private final JdbcTemplate jdbcTemplate;
     private final JitAuthService jitAuthService;
     private final ApiConfigService apiConfigService;
@@ -721,6 +723,292 @@ public class JitTestController {
             log.error("查詢庫內移倉/交易排程任務資訊失敗", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "查詢庫內移倉/交易排程任務資訊失敗: " + e.getMessage(), null));
+        }
+    }
+
+    // ========== 庫存查詢測試端點 ==========
+
+    /**
+     * 測試庫存查詢 JSON 格式映射
+     * 僅測試 JSON 序列化/反序列化和資料庫操作，不實際調用 JIT API
+     */
+    @GetMapping("/test-inventory-mapping")
+    public ResponseEntity<?> testInventoryMapping() {
+        log.info("=== JIT 庫存查詢 JSON 格式測試開始 ===");
+        try {
+            // 測試參數
+            String whName = "GT";
+            String zoneName = "ZSH基通.上海倉";
+            String storerAbbrName = "ZCSH";
+            String sku = "SKU001234";
+
+            // 1. 測試請求 JSON 格式
+            com.znt.outbound.model.jit.JitInvLocApiRequest apiRequest = 
+                com.znt.outbound.model.jit.JitInvLocApiRequest.builder()
+                    .whName(whName)
+                    .zoneName(zoneName)
+                    .storerAbbrName(storerAbbrName)
+                    .sku(sku)
+                    .build();
+
+            // 序列化請求物件為 JSON
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            String requestJson = objectMapper.writeValueAsString(apiRequest);
+            log.info("請求 JSON 格式: {}", requestJson);
+
+            // 2. 模擬 JIT API 回應 JSON
+            String mockResponseJson = """
+                {
+                  "InvLocs": [
+                    {
+                      "InvLocId": 12345,
+                      "WhName": "GT",
+                      "StorerAbbrName": "ZCSH",
+                      "ZoneName": "ZSH基通.上海倉",
+                      "Loc": "A01-01-01",
+                      "Lpn": "LPN20250716001",
+                      "Lot": "LOT20250716",
+                      "Sku": "SKU001234",
+                      "SkuName": "產品名稱",
+                      "SkuNameE": "Product Name",
+                      "Spec": "規格A",
+                      "Qty": 1000,
+                      "QtyAllocated": 200,
+                      "QtyPicked": 150,
+                      "QtyHold": 50,
+                      "QtyAvailable": 600,
+                      "Descriptions": "庫存描述",
+                      "CreateDt": "2025-07-16T08:00:00",
+                      "CreateP": "系統",
+                      "CreatePn": "創建人姓名",
+                      "UpdateDt": "2025-07-16T12:00:00",
+                      "UpdateP": "系統",
+                      "UpdatePn": "更新人姓名",
+                      "ReceiveDt": "2025-07-15T10:00:00",
+                      "InvAgeDays": 1,
+                      "DateCode": 20250716,
+                      "ExpiredDt": "2025-12-31T23:59:59",
+                      "Coo": "TW",
+                      "PackageType": "箱",
+                      "InboundType": "入庫",
+                      "VLot": "VL001",
+                      "QtyPEa": 10.5,
+                      "QtyPCase": 100,
+                      "QtyPip": 200,
+                      "QtyPPip": 300,
+                      "LotAttr01": "批次屬性1",
+                      "LotAttr02": "批次屬性2",
+                      "LotAttr03": "批次屬性3",
+                      "LotAttr04": "批次屬性4",
+                      "LotAttr05": "批次屬性5",
+                      "LotAttr06": "批次屬性6",
+                      "LotAttr07": "批次屬性7",
+                      "LotAttr08": "批次屬性8",
+                      "LotAttr09": "批次屬性9",
+                      "LotAttr10": "批次屬性10",
+                      "LotAttr11": "批次屬性11",
+                      "LotAttr12": "批次屬性12",
+                      "LotAttr13": "批次屬性13",
+                      "LotAttr14": "批次屬性14",
+                      "LotAttr15": "批次屬性15",
+                      "LotAttr16": "批次屬性16",
+                      "LotAttr17": "批次屬性17",
+                      "LotAttr18": "批次屬性18",
+                      "LotAttr19": "批次屬性19",
+                      "LotAttr20": "批次屬性20"
+                    }
+                  ]
+                }
+                """;
+
+            // 3. 測試回應 JSON 解析
+            objectMapper.findAndRegisterModules(); // 註冊 JavaTimeModule
+            com.znt.outbound.model.jit.JitInvLocApiResponse apiResponse = 
+                objectMapper.readValue(mockResponseJson, com.znt.outbound.model.jit.JitInvLocApiResponse.class);
+
+            log.info("成功解析回應 JSON，庫存記錄數量: {}", 
+                    apiResponse.getInvLocs() != null ? apiResponse.getInvLocs().size() : 0);
+
+            // 4. 測試資料庫操作（寫入請求記錄）
+            String queryIdSql = "SELECT B2B.JIT_INV_LOC_REQUEST_REQUEST_ID_SEQ.NEXTVAL FROM DUAL";
+            Long requestId = jdbcTemplate.queryForObject(queryIdSql, Long.class);
+            
+            String insertRequestSql = """
+                INSERT INTO B2B.JIT_INV_LOC_REQUEST (REQUEST_ID, WH_NAME, ZONE_NAME, STORER_ABBR_NAME, SKU, STATUS, CREATED_AT) 
+                VALUES (?, ?, ?, ?, ?, 'PENDING', ?)
+                """;
+            
+            jdbcTemplate.update(insertRequestSql, requestId, whName, zoneName, storerAbbrName, sku, 
+                               java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
+
+            // 5. 測試將 mock response 寫入 JIT_INV_LOC_LIST 表
+            int insertedCount = 0;
+            int failedCount = 0;
+            String insertInvLocSql = """
+                INSERT INTO B2B.JIT_INV_LOC_LIST (
+                    INV_LOC_ID, REQUEST_ID, WH_NAME, STORER_ABBR_NAME, ZONE_NAME, LOC, LPN, LOT, SKU, 
+                    SKU_NAME, SKU_NAME_E, SPEC, QTY, QTY_ALLOCATED, QTY_PICKED, QTY_HOLD, QTY_AVAILABLE, 
+                    DESCRIPTIONS, CREATE_DT, CREATE_P, CREATE_PN, UPDATE_DT, UPDATE_P, UPDATE_PN, 
+                    RECEIVE_DT, INV_AGE_DAYS, DATE_CODE, EXPIRED_DT, COO, PACKAGE_TYPE, INBOUND_TYPE, 
+                    VLOT, QTY_P_EA, QTY_P_CASE, QTY_PIP, QTY_P_IIP, 
+                    LOT_ATTR01, LOT_ATTR02, LOT_ATTR03, LOT_ATTR04, LOT_ATTR05, LOT_ATTR06, LOT_ATTR07, 
+                    LOT_ATTR08, LOT_ATTR09, LOT_ATTR10, LOT_ATTR11, LOT_ATTR12, LOT_ATTR13, LOT_ATTR14, 
+                    LOT_ATTR15, LOT_ATTR16, LOT_ATTR17, LOT_ATTR18, LOT_ATTR19, LOT_ATTR20
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+
+            for (com.znt.outbound.model.jit.JitInvLoc invLoc : apiResponse.getInvLocs()) {
+                try {
+                    jdbcTemplate.update(insertInvLocSql,
+                        invLoc.getInvLocId(), requestId, invLoc.getWhName(), invLoc.getStorerAbbrName(), 
+                        invLoc.getZoneName(), invLoc.getLoc(), invLoc.getLpn(), invLoc.getLot(), invLoc.getSku(),
+                        invLoc.getSkuName(), invLoc.getSkuNameE(), invLoc.getSpec(), invLoc.getQty(), 
+                        invLoc.getQtyAllocated(), invLoc.getQtyPicked(), invLoc.getQtyHold(), invLoc.getQtyAvailable(),
+                        invLoc.getDescriptions(), 
+                        invLoc.getCreateDt() != null ? java.sql.Timestamp.valueOf(invLoc.getCreateDt()) : null,
+                        invLoc.getCreateP(), invLoc.getCreatePn(), 
+                        invLoc.getUpdateDt() != null ? java.sql.Timestamp.valueOf(invLoc.getUpdateDt()) : null,
+                        invLoc.getUpdateP(), invLoc.getUpdatePn(), 
+                        invLoc.getReceiveDt() != null ? java.sql.Timestamp.valueOf(invLoc.getReceiveDt()) : null,
+                        invLoc.getInvAgeDays(), invLoc.getDateCode(), 
+                        invLoc.getExpiredDt() != null ? java.sql.Timestamp.valueOf(invLoc.getExpiredDt()) : null,
+                        invLoc.getCoo(), invLoc.getPackageType(), invLoc.getInboundType(), invLoc.getVLot(), 
+                        invLoc.getQtyPEa(), invLoc.getQtyPCase(), invLoc.getQtyPip(), invLoc.getQtyPPip(),
+                        invLoc.getLotAttr01(), invLoc.getLotAttr02(), invLoc.getLotAttr03(), invLoc.getLotAttr04(),
+                        invLoc.getLotAttr05(), invLoc.getLotAttr06(), invLoc.getLotAttr07(), invLoc.getLotAttr08(),
+                        invLoc.getLotAttr09(), invLoc.getLotAttr10(), invLoc.getLotAttr11(), invLoc.getLotAttr12(),
+                        invLoc.getLotAttr13(), invLoc.getLotAttr14(), invLoc.getLotAttr15(), invLoc.getLotAttr16(),
+                        invLoc.getLotAttr17(), invLoc.getLotAttr18(), invLoc.getLotAttr19(), invLoc.getLotAttr20()
+                    );
+                    insertedCount++;
+                    log.info("成功寫入庫存資料。InvLocId: {}", invLoc.getInvLocId());
+                } catch (Exception e) {
+                    failedCount++;
+                    log.error("寫入庫存資料失敗。InvLocId: {}", invLoc.getInvLocId(), e);
+                }
+            }
+
+            // 6. 根據插入結果決定請求狀態
+            String finalStatus;
+            if (failedCount > 0) {
+                finalStatus = "FAILED";
+                log.warn("庫存資料插入部分失敗。成功: {}, 失敗: {}", insertedCount, failedCount);
+            } else {
+                finalStatus = "COMPLETED";
+                log.info("庫存資料插入全部成功。成功: {}", insertedCount);
+            }
+            
+            String updateStatusSql = "UPDATE B2B.JIT_INV_LOC_REQUEST SET STATUS = ?, UPDATED_AT = ? WHERE REQUEST_ID = ?";
+            jdbcTemplate.update(updateStatusSql, finalStatus, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()), requestId);
+
+            // 7. 準備測試結果
+            java.util.Map<String, Object> testResult = new java.util.HashMap<>();
+            testResult.put("requestId", requestId);
+            testResult.put("requestJson", requestJson);
+            testResult.put("responseJsonParsed", true);
+            testResult.put("inventoryRecordCount", apiResponse.getInvLocs().size());
+            testResult.put("insertedInventoryRecords", insertedCount);
+            testResult.put("failedInventoryRecords", failedCount);
+            testResult.put("finalStatus", finalStatus);
+            testResult.put("firstInventoryRecord", apiResponse.getInvLocs().get(0));
+            testResult.put("databaseInsert", failedCount > 0 ? "部分失敗" : "成功");
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢 JSON 格式測試成功", testResult));
+
+        } catch (Exception e) {
+            log.error("庫存查詢 JSON 格式測試失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "JSON 格式測試失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== JIT 庫存查詢 JSON 格式測試結束 ===");
+        }
+    }
+
+    /**
+     * 預覽庫存查詢的 JSON 內容（不實際發送）
+     */
+    @GetMapping("/preview-inventory-json")
+    public ResponseEntity<?> previewInventoryJson() {
+        log.info("=== 預覽庫存查詢 JSON 內容開始 ===");
+        try {
+            // 使用測試參數
+            String whName = "GT";
+            String zoneName = "ZSH基通.上海倉";
+            String storerAbbrName = "ZCSH";
+            String sku = "SKU001234";
+
+            // 建立請求物件
+            com.znt.outbound.model.jit.JitInvLocApiRequest apiRequest = 
+                com.znt.outbound.model.jit.JitInvLocApiRequest.builder()
+                    .whName(whName)
+                    .zoneName(zoneName)
+                    .storerAbbrName(storerAbbrName)
+                    .sku(sku)
+                    .build();
+
+            // 轉換為 JSON 字串
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(apiRequest);
+
+            log.info("將要發送到 JIT 的庫存查詢 JSON 內容:");
+            log.info(jsonString);
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢 JSON 預覽成功",
+                    "JSON內容: " + jsonString));
+
+        } catch (Exception e) {
+            log.error("預覽庫存查詢 JSON 失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "預覽過程中發生錯誤: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 預覽庫存查詢 JSON 內容結束 ===");
+        }
+    }
+
+    /**
+     * 檢查庫存查詢健康狀態
+     */
+    @GetMapping("/health-inventory")
+    public ResponseEntity<?> healthInventory() {
+        log.info("收到庫存查詢健康檢查請求");
+        try {
+            // 檢查是否有待處理的庫存查詢請求
+            String pendingSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_REQUEST WHERE STATUS = 'PENDING'";
+            Integer pendingCount = jdbcTemplate.queryForObject(pendingSql, Integer.class);
+
+            // 檢查是否有失敗的庫存查詢請求
+            String failedSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_REQUEST WHERE STATUS = 'FAILED'";
+            Integer failedCount = jdbcTemplate.queryForObject(failedSql, Integer.class);
+
+            // 檢查是否有成功的庫存查詢請求
+            String completedSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_REQUEST WHERE STATUS = 'COMPLETED'";
+            Integer completedCount = jdbcTemplate.queryForObject(completedSql, Integer.class);
+
+            // 檢查庫存結果數量
+            String invLocCountSql = "SELECT COUNT(*) FROM B2B.JIT_INV_LOC_LIST";
+            Integer invLocCount = jdbcTemplate.queryForObject(invLocCountSql, Integer.class);
+
+            // 檢查 API 配置
+            String invLocApiUrl = apiConfigService.getInvLocApiUrl();
+
+            java.util.Map<String, Object> healthInfo = new java.util.HashMap<>();
+            healthInfo.put("pendingRequests", pendingCount);
+            healthInfo.put("failedRequests", failedCount);
+            healthInfo.put("completedRequests", completedCount);
+            healthInfo.put("totalInventoryRecords", invLocCount);
+            healthInfo.put("invLocApiUrl", invLocApiUrl != null ? "已設定" : "未設定");
+            healthInfo.put("currentTime", java.time.LocalDateTime.now());
+            healthInfo.put("serviceName", "JitInvLocService");
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫存查詢健康檢查完成", healthInfo));
+
+        } catch (Exception e) {
+            log.error("庫存查詢健康檢查失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "健康檢查失敗: " + e.getMessage(), null));
         }
     }
 
