@@ -73,8 +73,8 @@ public class EnvelopeService {
     }
 
     @Transactional
-    public String createJitAsnEnvelope(String externalNo, String providerName) {
-        log.info("正在為 JIT ASN (ExternalNo: {}) 建立 B2B 封套...", externalNo);
+    public String createJitAsnEnvelope(String externalId, String providerName) {
+        log.info("正在為 JIT ASN (ExternalId: {}) 建立 B2B 封套...", externalId);
 
         String seqId = jdbcTemplate.queryForObject("SELECT TO_CHAR(B2B.ZEN_B2B_SEQ.NEXTVAL) FROM DUAL", String.class);
         if (seqId == null) {
@@ -108,11 +108,11 @@ public class EnvelopeService {
                 "API",                  // DATASOURCE
                 formattedTimestamp,     // DOC_DATETIME
                 "W",                    // TRANS_FLAG (Waiting)
-                externalNo,             // CONVERSATION_ID (使用外部單號)
+                externalId,             // CONVERSATION_ID (使用外部識別碼)
                 formattedTimestamp,     // CREATION_DATE
                 formattedTimestamp      // LAST_UPDATE_DATE
             );
-            log.info("JIT ASN B2B 封套建立成功。SEQ_ID: {}, ExternalNo: {}", seqId, externalNo);
+            log.info("JIT ASN B2B 封套建立成功。SEQ_ID: {}, ExternalId: {}", seqId, externalId);
             return seqId;
         } catch (Exception e) {
             log.error("寫入 JIT ASN 封套到 ZEN_B2B_ENVELOPE 表時發生錯誤。", e);

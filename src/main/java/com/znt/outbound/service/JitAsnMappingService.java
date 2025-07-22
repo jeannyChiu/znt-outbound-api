@@ -64,8 +64,8 @@ public class JitAsnMappingService {
 
     /**
      * 處理並發送 JIT 入庫單 (ASN) 的主要方法。
-     * 該方法將持續查詢並處理待處理的 ASN 資料，每次只處理一筆 ExternalNo，
-     * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalNo 資料」的限制。
+     * 該方法將持續查詢並處理待處理的 ASN 資料，每次只處理一筆 ExternalId，
+     * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalId 資料」的限制。
      */
     public void processAndSendJitAsn() {
         String operationId = generateOperationId();
@@ -149,18 +149,18 @@ public class JitAsnMappingService {
                 consecutiveErrors = 0;
                 stats.processedCount++;
 
-                String externalNo = getStringValue(rows.get(0), "EXTERNAL_NO");
+                String externalId = getStringValue(rows.get(0), "EXTERNAL_ID");
                 
                 // 檢查是否為剛剛失敗的相同資料
-                if (externalNo.equals(lastFailedExternalNo)) {
+                if (externalId.equals(lastFailedExternalNo)) {
                     sameDataFailCount++;
-                    log.warn("[{}] ExternalNo: {} 連續失敗第 {} 次", 
-                            operationId, externalNo, sameDataFailCount);
+                    log.warn("[{}] ExternalId: {} 連續失敗第 {} 次", 
+                            operationId, externalId, sameDataFailCount);
                     
                     if (sameDataFailCount >= maxSameDataFails) {
-                        log.warn("[{}] ExternalNo: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
-                                operationId, externalNo, sameDataFailCount);
-                        recentlyFailedExternalNos.add(externalNo);
+                        log.warn("[{}] ExternalId: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
+                                operationId, externalId, sameDataFailCount);
+                        recentlyFailedExternalNos.add(externalId);
                         // 因為SQL查詢會持續返回相同的失敗資料，所以直接結束處理
                         log.info("[{}] 剩餘資料為連續失敗的資料，本次處理結束", operationId);
                         break; // 結束處理循環
@@ -168,34 +168,34 @@ public class JitAsnMappingService {
                 }
                 
                 // 如果是本次已經跳過的資料，直接跳過
-                if (recentlyFailedExternalNos.contains(externalNo)) {
-                    log.debug("[{}] ExternalNo: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalNo);
+                if (recentlyFailedExternalNos.contains(externalId)) {
+                    log.debug("[{}] ExternalId: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalId);
                     log.info("[{}] 所有未跳過的資料已處理完畢，處理作業完成。", operationId);
                     break; // 結束處理循環
                 }
                 
-                log.info("[{}] 開始處理第 {} 筆 ASN 資料，ExternalNo: {}",
-                        operationId, stats.processedCount, externalNo);
+                log.info("[{}] 開始處理第 {} 筆 ASN 資料，ExternalId: {}",
+                        operationId, stats.processedCount, externalId);
 
                 // 步驟 3: 處理單筆 ASN 資料
                 long singleStartTime = System.currentTimeMillis();
-                boolean success = processSingleAsnWithErrorHandling(operationId, rows, externalNo, stats);
+                boolean success = processSingleAsnWithErrorHandling(operationId, rows, externalId, stats);
                 long singleDuration = System.currentTimeMillis() - singleStartTime;
 
                 if (success) {
                     stats.successCount++;
-                    log.info("[{}] ASN (ExternalNo: {}) 處理成功，耗時: {}ms",
-                            operationId, externalNo, singleDuration);
+                    log.info("[{}] ASN (ExternalId: {}) 處理成功，耗時: {}ms",
+                            operationId, externalId, singleDuration);
                     // 成功後重置失敗計數
                     lastFailedExternalNo = null;
                     sameDataFailCount = 0;
                 } else {
                     stats.failedCount++;
-                    log.error("[{}] ASN (ExternalNo: {}) 處理失敗，耗時: {}ms",
-                            operationId, externalNo, singleDuration);
-                    // 記錄失敗的 ExternalNo
-                    if (!externalNo.equals(lastFailedExternalNo)) {
-                        lastFailedExternalNo = externalNo;
+                    log.error("[{}] ASN (ExternalId: {}) 處理失敗，耗時: {}ms",
+                            operationId, externalId, singleDuration);
+                    // 記錄失敗的 ExternalId
+                    if (!externalId.equals(lastFailedExternalNo)) {
+                        lastFailedExternalNo = externalId;
                         sameDataFailCount = 1;
                     }
                 }
@@ -258,11 +258,11 @@ public class JitAsnMappingService {
      * 帶錯誤處理的單筆 ASN 處理方法
      */
     private boolean processSingleAsnWithErrorHandling(String operationId, List<Map<String, Object>> rows,
-                                                     String externalNo, ProcessingStatistics stats) {
+                                                     String externalId, ProcessingStatistics stats) {
         try {
-            return processSingleAsn(rows, externalNo);
+            return processSingleAsn(rows, externalId);
         } catch (Exception e) {
-            log.error("[{}] 處理 ASN (ExternalNo: {}) 時發生未預期的錯誤", operationId, externalNo, e);
+            log.error("[{}] 處理 ASN (ExternalId: {}) 時發生未預期的錯誤", operationId, externalId, e);
 
             // 根據異常類型更新統計
             if (e.getMessage() != null) {
@@ -281,10 +281,10 @@ public class JitAsnMappingService {
 
             // 嘗試更新狀態為失敗
             try {
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED,
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED,
                         "處理過程發生未預期錯誤: " + e.getClass().getSimpleName());
             } catch (Exception statusUpdateError) {
-                log.error("[{}] 更新失敗狀態時也發生錯誤，ExternalNo: {}", operationId, externalNo, statusUpdateError);
+                log.error("[{}] 更新失敗狀態時也發生錯誤，ExternalId: {}", operationId, externalId, statusUpdateError);
             }
 
             return false;
@@ -296,15 +296,15 @@ public class JitAsnMappingService {
      */
     private void logFailedAsnSummary() {
         try {
-            String failedSql = "SELECT EXTERNAL_NO, UPDATED_AT FROM B2B.JIT_ASN_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT DESC";
+            String failedSql = "SELECT EXTERNAL_ID, UPDATED_AT FROM B2B.JIT_ASN_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT DESC";
             List<Map<String, Object>> failedAsns = jdbcTemplate.queryForList(failedSql, STATUS_FAILED);
 
             if (!failedAsns.isEmpty()) {
                 log.info("=== 失敗 ASN 摘要 ===");
                 for (Map<String, Object> asn : failedAsns) {
-                    String externalNo = getStringValue(asn, "EXTERNAL_NO");
+                    String externalId = getStringValue(asn, "EXTERNAL_ID");
                     Object updatedAt = asn.get("UPDATED_AT");
-                    log.info("失敗 ASN: {}, 最後更新時間: {}", externalNo, updatedAt);
+                    log.info("失敗 ASN: {}, 最後更新時間: {}", externalId, updatedAt);
                 }
                 log.info("=== 失敗 ASN 摘要結束 ===");
             }
@@ -322,7 +322,7 @@ public class JitAsnMappingService {
 
         try {
             // 查詢失敗狀態的 ASN，按更新時間排序
-            String failedSql = "SELECT EXTERNAL_NO FROM B2B.JIT_ASN_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT ASC";
+            String failedSql = "SELECT EXTERNAL_ID FROM B2B.JIT_ASN_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT ASC";
             List<Map<String, Object>> failedAsns = jdbcTemplate.queryForList(failedSql, STATUS_FAILED);
 
             if (failedAsns.isEmpty()) {
@@ -336,18 +336,18 @@ public class JitAsnMappingService {
             int retrySuccessCount = 0;
 
             for (Map<String, Object> asnRow : failedAsns) {
-                String externalNo = getStringValue(asnRow, "EXTERNAL_NO");
+                String externalId = getStringValue(asnRow, "EXTERNAL_ID");
                 retryCount++;
 
-                log.info("重試第 {} 筆失敗 ASN，ExternalNo: {}", retryCount, externalNo);
+                log.info("重試第 {} 筆失敗 ASN，ExternalId: {}", retryCount, externalId);
 
                 // 將狀態重置為 PENDING，讓主處理流程重新處理
-                boolean resetSuccess = updateAsnStatus(externalNo, STATUS_PENDING, null);
+                boolean resetSuccess = updateAsnStatus(externalId, STATUS_PENDING, null);
                 if (resetSuccess) {
                     retrySuccessCount++;
-                    log.info("成功重置 ASN 狀態為 PENDING，ExternalNo: {}", externalNo);
+                    log.info("成功重置 ASN 狀態為 PENDING，ExternalId: {}", externalId);
                 } else {
-                    log.error("重置 ASN 狀態失敗，ExternalNo: {}", externalNo);
+                    log.error("重置 ASN 狀態失敗，ExternalId: {}", externalId);
                 }
 
                 // 避免過度頻繁的資料庫操作
@@ -386,69 +386,69 @@ public class JitAsnMappingService {
 
     /**
      * 處理單筆 ASN 資料
-     * @param rows 查詢結果（單一 ExternalNo 的所有明細行）
-     * @param externalNo 外部單號
+     * @param rows 查詢結果（單一 ExternalId 的所有明細行）
+     * @param externalId 外部唯一識別碼
      * @return 處理是否成功
      */
-    private boolean processSingleAsn(List<Map<String, Object>> rows, String externalNo) {
+    private boolean processSingleAsn(List<Map<String, Object>> rows, String externalId) {
         String seqId = null;
         String currentStep = "初始化";
 
         try {
             // 步驟 1: 將查詢結果映射到 JitAsnRequest 物件
             currentStep = "資料映射";
-            log.debug("開始映射 ASN 資料，ExternalNo: {}", externalNo);
+            log.debug("開始映射 ASN 資料，ExternalId: {}", externalId);
 
             JitAsnRequest requestToSend;
             try {
                 requestToSend = mapDataToJitAsnRequest(rows);
             } catch (Exception e) {
-                log.error("ASN 資料映射過程發生異常，ExternalNo: {}", externalNo, e);
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED, "資料映射異常: " + e.getMessage());
+                log.error("ASN 資料映射過程發生異常，ExternalId: {}", externalId, e);
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED, "資料映射異常: " + e.getMessage());
                 return false;
             }
 
             if (requestToSend == null) {
-                log.error("資料映射失敗，無法產生有效的 JitAsnRequest 物件，ExternalNo: {}", externalNo);
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED, "資料映射失敗");
+                log.error("資料映射失敗，無法產生有效的 JitAsnRequest 物件，ExternalId: {}", externalId);
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED, "資料映射失敗");
                 return false;
             }
 
             // 步驟 2: 更新狀態為 PROCESSING
             currentStep = "狀態更新";
             try {
-                updateAsnStatusWithRetry(externalNo, STATUS_PROCESSING, null);
+                updateAsnStatusWithRetry(externalId, STATUS_PROCESSING, null);
             } catch (Exception e) {
-                log.error("更新 ASN 狀態為 PROCESSING 時發生異常，ExternalNo: {}", externalNo, e);
+                log.error("更新 ASN 狀態為 PROCESSING 時發生異常，ExternalId: {}", externalId, e);
                 // 狀態更新失敗不應該阻止後續處理，記錄警告即可
-                log.warn("狀態更新失敗，但繼續處理 ASN，ExternalNo: {}", externalNo);
+                log.warn("狀態更新失敗，但繼續處理 ASN，ExternalId: {}", externalId);
             }
 
             // 步驟 3: 寫入封套 (Envelope)
             currentStep = "封套建立";
-            log.info("準備為 ASN (ExternalNo: {}) 寫入 B2B 封套...", externalNo);
+            log.info("準備為 ASN (ExternalId: {}) 寫入 B2B 封套...", externalId);
 
             try {
                 String providerName = apiConfigService.getProviderName();
-                seqId = envelopeService.createJitAsnEnvelope(externalNo, providerName);
-                log.debug("成功建立封套，ExternalNo: {}, SEQ_ID: {}", externalNo, seqId);
+                seqId = envelopeService.createJitAsnEnvelope(externalId, providerName);
+                log.debug("成功建立封套，ExternalId: {}, SEQ_ID: {}", externalId, seqId);
             } catch (Exception e) {
-                log.error("建立 B2B 封套時發生異常，ExternalNo: {}", externalNo, e);
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED, "封套建立失敗: " + e.getMessage());
+                log.error("建立 B2B 封套時發生異常，ExternalId: {}", externalId, e);
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED, "封套建立失敗: " + e.getMessage());
                 return false;
             }
 
             // 步驟 4: 發送到 JIT API
             currentStep = "API 發送";
-            log.info("B2B 封套寫入成功 (SEQ_ID: {}), 準備發送 ASN (ExternalNo: {}) 到 JIT。", seqId, externalNo);
+            log.info("B2B 封套寫入成功 (SEQ_ID: {}), 準備發送 ASN (ExternalId: {}) 到 JIT。", seqId, externalId);
 
             ResponseEntity<String> response;
             try {
                 response = jitApiClient.sendAsn(requestToSend);
-                log.debug("JIT API 調用完成，ExternalNo: {}, Response Status: {}",
-                        externalNo, response != null ? response.getStatusCode() : "null");
+                log.debug("JIT API 調用完成，ExternalId: {}, Response Status: {}",
+                        externalId, response != null ? response.getStatusCode() : "null");
             } catch (Exception e) {
-                log.error("調用 JIT API 時發生異常，ExternalNo: {}", externalNo, e);
+                log.error("調用 JIT API 時發生異常，ExternalId: {}", externalId, e);
 
                 // 更新封套狀態為失敗
                 try {
@@ -457,20 +457,20 @@ public class JitAsnMappingService {
                     log.error("更新封套狀態為失敗時也發生錯誤，SEQ_ID: {}", seqId, envelopeError);
                 }
 
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED, "API 調用異常: " + e.getMessage());
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED, "API 調用異常: " + e.getMessage());
                 return false;
             }
 
             // 步驟 5: 根據 API 回應更新狀態
             currentStep = "結果處理";
-            return handleApiResponse(externalNo, seqId, response);
+            return handleApiResponse(externalId, seqId, response);
 
         } catch (Exception e) {
             // 處理過程中發生未預期的異常
-            log.error("在處理 ASN (ExternalNo: {}) 的 {} 階段發生嚴重錯誤", externalNo, currentStep, e);
+            log.error("在處理 ASN (ExternalId: {}) 的 {} 階段發生嚴重錯誤", externalId, currentStep, e);
 
             // 嘗試清理資源
-            cleanupOnError(externalNo, seqId, currentStep, e);
+            cleanupOnError(externalId, seqId, currentStep, e);
 
             return false;
         }
@@ -479,13 +479,13 @@ public class JitAsnMappingService {
     /**
      * 處理 API 回應並更新相應狀態
      */
-    private boolean handleApiResponse(String externalNo, String seqId, ResponseEntity<String> response) {
+    private boolean handleApiResponse(String externalId, String seqId, ResponseEntity<String> response) {
         try {
             if (response != null && response.getStatusCode().is2xxSuccessful()) {
                 // 成功情況
                 envelopeService.updateEnvelopeStatus(seqId, "S"); // Success
-                updateAsnStatusWithRetry(externalNo, STATUS_COMPLETED, "成功發送到 JIT");
-                log.info("ASN (ExternalNo: {}) 成功發送到 JIT，HTTP Status: {}", externalNo, response.getStatusCode());
+                updateAsnStatusWithRetry(externalId, STATUS_COMPLETED, "成功發送到 JIT");
+                log.info("ASN (ExternalId: {}) 成功發送到 JIT，HTTP Status: {}", externalId, response.getStatusCode());
 
                 // 發送成功通知郵件
                 sendNotificationSafely(seqId, "成功");
@@ -498,8 +498,8 @@ public class JitAsnMappingService {
                     "API 回應為 null";
 
                 envelopeService.updateEnvelopeStatus(seqId, "F"); // Failed
-                updateAsnStatusWithRetry(externalNo, STATUS_FAILED, errorMsg);
-                log.error("ASN (ExternalNo: {}) 發送失敗：{}", externalNo, errorMsg);
+                updateAsnStatusWithRetry(externalId, STATUS_FAILED, errorMsg);
+                log.error("ASN (ExternalId: {}) 發送失敗：{}", externalId, errorMsg);
 
                 // 發送失敗通知郵件
                 sendNotificationSafely(seqId, "失敗");
@@ -507,8 +507,8 @@ public class JitAsnMappingService {
                 return false;
             }
         } catch (Exception e) {
-            log.error("處理 API 回應時發生異常，ExternalNo: {}", externalNo, e);
-            cleanupOnError(externalNo, seqId, "結果處理", e);
+            log.error("處理 API 回應時發生異常，ExternalId: {}", externalId, e);
+            cleanupOnError(externalId, seqId, "結果處理", e);
             return false;
         }
     }
@@ -530,7 +530,7 @@ public class JitAsnMappingService {
     /**
      * 錯誤發生時的清理工作
      */
-    private void cleanupOnError(String externalNo, String seqId, String currentStep, Exception originalError) {
+    private void cleanupOnError(String externalId, String seqId, String currentStep, Exception originalError) {
         try {
             // 更新封套狀態
             if (seqId != null) {
@@ -545,67 +545,67 @@ public class JitAsnMappingService {
 
             // 更新 ASN 狀態
             String errorMessage = String.format("%s階段發生異常: %s", currentStep, originalError.getMessage());
-            updateAsnStatusWithRetry(externalNo, STATUS_FAILED, errorMessage);
+            updateAsnStatusWithRetry(externalId, STATUS_FAILED, errorMessage);
 
         } catch (Exception e) {
-            log.error("執行錯誤清理工作時發生異常，ExternalNo: {}", externalNo, e);
+            log.error("執行錯誤清理工作時發生異常，ExternalId: {}", externalId, e);
         }
     }
 
     /**
      * 帶重試機制的 ASN 狀態更新方法
-     * @param externalNo 外部單號
+     * @param externalId 外部唯一識別碼
      * @param status 新狀態 (PENDING, PROCESSING, COMPLETED, FAILED)
      * @param errorMessage 錯誤訊息（目前不儲存到資料庫，僅用於日誌記錄）
      */
-    private void updateAsnStatusWithRetry(String externalNo, String status, String errorMessage) {
+    private void updateAsnStatusWithRetry(String externalId, String status, String errorMessage) {
         long startTime = System.currentTimeMillis();
 
         for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             try {
-                boolean success = updateAsnStatus(externalNo, status, errorMessage);
+                boolean success = updateAsnStatus(externalId, status, errorMessage);
                 if (success) {
                     long duration = System.currentTimeMillis() - startTime;
                     if (attempt > 1) {
-                        log.info("ASN 狀態更新成功（第 {} 次嘗試），ExternalNo: {}, Status: {}, 耗時: {}ms",
-                                attempt, externalNo, status, duration);
+                        log.info("ASN 狀態更新成功（第 {} 次嘗試），ExternalId: {}, Status: {}, 耗時: {}ms",
+                                attempt, externalId, status, duration);
                     } else {
-                        log.debug("ASN 狀態更新成功，ExternalNo: {}, Status: {}, 耗時: {}ms",
-                                externalNo, status, duration);
+                        log.debug("ASN 狀態更新成功，ExternalId: {}, Status: {}, 耗時: {}ms",
+                                externalId, status, duration);
                     }
                     return; // 成功則直接返回
                 }
 
                 // 如果更新失敗但沒有異常，記錄警告並重試
                 if (attempt < MAX_RETRY_ATTEMPTS) {
-                    log.warn("ASN 狀態更新失敗（第 {} 次嘗試），可能是記錄不存在或已被其他程序處理，將在 {}ms 後重試，ExternalNo: {}, Status: {}",
-                            attempt, RETRY_DELAY_MS, externalNo, status);
+                    log.warn("ASN 狀態更新失敗（第 {} 次嘗試），可能是記錄不存在或已被其他程序處理，將在 {}ms 後重試，ExternalId: {}, Status: {}",
+                            attempt, RETRY_DELAY_MS, externalId, status);
                     Thread.sleep(RETRY_DELAY_MS);
                 } else {
                     long totalDuration = System.currentTimeMillis() - startTime;
-                    log.error("ASN 狀態更新失敗，已達最大重試次數 {}，ExternalNo: {}, Status: {}, 總耗時: {}ms",
-                            MAX_RETRY_ATTEMPTS, externalNo, status, totalDuration);
+                    log.error("ASN 狀態更新失敗，已達最大重試次數 {}，ExternalId: {}, Status: {}, 總耗時: {}ms",
+                            MAX_RETRY_ATTEMPTS, externalId, status, totalDuration);
                 }
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("ASN 狀態更新重試過程被中斷，ExternalNo: {}, Status: {}", externalNo, status);
+                log.error("ASN 狀態更新重試過程被中斷，ExternalId: {}, Status: {}", externalId, status);
                 return;
             } catch (Exception e) {
                 if (attempt < MAX_RETRY_ATTEMPTS) {
-                    log.warn("ASN 狀態更新發生異常（第 {} 次嘗試），異常類型: {}，將在 {}ms 後重試，ExternalNo: {}, Status: {}",
-                            attempt, e.getClass().getSimpleName(), RETRY_DELAY_MS, externalNo, status, e);
+                    log.warn("ASN 狀態更新發生異常（第 {} 次嘗試），異常類型: {}，將在 {}ms 後重試，ExternalId: {}, Status: {}",
+                            attempt, e.getClass().getSimpleName(), RETRY_DELAY_MS, externalId, status, e);
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("ASN 狀態更新重試過程被中斷，ExternalNo: {}, Status: {}", externalNo, status);
+                        log.error("ASN 狀態更新重試過程被中斷，ExternalId: {}, Status: {}", externalId, status);
                         return;
                     }
                 } else {
                     long totalDuration = System.currentTimeMillis() - startTime;
-                    log.error("ASN 狀態更新失敗，已達最大重試次數 {}，ExternalNo: {}, Status: {}, 總耗時: {}ms",
-                            MAX_RETRY_ATTEMPTS, externalNo, status, totalDuration, e);
+                    log.error("ASN 狀態更新失敗，已達最大重試次數 {}，ExternalId: {}, Status: {}, 總耗時: {}ms",
+                            MAX_RETRY_ATTEMPTS, externalId, status, totalDuration, e);
                 }
             }
         }
@@ -613,28 +613,28 @@ public class JitAsnMappingService {
 
     /**
      * 更新 ASN 的處理狀態（單次嘗試）
-     * @param externalNo 外部單號
+     * @param externalId 外部唯一識別碼
      * @param status 新狀態 (PENDING, PROCESSING, COMPLETED, FAILED)
      * @param errorMessage 錯誤訊息（目前不儲存到資料庫，僅用於日誌記錄）
      * @return 更新是否成功
      */
-    private boolean updateAsnStatus(String externalNo, String status, String errorMessage) {
+    private boolean updateAsnStatus(String externalId, String status, String errorMessage) {
         try {
-            String updateSql = "UPDATE B2B.JIT_ASN_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_NO = ?";
-            int updatedRows = jdbcTemplate.update(updateSql, status, externalNo);
+            String updateSql = "UPDATE B2B.JIT_ASN_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_ID = ?";
+            int updatedRows = jdbcTemplate.update(updateSql, status, externalId);
 
             if (updatedRows > 0) {
-                log.debug("成功更新 ASN 狀態，ExternalNo: {}, Status: {}", externalNo, status);
+                log.debug("成功更新 ASN 狀態，ExternalId: {}, Status: {}", externalId, status);
                 if (errorMessage != null) {
-                    log.error("ASN 處理錯誤詳情，ExternalNo: {}, Error: {}", externalNo, errorMessage);
+                    log.error("ASN 處理錯誤詳情，ExternalId: {}, Error: {}", externalId, errorMessage);
                 }
                 return true;
             } else {
-                log.warn("更新 ASN 狀態時沒有找到對應的記錄，ExternalNo: {}", externalNo);
+                log.warn("更新 ASN 狀態時沒有找到對應的記錄，ExternalId: {}", externalId);
                 return false;
             }
         } catch (Exception e) {
-            log.error("更新 ASN 狀態時發生錯誤，ExternalNo: {}, Status: {}", externalNo, status, e);
+            log.error("更新 ASN 狀態時發生錯誤，ExternalId: {}, Status: {}", externalId, status, e);
             throw e; // 重新拋出異常，讓重試機制處理
         }
     }
@@ -660,15 +660,16 @@ public class JitAsnMappingService {
 
             // 步驟 2: 取得第一筆資料作為 Header 資訊的來源
             Map<String, Object> firstRow = rows.get(0);
+            String externalId = getStringValue(firstRow, "EXTERNAL_ID");
             String externalNo = getStringValue(firstRow, "EXTERNAL_NO");
 
-            log.debug("開始映射 ASN 資料，ExternalNo: {}, 明細行數: {}", externalNo, rows.size());
+            log.debug("開始映射 ASN 資料，ExternalId: {}, ExternalNo: {}, 明細行數: {}", externalId, externalNo, rows.size());
 
             // 步驟 3: 建立 JitAsnRequest 物件並設定 Header 資訊
             JitAsnRequest request = new JitAsnRequest();
 
             // 映射 Header 欄位 (來自 JIT_ASN_HEADER 表格)
-            request.setExternalId(getStringValue(firstRow, "EXTERNAL_ID"));
+            request.setExternalId(externalId);
             request.setExternalNo(externalNo);
             request.setWhName(getStringValue(firstRow, "WH_NAME"));
             request.setStorerAbbrName(getStringValue(firstRow, "STORER_ABBR_NAME"));
@@ -714,32 +715,33 @@ public class JitAsnMappingService {
 
             // 步驟 5: 驗證映射結果
             if (lines.isEmpty()) {
-                log.error("所有明細行映射都失敗，無法建立有效的 JitAsnRequest，ExternalNo: {}", externalNo);
+                log.error("所有明細行映射都失敗，無法建立有效的 JitAsnRequest，ExternalId: {}", externalId);
                 return null;
             }
 
             if (failedLines > 0) {
-                log.warn("部分明細行映射失敗，ExternalNo: {}, 成功: {} 行, 失敗: {} 行",
-                        externalNo, successfulLines, failedLines);
+                log.warn("部分明細行映射失敗，ExternalId: {}, 成功: {} 行, 失敗: {} 行",
+                        externalId, successfulLines, failedLines);
             }
 
             request.setLines(lines);
 
-            log.info("成功映射 JitAsnRequest，ExternalNo: {}, 總明細行: {}, 成功映射: {} 行, 失敗: {} 行",
-                    externalNo, rows.size(), successfulLines, failedLines);
+            log.info("成功映射 JitAsnRequest，ExternalId: {}, 總明細行: {}, 成功映射: {} 行, 失敗: {} 行",
+                    externalId, rows.size(), successfulLines, failedLines);
 
             return request;
 
         } catch (Exception e) {
-            log.error("映射 JitAsnRequest 時發生嚴重錯誤，ExternalNo: {}",
-                    rows != null && !rows.isEmpty() ? getStringValue(rows.get(0), "EXTERNAL_NO") : "unknown", e);
+            log.error("映射 JitAsnRequest 時發生嚴重錯誤，ExternalId: {}",
+                    rows != null && !rows.isEmpty() ? getStringValue(rows.get(0), "EXTERNAL_ID") : "unknown", e);
 
             // 記錄詳細的錯誤資訊以便除錯
             if (rows != null) {
                 log.error("錯誤發生時的資料行數: {}", rows.size());
                 if (!rows.isEmpty()) {
                     Map<String, Object> firstRow = rows.get(0);
-                    log.error("第一行資料的關鍵欄位: EXTERNAL_NO={}, SKU={}, QTY_EXPECTED={}",
+                    log.error("第一行資料的關鍵欄位: EXTERNAL_ID={}, EXTERNAL_NO={}, SKU={}, QTY_EXPECTED={}",
+                            getStringValue(firstRow, "EXTERNAL_ID"),
                             getStringValue(firstRow, "EXTERNAL_NO"),
                             getStringValue(firstRow, "SKU"),
                             getNullableIntValue(firstRow, "QTY_EXPECTED"));
@@ -751,7 +753,7 @@ public class JitAsnMappingService {
     }
 
     /**
-     * 驗證查詢結果的資料完整性，確保所有資料行都屬於同一個 EXTERNAL_NO
+     * 驗證查詢結果的資料完整性，確保所有資料行都屬於同一個 EXTERNAL_ID
      * @param rows 查詢結果列表
      * @return 如果資料一致則返回 true，否則返回 false
      */
@@ -760,23 +762,23 @@ public class JitAsnMappingService {
             return false;
         }
 
-        String expectedExternalNo = getStringValue(rows.get(0), "EXTERNAL_NO");
-        if (expectedExternalNo == null) {
-            log.error("第一筆資料的 EXTERNAL_NO 為 null，資料完整性驗證失敗");
+        String expectedExternalId = getStringValue(rows.get(0), "EXTERNAL_ID");
+        if (expectedExternalId == null) {
+            log.error("第一筆資料的 EXTERNAL_ID 為 null，資料完整性驗證失敗");
             return false;
         }
 
-        // 檢查所有資料行是否都有相同的 EXTERNAL_NO
+        // 檢查所有資料行是否都有相同的 EXTERNAL_ID
         for (int i = 1; i < rows.size(); i++) {
-            String currentExternalNo = getStringValue(rows.get(i), "EXTERNAL_NO");
-            if (!expectedExternalNo.equals(currentExternalNo)) {
-                log.error("資料完整性驗證失敗：第 {} 行的 EXTERNAL_NO '{}' 與預期的 '{}' 不符",
-                        i + 1, currentExternalNo, expectedExternalNo);
+            String currentExternalId = getStringValue(rows.get(i), "EXTERNAL_ID");
+            if (!expectedExternalId.equals(currentExternalId)) {
+                log.error("資料完整性驗證失敗：第 {} 行的 EXTERNAL_ID '{}' 與預期的 '{}' 不符",
+                        i + 1, currentExternalId, expectedExternalId);
                 return false;
             }
         }
 
-        log.debug("資料完整性驗證通過，所有 {} 行資料都屬於 EXTERNAL_NO: {}", rows.size(), expectedExternalNo);
+        log.debug("資料完整性驗證通過，所有 {} 行資料都屬於 EXTERNAL_ID: {}", rows.size(), expectedExternalId);
         return true;
     }
 
@@ -1136,6 +1138,7 @@ public class JitAsnMappingService {
 
         if (result != null) {
             log.info("=== 資料映射測試結果 ===");
+            log.info("ExternalId: {}", result.getExternalId());
             log.info("ExternalNo: {}", result.getExternalNo());
             log.info("WhName: {}", result.getWhName());
             log.info("StorerAbbrName: {}", result.getStorerAbbrName());

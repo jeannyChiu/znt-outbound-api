@@ -1,7 +1,7 @@
--- JIT ASN 資料查詢 SQL (單筆 EXTERNAL_NO 處理版本)
+-- JIT ASN 資料查詢 SQL (單筆 EXTERNAL_ID 處理版本)
 -- 此 SQL 將 JIT_ASN_HEADER 和 JIT_ASN_LINE 表格進行 JOIN，
--- 查詢狀態為 'PENDING' 或 'FAILED' 的入庫單資料，但每次只返回一個 EXTERNAL_NO 的所有明細行
--- 這樣確保符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalNo 資料」的限制
+-- 查詢狀態為 'PENDING' 或 'FAILED' 的入庫單資料，但每次只返回一個 EXTERNAL_ID 的所有明細行
+-- 這樣確保符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalId 資料」的限制
 
 SELECT
     -- Header 欄位 (來自 JIT_ASN_HEADER)
