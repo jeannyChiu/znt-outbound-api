@@ -25,7 +25,7 @@ public class JitInvMoveOrTradeScheduledTask {
     @Scheduled(cron = "0 */5 * * * ?", zone = "Asia/Taipei")
     public void executeJitInvMoveOrTradeProcessing() {
         // 暫時停用排程 - 測試期間使用
-        boolean schedulingEnabled = false;
+        boolean schedulingEnabled = true;
         if (!schedulingEnabled) {
             log.debug("JIT 庫內移倉/交易排程已暫停，跳過此次執行");
             return;

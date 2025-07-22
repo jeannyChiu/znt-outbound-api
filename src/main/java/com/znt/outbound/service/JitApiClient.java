@@ -104,23 +104,23 @@ public class JitApiClient {
         HttpEntity<JitInvMoveOrTradeRequest> requestEntity = new HttpEntity<>(invMoveOrTradeRequest, headers);
 
         String attemptLog = isRetry ? "重試" : "首次嘗試";
-        log.info("({}) 準備發送庫內移倉/交易到 JIT API。URL: {}, ExternalNo: {}", 
-                attemptLog, url, invMoveOrTradeRequest.getExternalNo());
+        log.info("({}) 準備發送庫內移倉/交易到 JIT API。URL: {}, ExternalId: {}", 
+                attemptLog, url, invMoveOrTradeRequest.getExternalId());
 
         try {
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
-            log.info("({}) 成功接收到 JIT API 的回應。ExternalNo: {}, Status: {}",
-                    attemptLog, invMoveOrTradeRequest.getExternalNo(), responseEntity.getStatusCode());
+            log.info("({}) 成功接收到 JIT API 的回應。ExternalId: {}, Status: {}",
+                    attemptLog, invMoveOrTradeRequest.getExternalId(), responseEntity.getStatusCode());
             return responseEntity;
         } catch (HttpClientErrorException e) {
             // 捕獲 HTTP 錯誤，例如 401, 404 等
-            log.error("({}) 發送庫內移倉/交易到 JIT API 時發生 HTTP 錯誤。ExternalNo: {}, Status: {}, Response: {}",
-                    attemptLog, invMoveOrTradeRequest.getExternalNo(), e.getStatusCode(), e.getResponseBodyAsString(), e);
+            log.error("({}) 發送庫內移倉/交易到 JIT API 時發生 HTTP 錯誤。ExternalId: {}, Status: {}, Response: {}",
+                    attemptLog, invMoveOrTradeRequest.getExternalId(), e.getStatusCode(), e.getResponseBodyAsString(), e);
             // 將 HttpClientErrorException 包裝成 ResponseEntity 回傳，以便上層判斷
             return new ResponseEntity<>(e.getResponseBodyAsString(), e.getStatusCode());
         } catch (RestClientException e) {
-            log.error("({}) 發送庫內移倉/交易到 JIT API 時發生連接錯誤。ExternalNo: {}, URL: {}",
-                    attemptLog, invMoveOrTradeRequest.getExternalNo(), url, e);
+            log.error("({}) 發送庫內移倉/交易到 JIT API 時發生連接錯誤。ExternalId: {}, URL: {}",
+                    attemptLog, invMoveOrTradeRequest.getExternalId(), url, e);
             return null;
         }
     }
@@ -192,22 +192,22 @@ public class JitApiClient {
         HttpEntity<JitAsnRequest> requestEntity = new HttpEntity<>(asnRequest, headers);
 
         String attemptLog = isRetry ? "重試" : "首次嘗試";
-        log.info("({}) 準備發送 ASN 到 JIT API。URL: {}, ExternalNo: {}", attemptLog, url, asnRequest.getExternalNo());
+        log.info("({}) 準備發送 ASN 到 JIT API。URL: {}, ExternalId: {}", attemptLog, url, asnRequest.getExternalId());
 
         try {
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
-            log.info("({}) 成功接收到 JIT API 的回應。ExternalNo: {}, Status: {}",
-                    attemptLog, asnRequest.getExternalNo(), responseEntity.getStatusCode());
+            log.info("({}) 成功接收到 JIT API 的回應。ExternalId: {}, Status: {}",
+                    attemptLog, asnRequest.getExternalId(), responseEntity.getStatusCode());
             return responseEntity;
         } catch (HttpClientErrorException e) {
             // 捕獲 HTTP 錯誤，例如 401, 404 等
-            log.error("({}) 發送 ASN 到 JIT API 時發生 HTTP 錯誤。ExternalNo: {}, Status: {}, Response: {}",
-                    attemptLog, asnRequest.getExternalNo(), e.getStatusCode(), e.getResponseBodyAsString(), e);
+            log.error("({}) 發送 ASN 到 JIT API 時發生 HTTP 錯誤。ExternalId: {}, Status: {}, Response: {}",
+                    attemptLog, asnRequest.getExternalId(), e.getStatusCode(), e.getResponseBodyAsString(), e);
             // 將 HttpClientErrorException 包裝成 ResponseEntity 回傳，以便上層判斷
             return new ResponseEntity<>(e.getResponseBodyAsString(), e.getStatusCode());
         } catch (RestClientException e) {
-            log.error("({}) 發送 ASN 到 JIT API 時發生連接錯誤。ExternalNo: {}, URL: {}",
-                    attemptLog, asnRequest.getExternalNo(), url, e);
+            log.error("({}) 發送 ASN 到 JIT API 時發生連接錯誤。ExternalId: {}, URL: {}",
+                    attemptLog, asnRequest.getExternalId(), url, e);
             return null;
         }
     }
