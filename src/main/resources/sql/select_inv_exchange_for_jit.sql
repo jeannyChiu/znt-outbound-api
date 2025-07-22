@@ -1,0 +1,19 @@
+-- 查詢待處理的JIT庫內換料主表資料
+-- 查詢狀態為 PENDING 或 FAILED 的換料單
+-- 按 HEADER_ID 排序，確保處理順序一致
+SELECT 
+    h.HEADER_ID,
+    h.EXTERNAL_ID,
+    h.EXTERNAL_NO,
+    h.WH_NAME,
+    h.STORER,
+    h.EXCHANGE_TYPE,
+    h.APPLY_DATE,
+    h.REF_NO,
+    h.REMARK,
+    h.STATUS,
+    h.CREATED_AT,
+    h.UPDATED_AT
+FROM JIT_INV_EXCHANGE_HEADER h
+WHERE h.STATUS IN ('PENDING', 'FAILED')
+ORDER BY h.HEADER_ID ASC

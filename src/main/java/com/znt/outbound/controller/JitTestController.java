@@ -5,9 +5,11 @@ import com.znt.outbound.model.jit.JitInvMoveOrTradeRequest;
 import com.znt.outbound.scheduler.JitAsnScheduledTask;
 import com.znt.outbound.scheduler.JitInvMoveOrTradeScheduledTask;
 import com.znt.outbound.scheduler.JitInvLocScheduledTask;
+import com.znt.outbound.scheduler.JitInvExchangeScheduledTask;
 import com.znt.outbound.service.JitAsnMappingService;
 import com.znt.outbound.service.JitInvMoveOrTradeMappingService;
 import com.znt.outbound.service.JitInvLocService;
+import com.znt.outbound.service.JitInvExchangeService;
 import com.znt.outbound.service.JitAuthService;
 import com.znt.outbound.service.ApiConfigService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +37,14 @@ public class JitTestController {
     private final JitAsnMappingService jitAsnMappingService;
     private final JitInvMoveOrTradeMappingService jitInvMoveOrTradeMappingService;
     private final JitInvLocService jitInvLocService;
+    private final JitInvExchangeService jitInvExchangeService;
     private final JdbcTemplate jdbcTemplate;
     private final JitAuthService jitAuthService;
     private final ApiConfigService apiConfigService;
     private final JitAsnScheduledTask jitAsnScheduledTask;
     private final JitInvMoveOrTradeScheduledTask jitInvMoveOrTradeScheduledTask;
     private final JitInvLocScheduledTask jitInvLocScheduledTask;
+    private final JitInvExchangeScheduledTask jitInvExchangeScheduledTask;
 
     /**
      * 健康檢查端點
@@ -1124,6 +1129,190 @@ public class JitTestController {
                 
         } catch (Exception e) {
             log.error("獲取庫存查詢排程任務資訊時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "獲取任務資訊失敗: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 測試 JIT 庫內換料處理與發送
+     */
+    @GetMapping("/process-and-send-inv-exchange")
+    public ResponseEntity<?> processAndSendInvExchange() {
+        log.info("=== 手動觸發 JIT 庫內換料處理開始 ===");
+        try {
+            // 檢查配置
+            String apiUrl = apiConfigService.getInvExchangeApiUrl();
+            if (apiUrl == null || apiUrl.isEmpty()) {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "JIT 庫內換料 API URL 未設定",
+                        "請檢查資料庫中的 JIT-INV_EXCHANGE_URLT 設定"));
+            }
+
+            // 執行庫內換料處理
+            jitInvExchangeService.processAndSendJitInvExchange();
+
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "JIT 庫內換料處理已觸發",
+                    "請檢查日誌以了解處理結果"));
+
+        } catch (Exception e) {
+            log.error("處理 JIT 庫內換料時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "JIT 庫內換料處理失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 手動觸發 JIT 庫內換料處理結束 ===");
+        }
+    }
+
+    /**
+     * 測試 JIT 庫內換料 JSON Mapping
+     */
+    @GetMapping("/test-inv-exchange-mapping")
+    public ResponseEntity<?> testInvExchangeMapping() {
+        log.info("=== 測試 JIT 庫內換料 JSON Mapping 開始 ===");
+        try {
+            // 查詢待處理的第一筆換料單
+            String headerSql = "SELECT * FROM JIT_INV_EXCHANGE_HEADER WHERE STATUS IN ('PENDING', 'FAILED') AND ROWNUM = 1 ORDER BY HEADER_ID";
+            List<Map<String, Object>> headers = jdbcTemplate.queryForList(headerSql);
+            
+            if (headers.isEmpty()) {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "沒有待處理的庫內換料資料", 
+                        "請先在資料庫中插入測試資料"));
+            }
+
+            Map<String, Object> header = headers.get(0);
+            Long headerId = ((Number) header.get("HEADER_ID")).longValue();
+            
+            // 查詢成品明細
+            String finalSql = "SELECT * FROM JIT_INV_EXCHANGE_FINAL WHERE HEADER_ID = ? ORDER BY FINAL_ID";
+            List<Map<String, Object>> finalLines = jdbcTemplate.queryForList(finalSql, headerId);
+            
+            // 建立測試用的 JitInvExchangeRequest
+            com.znt.outbound.model.jit.JitInvExchangeRequest request = new com.znt.outbound.model.jit.JitInvExchangeRequest();
+            
+            // 設置主要欄位
+            request.setExternalId(header.get("EXTERNAL_ID") != null ? header.get("EXTERNAL_ID").toString() : null);
+            request.setExternalNo(header.get("EXTERNAL_NO") != null ? header.get("EXTERNAL_NO").toString() : null);
+            request.setWhName(header.get("WH_NAME") != null ? header.get("WH_NAME").toString() : null);
+            request.setStorer(header.get("STORER") != null ? header.get("STORER").toString() : null);
+            request.setExchangeType(header.get("EXCHANGE_TYPE") != null ? header.get("EXCHANGE_TYPE").toString() : null);
+            
+            // 處理日期
+            if (header.get("APPLY_DATE") != null) {
+                if (header.get("APPLY_DATE") instanceof java.sql.Timestamp) {
+                    request.setApplyDate(((java.sql.Timestamp) header.get("APPLY_DATE")).toLocalDateTime());
+                }
+            }
+            
+            request.setRefNo(header.get("REF_NO") != null ? header.get("REF_NO").toString() : null);
+            request.setRemark(header.get("REMARK") != null ? header.get("REMARK").toString() : null);
+            
+            // 建立成品明細
+            List<com.znt.outbound.model.jit.JitInvExchangeSkuFinalLineByApi> jitFinalLines = new ArrayList<>();
+            
+            for (Map<String, Object> finalLine : finalLines) {
+                com.znt.outbound.model.jit.JitInvExchangeSkuFinalLineByApi jitFinalLine = 
+                    new com.znt.outbound.model.jit.JitInvExchangeSkuFinalLineByApi();
+                
+                jitFinalLine.setProduct(finalLine.get("PRODUCT") != null ? finalLine.get("PRODUCT").toString() : null);
+                jitFinalLine.setQty(finalLine.get("QTY") != null ? ((Number) finalLine.get("QTY")).intValue() : null);
+                jitFinalLine.setZoneName(finalLine.get("ZONE_NAME") != null ? finalLine.get("ZONE_NAME").toString() : null);
+                jitFinalLine.setLot(finalLine.get("LOT") != null ? finalLine.get("LOT").toString() : null);
+                jitFinalLine.setBatch(finalLine.get("BATCH") != null ? finalLine.get("BATCH").toString() : null);
+                jitFinalLine.setDateCode(finalLine.get("DATE_CODE") != null ? finalLine.get("DATE_CODE").toString() : null);
+                jitFinalLine.setCoo(finalLine.get("COO") != null ? finalLine.get("COO").toString() : null);
+                
+                // 查詢原材料明細
+                Long finalId = ((Number) finalLine.get("FINAL_ID")).longValue();
+                String materialSql = "SELECT * FROM JIT_INV_EXCHANGE_MATERIAL WHERE FINAL_ID = ? ORDER BY MATERIAL_ID";
+                List<Map<String, Object>> materialLines = jdbcTemplate.queryForList(materialSql, finalId);
+                
+                List<com.znt.outbound.model.jit.JitInvExchangeMaterialLineByApi> jitMaterialLines = new ArrayList<>();
+                
+                for (Map<String, Object> materialLine : materialLines) {
+                    com.znt.outbound.model.jit.JitInvExchangeMaterialLineByApi jitMaterialLine = 
+                        new com.znt.outbound.model.jit.JitInvExchangeMaterialLineByApi();
+                    
+                    jitMaterialLine.setMaterial(materialLine.get("MATERIAL") != null ? materialLine.get("MATERIAL").toString() : null);
+                    jitMaterialLine.setQty(materialLine.get("QTY") != null ? ((Number) materialLine.get("QTY")).intValue() : null);
+                    jitMaterialLine.setZoneName(materialLine.get("ZONE_NAME") != null ? materialLine.get("ZONE_NAME").toString() : null);
+                    jitMaterialLine.setLot(materialLine.get("LOT") != null ? materialLine.get("LOT").toString() : null);
+                    jitMaterialLine.setBatch(materialLine.get("BATCH") != null ? materialLine.get("BATCH").toString() : null);
+                    jitMaterialLine.setDateCode(materialLine.get("DATE_CODE") != null ? materialLine.get("DATE_CODE").toString() : null);
+                    jitMaterialLine.setCoo(materialLine.get("COO") != null ? materialLine.get("COO").toString() : null);
+                    
+                    jitMaterialLines.add(jitMaterialLine);
+                }
+                
+                jitFinalLine.setMaterialLines(jitMaterialLines);
+                jitFinalLines.add(jitFinalLine);
+            }
+            
+            request.setFinalLines(jitFinalLines);
+            
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("externalId", request.getExternalId());
+            result.put("exchangeType", request.getExchangeType());
+            result.put("finalLineCount", request.getFinalLines() != null ? request.getFinalLines().size() : 0);
+            result.put("jsonMapping", request);  // 直接返回物件，Spring 會自動轉換為 JSON
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "JIT 庫內換料 JSON Mapping 測試成功", result));
+            
+        } catch (Exception e) {
+            log.error("測試 JIT 庫內換料 JSON Mapping 失敗", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "測試失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 測試 JIT 庫內換料 JSON Mapping 結束 ===");
+        }
+    }
+
+    /**
+     * 手動執行庫內換料排程任務
+     */
+    @GetMapping("/run-inv-exchange-schedule")
+    public ResponseEntity<?> runInvExchangeSchedule() {
+        log.info("=== 手動執行庫內換料排程任務開始 ===");
+        try {
+            jitInvExchangeScheduledTask.executeManually();
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫內換料排程任務已手動執行",
+                    "請檢查日誌以了解執行結果"));
+        } catch (Exception e) {
+            log.error("手動執行庫內換料排程任務時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "執行失敗: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 手動執行庫內換料排程任務結束 ===");
+        }
+    }
+
+    /**
+     * 取得庫內換料排程任務資訊
+     */
+    @GetMapping("/inv-exchange-schedule-info")
+    public ResponseEntity<?> getInvExchangeScheduleInfo() {
+        log.info("=== 取得庫內換料排程任務資訊 ===");
+        try {
+            String taskInfo = jitInvExchangeScheduledTask.getTaskInfo();
+            boolean isEnabled = jitInvExchangeScheduledTask.isSchedulingEnabled();
+            
+            Map<String, Object> info = new java.util.HashMap<>();
+            info.put("taskInfo", taskInfo);
+            info.put("enabled", isEnabled);
+            info.put("cronExpression", "0 */5 * * * ?");
+            info.put("timezone", "Asia/Taipei");
+            info.put("frequency", "每5分鐘執行一次");
+            info.put("description", "自動處理待處理的JIT庫內換料請求");
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "庫內換料排程任務資訊", info));
+                
+        } catch (Exception e) {
+            log.error("獲取庫內換料排程任務資訊時發生錯誤", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "獲取任務資訊失敗: " + e.getMessage(), null));
         }

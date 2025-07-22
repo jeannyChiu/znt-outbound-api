@@ -27,6 +27,7 @@ public class ApiConfigService {
     private String asnApiUrl;
     private String moveTradeApiUrl;
     private String invLocApiUrl;
+    private String invExchangeApiUrl;
     private String loginApiUrl;
     private String loginUsername;
     private String loginPassword;
@@ -52,6 +53,7 @@ public class ApiConfigService {
             this.asnApiUrl = configMap.get(providerName + "-ASN_URLT");
             this.moveTradeApiUrl = configMap.get(providerName + "-MOVE_TRADE_URLT");
             this.invLocApiUrl = configMap.get(providerName + "-INV_LOC_URLT");
+            this.invExchangeApiUrl = configMap.get(providerName + "-INV_EXCHANGE_URLT");
             this.loginApiUrl = configMap.get(providerName + "-LOGIN_URLT");
             this.loginUsername = configMap.get(providerName + "-LOGIN_USERNAME");
             this.loginPassword = configMap.get(providerName + "-LOGIN_PASSWORD");
@@ -62,8 +64,8 @@ public class ApiConfigService {
             }
             log.info("API 設定載入成功。Provider: {}, Part Code: {}",
                     providerName, this.partCode);
-            log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, INV_LOC_URL: {}, LOGIN_URL: {}", 
-                    this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.invLocApiUrl, this.loginApiUrl);
+            log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, INV_LOC_URL: {}, INV_EXCHANGE_URL: {}, LOGIN_URL: {}", 
+                    this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.invLocApiUrl, this.invExchangeApiUrl, this.loginApiUrl);
             log.info("Login Username: {}", this.loginUsername);
 
         } catch (Exception e) {
@@ -133,6 +135,13 @@ public class ApiConfigService {
             log.warn("Inventory Location API URL 尚未從資料庫初始化或未設定。");
         }
         return invLocApiUrl;
+    }
+
+    public String getInvExchangeApiUrl() {
+        if (invExchangeApiUrl == null) {
+            log.warn("Inventory Exchange API URL 尚未從資料庫初始化或未設定。");
+        }
+        return invExchangeApiUrl;
     }
 
     public String getProviderName() {
