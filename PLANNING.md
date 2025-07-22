@@ -216,7 +216,7 @@ API token lifecycle management
 
 ### JIT WMS API Endpoints
 - **Authentication**: `/comm/auth/api-login`
-- **ASN Management**: `/wms/b2b-api/create-asn-by-api`
+- **ASN Management**: `/wms/b2b-api/create-asn-by-api` (Uses ExternalId as unique identifier)
 - **Inventory Operations**: `/project/b2b-api/inv-move-or-trade`
 - **Inventory Exchange**: `/project/b2b-api/inv-exchange-sku`
 - **Inventory Query**: `/project/b2b-api/get-inv-loc-list`

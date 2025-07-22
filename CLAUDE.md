@@ -125,6 +125,7 @@ java -jar target/outbound-api-0.0.1-SNAPSHOT.jar
 - Creates inbound notifications (預定進貨通知單)
 - Supports multiple warehouse zones (ZSH 基通.上海倉, ZSH 基通.不良倉, etc.)
 - Handles batch attributes (LotAttr01-20)
+- Uses ExternalId as unique identifier (updated 2025-07-22)
 
 **Inventory Operations**: `/project/b2b-api/inv-move-or-trade`
 - Move: Internal warehouse transfers within same account
@@ -454,6 +455,60 @@ The JIT Inventory Location Query Module represents a complete, production-ready 
 ### JIT Inventory Exchange (庫內換料) Module Implementation Session (2025-07-22)
 
 **Objective**: Implement comprehensive JIT inventory exchange functionality supporting material conversion operations including Combine, Separate, and Exchange modes.
+
+### ASN Unique Identifier Update Session (2025-07-22)
+
+**Objective**: Update the ASN (入庫單) processing logic to use ExternalId as the unique identifier instead of ExternalNo for better system integration and consistency.
+
+**Phase 1: Requirements Analysis**
+
+**Business Requirement**: 
+- Change the unique record identification from ExternalNo to ExternalId across all ASN-related operations
+- Maintain backward compatibility by keeping both fields in the data structure
+- Ensure consistent identification across database operations, logging, and notifications
+
+**Phase 2: Implementation Changes**
+
+**Core Service Updates**:
+1. **JitAsnMappingService**: 
+   - Updated all processing logic to use ExternalId for unique identification
+   - Modified database queries to use `WHERE EXTERNAL_ID = ?` instead of `WHERE EXTERNAL_NO = ?`
+   - Updated retry protection mechanism to track failures by ExternalId
+   - Changed all log messages from "ExternalNo" to "ExternalId"
+
+2. **EnvelopeService**:
+   - Updated `createJitAsnEnvelope` method to accept ExternalId parameter
+   - Changed CONVERSATION_ID field to use ExternalId instead of ExternalNo
+   - Updated all related log messages
+
+3. **StatusNotificationService**:
+   - Modified email notification content to display "ExternalId" in the email body
+   - Updated both ASN and inventory move/trade email templates
+
+**Database Operations**:
+- All ASN status updates now use EXTERNAL_ID as the primary identifier
+- Maintained data integrity by preserving both ExternalId and ExternalNo fields
+- SQL query comments updated to reflect the change
+
+**Phase 3: Validation and Testing**
+
+**Testing Results**:
+- ✅ Successfully tested ASN processing with ExternalId identification
+- ✅ Verified database updates work correctly with new identifier
+- ✅ Confirmed email notifications display correct ExternalId
+- ✅ Validated backward compatibility with existing data structures
+
+**Technical Achievements**:
+1. **Consistent Identification**: Unified use of ExternalId across all ASN operations
+2. **Improved Data Integrity**: More reliable unique identification system
+3. **Seamless Migration**: No breaking changes to API contracts or data structures
+4. **Enhanced Logging**: All logs now consistently reference ExternalId for better traceability
+
+**Current Status**:
+- **Implementation**: ✅ 100% complete
+- **Testing**: ✅ Successfully validated
+- **Production Ready**: ✅ Ready for deployment
+- **Documentation**: ✅ Updated to reflect changes
 
 **Phase 1: Requirements Analysis & Design**
 
