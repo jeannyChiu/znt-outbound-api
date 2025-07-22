@@ -121,8 +121,8 @@ public class EnvelopeService {
     }
 
     @Transactional
-    public String createJitInvMoveOrTradeEnvelope(String externalNo, String providerName) {
-        log.info("正在為 JIT 庫內移倉/交易 (ExternalNo: {}) 建立 B2B 封套...", externalNo);
+    public String createJitInvMoveOrTradeEnvelope(String externalId, String providerName) {
+        log.info("正在為 JIT 庫內移倉/交易 (ExternalId: {}) 建立 B2B 封套...", externalId);
 
         String seqId = jdbcTemplate.queryForObject("SELECT TO_CHAR(B2B.ZEN_B2B_SEQ.NEXTVAL) FROM DUAL", String.class);
         if (seqId == null) {
@@ -156,11 +156,11 @@ public class EnvelopeService {
                 "API",                  // DATASOURCE
                 formattedTimestamp,     // DOC_DATETIME
                 "W",                    // TRANS_FLAG (Waiting)
-                externalNo,             // CONVERSATION_ID (使用外部單號)
+                externalId,             // CONVERSATION_ID (使用外部識別碼)
                 formattedTimestamp,     // CREATION_DATE
                 formattedTimestamp      // LAST_UPDATE_DATE
             );
-            log.info("JIT 庫內移倉/交易 B2B 封套建立成功。SEQ_ID: {}, ExternalNo: {}", seqId, externalNo);
+            log.info("JIT 庫內移倉/交易 B2B 封套建立成功。SEQ_ID: {}, ExternalId: {}", seqId, externalId);
             return seqId;
         } catch (Exception e) {
             log.error("寫入 JIT 庫內移倉/交易封套到 ZEN_B2B_ENVELOPE 表時發生錯誤。", e);

@@ -61,8 +61,8 @@ public class JitInvMoveOrTradeMappingService {
 
     /**
      * 處理並發送 JIT 庫內移倉/交易的主要方法。
-     * 該方法將持續查詢並處理待處理的庫內移倉/交易資料，每次只處理一筆 ExternalNo，
-     * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalNo 資料」的限制。
+     * 該方法將持續查詢並處理待處理的庫內移倉/交易資料，每次只處理一筆 ExternalId，
+     * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalId 資料」的限制。
      */
     public void processAndSendJitInvMoveOrTrade() {
         String operationId = generateOperationId();
@@ -109,8 +109,8 @@ public class JitInvMoveOrTradeMappingService {
         final int maxConsecutiveErrors = 5;
         
         // 防止無限循環的機制
-        java.util.Set<String> recentlyFailedExternalNos = new java.util.HashSet<>();
-        String lastFailedExternalNo = null;
+        java.util.Set<String> recentlyFailedExternalIds = new java.util.HashSet<>();
+        String lastFailedExternalId = null;
         int sameDataFailCount = 0;
         final int maxSameDataFails = 2; // 同一筆資料最多連續失敗2次就跳過
 
@@ -146,18 +146,18 @@ public class JitInvMoveOrTradeMappingService {
                 consecutiveErrors = 0;
                 stats.processedCount++;
 
-                String externalNo = getStringValue(rows.get(0), "EXTERNAL_NO");
+                String externalId = getStringValue(rows.get(0), "EXTERNAL_ID");
                 
                 // 檢查是否為剛剛失敗的相同資料
-                if (externalNo.equals(lastFailedExternalNo)) {
+                if (externalId.equals(lastFailedExternalId)) {
                     sameDataFailCount++;
-                    log.warn("[{}] ExternalNo: {} 連續失敗第 {} 次", 
-                            operationId, externalNo, sameDataFailCount);
+                    log.warn("[{}] ExternalId: {} 連續失敗第 {} 次", 
+                            operationId, externalId, sameDataFailCount);
                     
                     if (sameDataFailCount >= maxSameDataFails) {
-                        log.warn("[{}] ExternalNo: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
-                                operationId, externalNo, sameDataFailCount);
-                        recentlyFailedExternalNos.add(externalNo);
+                        log.warn("[{}] ExternalId: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
+                                operationId, externalId, sameDataFailCount);
+                        recentlyFailedExternalIds.add(externalId);
                         // 因為SQL查詢會持續返回相同的失敗資料，所以直接結束處理
                         log.info("[{}] 剩餘資料為連續失敗的資料，本次處理結束", operationId);
                         break; // 結束處理循環
@@ -165,34 +165,34 @@ public class JitInvMoveOrTradeMappingService {
                 }
                 
                 // 如果是本次已經跳過的資料，直接跳過
-                if (recentlyFailedExternalNos.contains(externalNo)) {
-                    log.debug("[{}] ExternalNo: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalNo);
+                if (recentlyFailedExternalIds.contains(externalId)) {
+                    log.debug("[{}] ExternalId: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalId);
                     log.info("[{}] 所有未跳過的資料已處理完畢，處理作業完成。", operationId);
                     break; // 結束處理循環
                 }
                 
-                log.info("[{}] 開始處理第 {} 筆庫內移倉/交易資料，ExternalNo: {}",
-                        operationId, stats.processedCount, externalNo);
+                log.info("[{}] 開始處理第 {} 筆庫內移倉/交易資料，ExternalId: {}",
+                        operationId, stats.processedCount, externalId);
 
                 // 步驟 3: 處理單筆庫內移倉/交易資料
                 long singleStartTime = System.currentTimeMillis();
-                boolean success = processSingleInvMoveOrTradeWithErrorHandling(operationId, rows, externalNo, stats);
+                boolean success = processSingleInvMoveOrTradeWithErrorHandling(operationId, rows, externalId, stats);
                 long singleDuration = System.currentTimeMillis() - singleStartTime;
 
                 if (success) {
                     stats.successCount++;
-                    log.info("[{}] 庫內移倉/交易 (ExternalNo: {}) 處理成功，耗時: {}ms",
-                            operationId, externalNo, singleDuration);
+                    log.info("[{}] 庫內移倉/交易 (ExternalId: {}) 處理成功，耗時: {}ms",
+                            operationId, externalId, singleDuration);
                     // 成功後重置失敗計數
-                    lastFailedExternalNo = null;
+                    lastFailedExternalId = null;
                     sameDataFailCount = 0;
                 } else {
                     stats.failedCount++;
-                    log.error("[{}] 庫內移倉/交易 (ExternalNo: {}) 處理失敗，耗時: {}ms",
-                            operationId, externalNo, singleDuration);
-                    // 記錄失敗的 ExternalNo
-                    if (!externalNo.equals(lastFailedExternalNo)) {
-                        lastFailedExternalNo = externalNo;
+                    log.error("[{}] 庫內移倉/交易 (ExternalId: {}) 處理失敗，耗時: {}ms",
+                            operationId, externalId, singleDuration);
+                    // 記錄失敗的 ExternalId
+                    if (!externalId.equals(lastFailedExternalId)) {
+                        lastFailedExternalId = externalId;
                         sameDataFailCount = 1;
                     }
                 }
@@ -255,11 +255,11 @@ public class JitInvMoveOrTradeMappingService {
      * 帶錯誤處理的單筆庫內移倉/交易處理方法
      */
     private boolean processSingleInvMoveOrTradeWithErrorHandling(String operationId, List<Map<String, Object>> rows,
-                                                               String externalNo, ProcessingStatistics stats) {
+                                                               String externalId, ProcessingStatistics stats) {
         try {
-            return processSingleInvMoveOrTrade(rows, externalNo);
+            return processSingleInvMoveOrTrade(rows, externalId);
         } catch (Exception e) {
-            log.error("[{}] 處理庫內移倉/交易 (ExternalNo: {}) 時發生未預期的錯誤", operationId, externalNo, e);
+            log.error("[{}] 處理庫內移倉/交易 (ExternalId: {}) 時發生未預期的錯誤", operationId, externalId, e);
 
             // 根據異常類型更新統計
             if (e.getMessage() != null) {
@@ -278,10 +278,10 @@ public class JitInvMoveOrTradeMappingService {
 
             // 嘗試更新狀態為失敗
             try {
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED,
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED,
                         "處理過程發生未預期錯誤: " + e.getClass().getSimpleName());
             } catch (Exception statusUpdateError) {
-                log.error("[{}] 更新失敗狀態時也發生錯誤，ExternalNo: {}", operationId, externalNo, statusUpdateError);
+                log.error("[{}] 更新失敗狀態時也發生錯誤，ExternalId: {}", operationId, externalId, statusUpdateError);
             }
 
             return false;
@@ -293,15 +293,15 @@ public class JitInvMoveOrTradeMappingService {
      */
     private void logFailedInvMoveOrTradeSummary() {
         try {
-            String failedSql = "SELECT EXTERNAL_NO, UPDATED_AT FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT DESC";
+            String failedSql = "SELECT EXTERNAL_ID, UPDATED_AT FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT DESC";
             List<Map<String, Object>> failedData = jdbcTemplate.queryForList(failedSql, STATUS_FAILED);
 
             if (!failedData.isEmpty()) {
                 log.info("=== 失敗庫內移倉/交易摘要 ===");
                 for (Map<String, Object> data : failedData) {
-                    String externalNo = getStringValue(data, "EXTERNAL_NO");
+                    String externalId = getStringValue(data, "EXTERNAL_ID");
                     Object updatedAt = data.get("UPDATED_AT");
-                    log.info("失敗庫內移倉/交易: {}, 最後更新時間: {}", externalNo, updatedAt);
+                    log.info("失敗庫內移倉/交易: {}, 最後更新時間: {}", externalId, updatedAt);
                 }
                 log.info("=== 失敗庫內移倉/交易摘要結束 ===");
             }
@@ -319,7 +319,7 @@ public class JitInvMoveOrTradeMappingService {
 
         try {
             // 查詢失敗狀態的庫內移倉/交易，按更新時間排序
-            String failedSql = "SELECT EXTERNAL_NO FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT ASC";
+            String failedSql = "SELECT EXTERNAL_ID FROM B2B.JIT_MOVE_TRADE_HEADER WHERE STATUS = ? ORDER BY UPDATED_AT ASC";
             List<Map<String, Object>> failedData = jdbcTemplate.queryForList(failedSql, STATUS_FAILED);
 
             if (failedData.isEmpty()) {
@@ -333,18 +333,18 @@ public class JitInvMoveOrTradeMappingService {
             int retrySuccessCount = 0;
 
             for (Map<String, Object> dataRow : failedData) {
-                String externalNo = getStringValue(dataRow, "EXTERNAL_NO");
+                String externalId = getStringValue(dataRow, "EXTERNAL_ID");
                 retryCount++;
 
-                log.info("重試第 {} 筆失敗庫內移倉/交易，ExternalNo: {}", retryCount, externalNo);
+                log.info("重試第 {} 筆失敗庫內移倉/交易，ExternalId: {}", retryCount, externalId);
 
                 // 將狀態重置為 PENDING，讓主處理流程重新處理
-                boolean resetSuccess = updateInvMoveOrTradeStatus(externalNo, STATUS_PENDING, null);
+                boolean resetSuccess = updateInvMoveOrTradeStatus(externalId, STATUS_PENDING, null);
                 if (resetSuccess) {
                     retrySuccessCount++;
-                    log.info("成功重置庫內移倉/交易狀態為 PENDING，ExternalNo: {}", externalNo);
+                    log.info("成功重置庫內移倉/交易狀態為 PENDING，ExternalId: {}", externalId);
                 } else {
-                    log.error("重置庫內移倉/交易狀態失敗，ExternalNo: {}", externalNo);
+                    log.error("重置庫內移倉/交易狀態失敗，ExternalId: {}", externalId);
                 }
 
                 // 避免過度頻繁的資料庫操作
@@ -383,69 +383,69 @@ public class JitInvMoveOrTradeMappingService {
 
     /**
      * 處理單筆庫內移倉/交易資料
-     * @param rows 查詢結果（單一 ExternalNo 的所有明細行）
-     * @param externalNo 外部單號
+     * @param rows 查詢結果（單一 ExternalId 的所有明細行）
+     * @param externalId 外部單號
      * @return 處理是否成功
      */
-    private boolean processSingleInvMoveOrTrade(List<Map<String, Object>> rows, String externalNo) {
+    private boolean processSingleInvMoveOrTrade(List<Map<String, Object>> rows, String externalId) {
         String seqId = null;
         String currentStep = "初始化";
 
         try {
             // 步驟 1: 將查詢結果映射到 JitInvMoveOrTradeRequest 物件
             currentStep = "資料映射";
-            log.debug("開始映射庫內移倉/交易資料，ExternalNo: {}", externalNo);
+            log.debug("開始映射庫內移倉/交易資料，ExternalId: {}", externalId);
 
             JitInvMoveOrTradeRequest requestToSend;
             try {
                 requestToSend = mapDataToJitInvMoveOrTradeRequest(rows);
             } catch (Exception e) {
-                log.error("庫內移倉/交易資料映射過程發生異常，ExternalNo: {}", externalNo, e);
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, "資料映射異常: " + e.getMessage());
+                log.error("庫內移倉/交易資料映射過程發生異常，ExternalId: {}", externalId, e);
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, "資料映射異常: " + e.getMessage());
                 return false;
             }
 
             if (requestToSend == null) {
-                log.error("資料映射失敗，無法產生有效的 JitInvMoveOrTradeRequest 物件，ExternalNo: {}", externalNo);
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, "資料映射失敗");
+                log.error("資料映射失敗，無法產生有效的 JitInvMoveOrTradeRequest 物件，ExternalId: {}", externalId);
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, "資料映射失敗");
                 return false;
             }
 
             // 步驟 2: 更新狀態為 PROCESSING
             currentStep = "狀態更新";
             try {
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_PROCESSING, null);
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_PROCESSING, null);
             } catch (Exception e) {
-                log.error("更新庫內移倉/交易狀態為 PROCESSING 時發生異常，ExternalNo: {}", externalNo, e);
+                log.error("更新庫內移倉/交易狀態為 PROCESSING 時發生異常，ExternalId: {}", externalId, e);
                 // 狀態更新失敗不應該阻止後續處理，記錄警告即可
-                log.warn("狀態更新失敗，但繼續處理庫內移倉/交易，ExternalNo: {}", externalNo);
+                log.warn("狀態更新失敗，但繼續處理庫內移倉/交易，ExternalId: {}", externalId);
             }
 
             // 步驟 3: 寫入封套 (Envelope)
             currentStep = "封套建立";
-            log.info("準備為庫內移倉/交易 (ExternalNo: {}) 寫入 B2B 封套...", externalNo);
+            log.info("準備為庫內移倉/交易 (ExternalId: {}) 寫入 B2B 封套...", externalId);
 
             try {
                 String providerName = apiConfigService.getProviderName();
-                seqId = envelopeService.createJitInvMoveOrTradeEnvelope(externalNo, providerName);
-                log.debug("成功建立封套，ExternalNo: {}, SEQ_ID: {}", externalNo, seqId);
+                seqId = envelopeService.createJitInvMoveOrTradeEnvelope(externalId, providerName);
+                log.debug("成功建立封套，ExternalId: {}, SEQ_ID: {}", externalId, seqId);
             } catch (Exception e) {
-                log.error("建立 B2B 封套時發生異常，ExternalNo: {}", externalNo, e);
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, "封套建立失敗: " + e.getMessage());
+                log.error("建立 B2B 封套時發生異常，ExternalId: {}", externalId, e);
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, "封套建立失敗: " + e.getMessage());
                 return false;
             }
 
             // 步驟 4: 發送到 JIT API
             currentStep = "API 發送";
-            log.info("B2B 封套寫入成功 (SEQ_ID: {}), 準備發送庫內移倉/交易 (ExternalNo: {}) 到 JIT。", seqId, externalNo);
+            log.info("B2B 封套寫入成功 (SEQ_ID: {}), 準備發送庫內移倉/交易 (ExternalId: {}) 到 JIT。", seqId, externalId);
 
             ResponseEntity<String> response;
             try {
                 response = jitApiClient.sendInvMoveOrTrade(requestToSend);
-                log.debug("JIT API 調用完成，ExternalNo: {}, Response Status: {}",
-                        externalNo, response != null ? response.getStatusCode() : "null");
+                log.debug("JIT API 調用完成，ExternalId: {}, Response Status: {}",
+                        externalId, response != null ? response.getStatusCode() : "null");
             } catch (Exception e) {
-                log.error("調用 JIT API 時發生異常，ExternalNo: {}", externalNo, e);
+                log.error("調用 JIT API 時發生異常，ExternalId: {}", externalId, e);
 
                 // 更新封套狀態為失敗
                 try {
@@ -454,20 +454,20 @@ public class JitInvMoveOrTradeMappingService {
                     log.error("更新封套狀態為失敗時也發生錯誤，SEQ_ID: {}", seqId, envelopeError);
                 }
 
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, "API 調用異常: " + e.getMessage());
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, "API 調用異常: " + e.getMessage());
                 return false;
             }
 
             // 步驟 5: 根據 API 回應更新狀態
             currentStep = "結果處理";
-            return handleApiResponse(externalNo, seqId, response);
+            return handleApiResponse(externalId, seqId, response);
 
         } catch (Exception e) {
             // 處理過程中發生未預期的異常
-            log.error("在處理庫內移倉/交易 (ExternalNo: {}) 的 {} 階段發生嚴重錯誤", externalNo, currentStep, e);
+            log.error("在處理庫內移倉/交易 (ExternalId: {}) 的 {} 階段發生嚴重錯誤", externalId, currentStep, e);
 
             // 嘗試清理資源
-            cleanupOnError(externalNo, seqId, currentStep, e);
+            cleanupOnError(externalId, seqId, currentStep, e);
 
             return false;
         }
@@ -476,13 +476,13 @@ public class JitInvMoveOrTradeMappingService {
     /**
      * 處理 API 回應並更新相應狀態
      */
-    private boolean handleApiResponse(String externalNo, String seqId, ResponseEntity<String> response) {
+    private boolean handleApiResponse(String externalId, String seqId, ResponseEntity<String> response) {
         try {
             if (response != null && response.getStatusCode().is2xxSuccessful()) {
                 // 成功情況
                 envelopeService.updateEnvelopeStatus(seqId, "S"); // Success
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_COMPLETED, "成功發送到 JIT");
-                log.info("庫內移倉/交易 (ExternalNo: {}) 成功發送到 JIT，HTTP Status: {}", externalNo, response.getStatusCode());
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_COMPLETED, "成功發送到 JIT");
+                log.info("庫內移倉/交易 (ExternalId: {}) 成功發送到 JIT，HTTP Status: {}", externalId, response.getStatusCode());
 
                 // 發送成功通知郵件
                 sendNotificationSafely(seqId, "成功");
@@ -495,8 +495,8 @@ public class JitInvMoveOrTradeMappingService {
                     "API 回應為 null";
 
                 envelopeService.updateEnvelopeStatus(seqId, "F"); // Failed
-                updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, errorMsg);
-                log.error("庫內移倉/交易 (ExternalNo: {}) 發送失敗：{}", externalNo, errorMsg);
+                updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, errorMsg);
+                log.error("庫內移倉/交易 (ExternalId: {}) 發送失敗：{}", externalId, errorMsg);
 
                 // 發送失敗通知郵件
                 sendNotificationSafely(seqId, "失敗");
@@ -504,8 +504,8 @@ public class JitInvMoveOrTradeMappingService {
                 return false;
             }
         } catch (Exception e) {
-            log.error("處理 API 回應時發生異常，ExternalNo: {}", externalNo, e);
-            cleanupOnError(externalNo, seqId, "結果處理", e);
+            log.error("處理 API 回應時發生異常，ExternalId: {}", externalId, e);
+            cleanupOnError(externalId, seqId, "結果處理", e);
             return false;
         }
     }
@@ -527,7 +527,7 @@ public class JitInvMoveOrTradeMappingService {
     /**
      * 錯誤發生時的清理工作
      */
-    private void cleanupOnError(String externalNo, String seqId, String currentStep, Exception originalError) {
+    private void cleanupOnError(String externalId, String seqId, String currentStep, Exception originalError) {
         try {
             // 更新封套狀態
             if (seqId != null) {
@@ -542,67 +542,67 @@ public class JitInvMoveOrTradeMappingService {
 
             // 更新庫內移倉/交易狀態
             String errorMessage = String.format("%s階段發生異常: %s", currentStep, originalError.getMessage());
-            updateInvMoveOrTradeStatusWithRetry(externalNo, STATUS_FAILED, errorMessage);
+            updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, errorMessage);
 
         } catch (Exception e) {
-            log.error("執行錯誤清理工作時發生異常，ExternalNo: {}", externalNo, e);
+            log.error("執行錯誤清理工作時發生異常，ExternalId: {}", externalId, e);
         }
     }
 
     /**
      * 帶重試機制的庫內移倉/交易狀態更新方法
-     * @param externalNo 外部單號
+     * @param externalId 外部單號
      * @param status 新狀態 (PENDING, PROCESSING, COMPLETED, FAILED)
      * @param errorMessage 錯誤訊息（目前不儲存到資料庫，僅用於日誌記錄）
      */
-    private void updateInvMoveOrTradeStatusWithRetry(String externalNo, String status, String errorMessage) {
+    private void updateInvMoveOrTradeStatusWithRetry(String externalId, String status, String errorMessage) {
         long startTime = System.currentTimeMillis();
 
         for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             try {
-                boolean success = updateInvMoveOrTradeStatus(externalNo, status, errorMessage);
+                boolean success = updateInvMoveOrTradeStatus(externalId, status, errorMessage);
                 if (success) {
                     long duration = System.currentTimeMillis() - startTime;
                     if (attempt > 1) {
-                        log.info("庫內移倉/交易狀態更新成功（第 {} 次嘗試），ExternalNo: {}, Status: {}, 耗時: {}ms",
-                                attempt, externalNo, status, duration);
+                        log.info("庫內移倉/交易狀態更新成功（第 {} 次嘗試），ExternalId: {}, Status: {}, 耗時: {}ms",
+                                attempt, externalId, status, duration);
                     } else {
-                        log.debug("庫內移倉/交易狀態更新成功，ExternalNo: {}, Status: {}, 耗時: {}ms",
-                                externalNo, status, duration);
+                        log.debug("庫內移倉/交易狀態更新成功，ExternalId: {}, Status: {}, 耗時: {}ms",
+                                externalId, status, duration);
                     }
                     return; // 成功則直接返回
                 }
 
                 // 如果更新失敗但沒有異常，記錄警告並重試
                 if (attempt < MAX_RETRY_ATTEMPTS) {
-                    log.warn("庫內移倉/交易狀態更新失敗（第 {} 次嘗試），可能是記錄不存在或已被其他程序處理，將在 {}ms 後重試，ExternalNo: {}, Status: {}",
-                            attempt, RETRY_DELAY_MS, externalNo, status);
+                    log.warn("庫內移倉/交易狀態更新失敗（第 {} 次嘗試），可能是記錄不存在或已被其他程序處理，將在 {}ms 後重試，ExternalId: {}, Status: {}",
+                            attempt, RETRY_DELAY_MS, externalId, status);
                     Thread.sleep(RETRY_DELAY_MS);
                 } else {
                     long totalDuration = System.currentTimeMillis() - startTime;
-                    log.error("庫內移倉/交易狀態更新失敗，已達最大重試次數 {}，ExternalNo: {}, Status: {}, 總耗時: {}ms",
-                            MAX_RETRY_ATTEMPTS, externalNo, status, totalDuration);
+                    log.error("庫內移倉/交易狀態更新失敗，已達最大重試次數 {}，ExternalId: {}, Status: {}, 總耗時: {}ms",
+                            MAX_RETRY_ATTEMPTS, externalId, status, totalDuration);
                 }
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("庫內移倉/交易狀態更新重試過程被中斷，ExternalNo: {}, Status: {}", externalNo, status);
+                log.error("庫內移倉/交易狀態更新重試過程被中斷，ExternalId: {}, Status: {}", externalId, status);
                 return;
             } catch (Exception e) {
                 if (attempt < MAX_RETRY_ATTEMPTS) {
-                    log.warn("庫內移倉/交易狀態更新發生異常（第 {} 次嘗試），異常類型: {}，將在 {}ms 後重試，ExternalNo: {}, Status: {}",
-                            attempt, e.getClass().getSimpleName(), RETRY_DELAY_MS, externalNo, status, e);
+                    log.warn("庫內移倉/交易狀態更新發生異常（第 {} 次嘗試），異常類型: {}，將在 {}ms 後重試，ExternalId: {}, Status: {}",
+                            attempt, e.getClass().getSimpleName(), RETRY_DELAY_MS, externalId, status, e);
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("庫內移倉/交易狀態更新重試過程被中斷，ExternalNo: {}, Status: {}", externalNo, status);
+                        log.error("庫內移倉/交易狀態更新重試過程被中斷，ExternalId: {}, Status: {}", externalId, status);
                         return;
                     }
                 } else {
                     long totalDuration = System.currentTimeMillis() - startTime;
-                    log.error("庫內移倉/交易狀態更新失敗，已達最大重試次數 {}，ExternalNo: {}, Status: {}, 總耗時: {}ms",
-                            MAX_RETRY_ATTEMPTS, externalNo, status, totalDuration, e);
+                    log.error("庫內移倉/交易狀態更新失敗，已達最大重試次數 {}，ExternalId: {}, Status: {}, 總耗時: {}ms",
+                            MAX_RETRY_ATTEMPTS, externalId, status, totalDuration, e);
                 }
             }
         }
@@ -610,36 +610,36 @@ public class JitInvMoveOrTradeMappingService {
 
     /**
      * 更新庫內移倉/交易的處理狀態（單次嘗試）
-     * @param externalNo 外部單號
+     * @param externalId 外部單號
      * @param status 新狀態 (PENDING, PROCESSING, COMPLETED, FAILED)
      * @param errorMessage 錯誤訊息（目前不儲存到資料庫，僅用於日誌記錄）
      * @return 更新是否成功
      */
-    private boolean updateInvMoveOrTradeStatus(String externalNo, String status, String errorMessage) {
+    private boolean updateInvMoveOrTradeStatus(String externalId, String status, String errorMessage) {
         try {
-            String updateSql = "UPDATE B2B.JIT_MOVE_TRADE_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_NO = ?";
-            int updatedRows = jdbcTemplate.update(updateSql, status, externalNo);
+            String updateSql = "UPDATE B2B.JIT_MOVE_TRADE_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_ID = ?";
+            int updatedRows = jdbcTemplate.update(updateSql, status, externalId);
 
             if (updatedRows > 0) {
-                log.debug("成功更新庫內移倉/交易狀態，ExternalNo: {}, Status: {}", externalNo, status);
+                log.debug("成功更新庫內移倉/交易狀態，ExternalId: {}, Status: {}", externalId, status);
                 if (errorMessage != null) {
-                    log.error("庫內移倉/交易處理錯誤詳情，ExternalNo: {}, Error: {}", externalNo, errorMessage);
+                    log.error("庫內移倉/交易處理錯誤詳情，ExternalId: {}, Error: {}", externalId, errorMessage);
                 }
                 return true;
             } else {
-                log.warn("更新庫內移倉/交易狀態時沒有找到對應的記錄，ExternalNo: {}", externalNo);
+                log.warn("更新庫內移倉/交易狀態時沒有找到對應的記錄，ExternalId: {}", externalId);
                 return false;
             }
         } catch (Exception e) {
-            log.error("更新庫內移倉/交易狀態時發生錯誤，ExternalNo: {}, Status: {}", externalNo, status, e);
+            log.error("更新庫內移倉/交易狀態時發生錯誤，ExternalId: {}, Status: {}", externalId, status, e);
             throw e; // 重新拋出異常，讓重試機制處理
         }
     }
 
     /**
      * 將從資料庫查詢出的扁平結果映射到 JitInvMoveOrTradeRequest 物件。
-     * 此方法已針對單一 EXTERNAL_NO 處理進行優化，包含資料完整性驗證。
-     * @param rows 從 jdbcTemplate 查詢出的結果列表（應該只包含單一 EXTERNAL_NO 的資料）
+     * 此方法已針對單一 EXTERNAL_ID 處理進行優化，包含資料完整性驗證。
+     * @param rows 從 jdbcTemplate 查詢出的結果列表（應該只包含單一 EXTERNAL_ID 的資料）
      * @return 組裝好的 JitInvMoveOrTradeRequest 物件，如果無法組裝則返回 null
      */
     private JitInvMoveOrTradeRequest mapDataToJitInvMoveOrTradeRequest(List<Map<String, Object>> rows) {
@@ -649,24 +649,24 @@ public class JitInvMoveOrTradeMappingService {
         }
 
         try {
-            // 步驟 1: 驗證資料完整性 - 確保所有資料行都屬於同一個 EXTERNAL_NO
+            // 步驟 1: 驗證資料完整性 - 確保所有資料行都屬於同一個 EXTERNAL_ID
             if (!validateDataConsistency(rows)) {
-                log.error("資料完整性驗證失敗，查詢結果包含多個不同的 EXTERNAL_NO");
+                log.error("資料完整性驗證失敗，查詢結果包含多個不同的 EXTERNAL_ID");
                 return null;
             }
 
             // 步驟 2: 取得第一筆資料作為 Header 資訊的來源
             Map<String, Object> firstRow = rows.get(0);
-            String externalNo = getStringValue(firstRow, "EXTERNAL_NO");
+            String externalId = getStringValue(firstRow, "EXTERNAL_ID");
 
-            log.debug("開始映射庫內移倉/交易資料，ExternalNo: {}, 明細行數: {}", externalNo, rows.size());
+            log.debug("開始映射庫內移倉/交易資料，ExternalId: {}, 明細行數: {}", externalId, rows.size());
 
             // 步驟 3: 建立 JitInvMoveOrTradeRequest 物件並設定 Header 資訊
             JitInvMoveOrTradeRequest request = new JitInvMoveOrTradeRequest();
 
             // 映射 Header 欄位 (來自 JIT_INV_MOVE_TRADE_HEADER 表格)
-            request.setExternalId(getStringValue(firstRow, "EXTERNAL_ID"));
-            request.setExternalNo(externalNo);
+            request.setExternalId(externalId);
+            request.setExternalNo(getStringValue(firstRow, "EXTERNAL_NO"));
             request.setWhName(getStringValue(firstRow, "WH_NAME"));
             request.setTradeType(getStringValue(firstRow, "TRADE_TYPE"));
             request.setFromStorer(getStringValue(firstRow, "FROM_STORER"));
@@ -702,19 +702,19 @@ public class JitInvMoveOrTradeMappingService {
 
             // 步驟 5: 驗證映射結果
             if (lines.isEmpty()) {
-                log.error("所有明細行映射都失敗，無法建立有效的 JitInvMoveOrTradeRequest，ExternalNo: {}", externalNo);
+                log.error("所有明細行映射都失敗，無法建立有效的 JitInvMoveOrTradeRequest，ExternalId: {}", externalId);
                 return null;
             }
 
             if (failedLines > 0) {
-                log.warn("部分明細行映射失敗，ExternalNo: {}, 成功: {} 行, 失敗: {} 行",
-                        externalNo, successfulLines, failedLines);
+                log.warn("部分明細行映射失敗，ExternalId: {}, 成功: {} 行, 失敗: {} 行",
+                        externalId, successfulLines, failedLines);
             }
 
             request.setLines(lines);
 
-            log.info("成功映射 JitInvMoveOrTradeRequest，ExternalNo: {}, 總明細行: {}, 成功映射: {} 行, 失敗: {} 行",
-                    externalNo, rows.size(), successfulLines, failedLines);
+            log.info("成功映射 JitInvMoveOrTradeRequest，ExternalId: {}, 總明細行: {}, 成功映射: {} 行, 失敗: {} 行",
+                    externalId, rows.size(), successfulLines, failedLines);
 
             return request;
 
@@ -739,7 +739,7 @@ public class JitInvMoveOrTradeMappingService {
     }
 
     /**
-     * 驗證查詢結果的資料完整性，確保所有資料行都屬於同一個 EXTERNAL_NO
+     * 驗證查詢結果的資料完整性，確保所有資料行都屬於同一個 EXTERNAL_ID
      * @param rows 查詢結果列表
      * @return 如果資料一致則返回 true，否則返回 false
      */
@@ -748,23 +748,23 @@ public class JitInvMoveOrTradeMappingService {
             return false;
         }
 
-        String expectedExternalNo = getStringValue(rows.get(0), "EXTERNAL_NO");
-        if (expectedExternalNo == null) {
-            log.error("第一筆資料的 EXTERNAL_NO 為 null，資料完整性驗證失敗");
+        String expectedExternalId = getStringValue(rows.get(0), "EXTERNAL_ID");
+        if (expectedExternalId == null) {
+            log.error("第一筆資料的 EXTERNAL_ID 為 null，資料完整性驗證失敗");
             return false;
         }
 
-        // 檢查所有資料行是否都有相同的 EXTERNAL_NO
+        // 檢查所有資料行是否都有相同的 EXTERNAL_ID
         for (int i = 1; i < rows.size(); i++) {
-            String currentExternalNo = getStringValue(rows.get(i), "EXTERNAL_NO");
-            if (!expectedExternalNo.equals(currentExternalNo)) {
-                log.error("資料完整性驗證失敗：第 {} 行的 EXTERNAL_NO '{}' 與預期的 '{}' 不符",
-                        i + 1, currentExternalNo, expectedExternalNo);
+            String currentExternalId = getStringValue(rows.get(i), "EXTERNAL_ID");
+            if (!expectedExternalId.equals(currentExternalId)) {
+                log.error("資料完整性驗證失敗：第 {} 行的 EXTERNAL_ID '{}' 與預期的 '{}' 不符",
+                        i + 1, currentExternalId, expectedExternalId);
                 return false;
             }
         }
 
-        log.debug("資料完整性驗證通過，所有 {} 行資料都屬於 EXTERNAL_NO: {}", rows.size(), expectedExternalNo);
+        log.debug("資料完整性驗證通過，所有 {} 行資料都屬於 EXTERNAL_ID: {}", rows.size(), expectedExternalId);
         return true;
     }
 
@@ -908,6 +908,7 @@ public class JitInvMoveOrTradeMappingService {
 
         if (result != null) {
             log.info("=== 資料映射測試結果 ===");
+            log.info("ExternalId: {}", result.getExternalId());
             log.info("ExternalNo: {}", result.getExternalNo());
             log.info("WhName: {}", result.getWhName());
             log.info("TradeType: {}", result.getTradeType());
