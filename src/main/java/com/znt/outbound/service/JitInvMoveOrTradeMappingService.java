@@ -622,8 +622,10 @@ public class JitInvMoveOrTradeMappingService {
 
             if (updatedRows > 0) {
                 log.debug("成功更新庫內移倉/交易狀態，ExternalId: {}, Status: {}", externalId, status);
-                if (errorMessage != null) {
+                if (errorMessage != null && STATUS_FAILED.equals(status)) {
                     log.error("庫內移倉/交易處理錯誤詳情，ExternalId: {}, Error: {}", externalId, errorMessage);
+                } else if (errorMessage != null && !STATUS_FAILED.equals(status)) {
+                    log.info("庫內移倉/交易處理狀態詳情，ExternalId: {}, Status: {}, Message: {}", externalId, status, errorMessage);
                 }
                 return true;
             } else {
