@@ -195,8 +195,21 @@ public class JitInvExchangeService {
     private boolean processSingleExchangeOrder(String operationId, Map<String, Object> header, 
                                              Long headerId, ProcessingStatistics stats) {
         String externalId = extractString(header, "EXTERNAL_ID");
+        String seqId = null;
         
         try {
+            // 建立 B2B 封套
+            try {
+                String providerName = apiConfigService.getProviderName();
+                seqId = envelopeService.createJitInvExchangeEnvelope(externalId, providerName);
+                log.info("[{}] 成功建立 B2B 封套，SEQ_ID: {}, ExternalId: {}", operationId, seqId, externalId);
+            } catch (Exception e) {
+                log.error("[{}] 建立 B2B 封套失敗，ExternalId: {}", operationId, externalId, e);
+                updateInvExchangeStatus(externalId, STATUS_FAILED);
+                stats.databaseErrors++;
+                return false;
+            }
+            
             // 更新狀態為處理中
             updateInvExchangeStatus(externalId, STATUS_PROCESSING);
 
@@ -205,6 +218,17 @@ public class JitInvExchangeService {
             if (finalLines.isEmpty()) {
                 log.error("[{}] ExternalId: {} 沒有成品明細資料", operationId, externalId);
                 updateInvExchangeStatus(externalId, STATUS_FAILED);
+                // 更新 B2B 封套狀態為失敗
+                if (seqId != null) {
+                    envelopeService.updateEnvelopeStatus(seqId, "F");
+                    // 發送失敗通知
+                    try {
+                        statusNotificationService.sendNotification(seqId);
+                        log.info("[{}] 已發送失敗通知，SeqId: {}", operationId, seqId);
+                    } catch (Exception e) {
+                        log.error("[{}] 發送失敗通知時發生錯誤，但不影響主流程", operationId, e);
+                    }
+                }
                 stats.mappingErrors++;
                 return false;
             }
@@ -215,6 +239,17 @@ public class JitInvExchangeService {
             if (request == null) {
                 log.error("[{}] 無法構建 JIT 庫內換料請求，ExternalId: {}", operationId, externalId);
                 updateInvExchangeStatus(externalId, STATUS_FAILED);
+                // 更新 B2B 封套狀態為失敗
+                if (seqId != null) {
+                    envelopeService.updateEnvelopeStatus(seqId, "F");
+                    // 發送失敗通知
+                    try {
+                        statusNotificationService.sendNotification(seqId);
+                        log.info("[{}] 已發送失敗通知，SeqId: {}", operationId, seqId);
+                    } catch (Exception e) {
+                        log.error("[{}] 發送失敗通知時發生錯誤，但不影響主流程", operationId, e);
+                    }
+                }
                 stats.mappingErrors++;
                 return false;
             }
@@ -225,19 +260,38 @@ public class JitInvExchangeService {
             if (response != null && response.getStatusCode().is2xxSuccessful()) {
                 log.info("[{}] 成功發送庫內換料請求到 JIT，ExternalId: {}", operationId, externalId);
                 updateInvExchangeStatus(externalId, STATUS_COMPLETED);
+                
+                // 更新 B2B 封套狀態為成功
+                if (seqId != null) {
+                    envelopeService.updateEnvelopeStatus(seqId, "S");
+                }
+                
                 stats.successCount++;
                 
                 // 發送成功通知
-                sendSuccessNotification(externalId, request);
+                sendSuccessNotification(externalId, request, seqId);
                 return true;
             } else {
-                handleApiError(operationId, externalId, response, stats);
+                handleApiError(operationId, externalId, response, stats, seqId);
                 return false;
             }
 
         } catch (Exception e) {
             log.error("[{}] 處理 ExternalId: {} 時發生錯誤", operationId, externalId, e);
             updateInvExchangeStatus(externalId, STATUS_FAILED);
+            
+            // 更新 B2B 封套狀態為失敗
+            if (seqId != null) {
+                envelopeService.updateEnvelopeStatus(seqId, "F");
+                // 發送失敗通知
+                try {
+                    statusNotificationService.sendNotification(seqId);
+                    log.info("[{}] 已發送失敗通知，SeqId: {}", operationId, seqId);
+                } catch (Exception notificationError) {
+                    log.error("[{}] 發送失敗通知時發生錯誤，但不影響主流程", operationId, notificationError);
+                }
+            }
+            
             stats.mappingErrors++;
             return false;
         }
@@ -352,10 +406,23 @@ public class JitInvExchangeService {
      * 處理 API 錯誤回應
      */
     private void handleApiError(String operationId, String externalId, 
-                               ResponseEntity<String> response, ProcessingStatistics stats) {
+                               ResponseEntity<String> response, ProcessingStatistics stats, String seqId) {
         if (response == null) {
             log.error("[{}] JIT API 回應為 null，ExternalId: {}", operationId, externalId);
             updateInvExchangeStatus(externalId, STATUS_FAILED);
+            
+            // 更新 B2B 封套狀態為失敗
+            if (seqId != null) {
+                envelopeService.updateEnvelopeStatus(seqId, "F");
+                // 發送失敗通知
+                try {
+                    statusNotificationService.sendNotification(seqId);
+                    log.info("[{}] 已發送失敗通知，SeqId: {}", operationId, seqId);
+                } catch (Exception e) {
+                    log.error("[{}] 發送失敗通知時發生錯誤，但不影響主流程", operationId, e);
+                }
+            }
+            
             stats.apiErrors++;
             return;
         }
@@ -381,6 +448,18 @@ public class JitInvExchangeService {
             updateInvExchangeStatus(externalId, STATUS_FAILED);
         }
         
+        // 更新 B2B 封套狀態為失敗
+        if (seqId != null) {
+            envelopeService.updateEnvelopeStatus(seqId, "F");
+            // 發送失敗通知
+            try {
+                statusNotificationService.sendNotification(seqId);
+                log.info("[{}] 已發送失敗通知，SeqId: {}", operationId, seqId);
+            } catch (Exception e) {
+                log.error("[{}] 發送失敗通知時發生錯誤，但不影響主流程", operationId, e);
+            }
+        }
+        
         stats.apiErrors++;
     }
 
@@ -404,11 +483,15 @@ public class JitInvExchangeService {
     /**
      * 發送成功通知
      */
-    private void sendSuccessNotification(String externalId, JitInvExchangeRequest request) {
+    private void sendSuccessNotification(String externalId, JitInvExchangeRequest request, String seqId) {
         try {
-            // StatusNotificationService 需要 seqId，但我們沒有這個值
-            // 所以只記錄日誌
-            log.info("JIT庫內換料成功 - ExternalId: {}, ExternalNo: {}, 換料類型: {}, 貨主: {}, 成品明細數: {}", 
+            // 使用通用的通知服務
+            if (seqId != null) {
+                statusNotificationService.sendNotification(seqId);
+            }
+            
+            log.info("JIT庫內換料成功 - SeqId: {}, ExternalId: {}, ExternalNo: {}, 換料類型: {}, 貨主: {}, 成品明細數: {}", 
+                seqId,
                 externalId, 
                 request.getExternalNo(),
                 request.getExchangeType(),
@@ -416,7 +499,7 @@ public class JitInvExchangeService {
                 request.getFinalLines() != null ? request.getFinalLines().size() : 0
             );
         } catch (Exception e) {
-            log.error("記錄成功通知時發生錯誤，但不影響主流程", e);
+            log.error("發送成功通知時發生錯誤，但不影響主流程", e);
         }
     }
 

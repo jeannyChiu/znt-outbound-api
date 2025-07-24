@@ -99,6 +99,24 @@ public class StatusNotificationService {
 
             textBody = String.format("ExternalId : %s\n交易類型 : 庫內移倉/交易\n***EDI系統自動通知請勿回覆!***",
                     envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+        } else if ("INV_EXCHANGE".equals(envelopeInfo.b2bMsgType())) {
+            // 庫內換料的郵件格式
+            originalSubject = String.format("Send Inventory Exchange To [%s] %s ! (DOC_NO: %s)",
+                    envelopeInfo.receiverCode(),
+                    transFlagEnglish,
+                    envelopeInfo.docNo());
+
+            textBody = String.format("ExternalId : %s\n交易類型 : 庫內換料\n***EDI系統自動通知請勿回覆!***",
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+        } else if ("INV_LOC".equals(envelopeInfo.b2bMsgType())) {
+            // 庫存查詢的郵件格式
+            originalSubject = String.format("Send Inventory Location Query To [%s] %s ! (DOC_NO: %s)",
+                    envelopeInfo.receiverCode(),
+                    transFlagEnglish,
+                    envelopeInfo.docNo());
+
+            textBody = String.format("RequestId : %s\n查詢類型 : 庫存查詢\n***EDI系統自動通知請勿回覆!***",
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
         } else {
             // 出庫單 (ORDERS) 的郵件格式 (保持原有格式)
             originalSubject = String.format("Send Orders To [%s] %s ! (DOC_NO: %s)",
