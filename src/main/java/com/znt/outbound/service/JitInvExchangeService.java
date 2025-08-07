@@ -360,6 +360,7 @@ public class JitInvExchangeService {
         JitInvExchangeSkuFinalLineByApi jitFinalLine = new JitInvExchangeSkuFinalLineByApi();
         
         jitFinalLine.setProduct(extractString(finalLine, "PRODUCT"));
+        jitFinalLine.setMfSku(extractString(finalLine, "MF_SKU"));  // 設置原廠料號（必填）
         jitFinalLine.setQty(extractInteger(finalLine, "QTY"));
         jitFinalLine.setZoneName(extractString(finalLine, "ZONE_NAME"));
         jitFinalLine.setLot(extractString(finalLine, "LOT"));
@@ -392,6 +393,7 @@ public class JitInvExchangeService {
         JitInvExchangeMaterialLineByApi jitMaterialLine = new JitInvExchangeMaterialLineByApi();
         
         jitMaterialLine.setMaterial(extractString(materialLine, "MATERIAL"));
+        jitMaterialLine.setMfSku(extractString(materialLine, "MF_SKU"));  // 設置原廠料號（必填）
         jitMaterialLine.setQty(extractInteger(materialLine, "QTY"));
         jitMaterialLine.setZoneName(extractString(materialLine, "ZONE_NAME"));
         jitMaterialLine.setLot(extractString(materialLine, "LOT"));

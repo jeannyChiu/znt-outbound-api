@@ -14,6 +14,9 @@ public class JitInvExchangeMaterialLineByApi {
     private String material;    // 原材料料號
                                // Exchange-換料情況下，成品和原材料之間的比例對關係是1:1，Material是原料號，數量代表減少
 
+    @JsonProperty("MfSku")
+    private String mfSku;        // 原廠料號（必填）
+
     @JsonProperty("Qty")
     private Integer qty;        // 轉換數量（保持為正數）
 

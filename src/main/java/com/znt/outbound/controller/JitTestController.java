@@ -1217,6 +1217,7 @@ public class JitTestController {
                     new com.znt.outbound.model.jit.JitInvExchangeSkuFinalLineByApi();
                 
                 jitFinalLine.setProduct(finalLine.get("PRODUCT") != null ? finalLine.get("PRODUCT").toString() : null);
+                jitFinalLine.setMfSku(finalLine.get("MF_SKU") != null ? finalLine.get("MF_SKU").toString() : null);  // 設置原廠料號
                 jitFinalLine.setQty(finalLine.get("QTY") != null ? ((Number) finalLine.get("QTY")).intValue() : null);
                 jitFinalLine.setZoneName(finalLine.get("ZONE_NAME") != null ? finalLine.get("ZONE_NAME").toString() : null);
                 jitFinalLine.setLot(finalLine.get("LOT") != null ? finalLine.get("LOT").toString() : null);
@@ -1236,6 +1237,7 @@ public class JitTestController {
                         new com.znt.outbound.model.jit.JitInvExchangeMaterialLineByApi();
                     
                     jitMaterialLine.setMaterial(materialLine.get("MATERIAL") != null ? materialLine.get("MATERIAL").toString() : null);
+                    jitMaterialLine.setMfSku(materialLine.get("MF_SKU") != null ? materialLine.get("MF_SKU").toString() : null);  // 設置原廠料號
                     jitMaterialLine.setQty(materialLine.get("QTY") != null ? ((Number) materialLine.get("QTY")).intValue() : null);
                     jitMaterialLine.setZoneName(materialLine.get("ZONE_NAME") != null ? materialLine.get("ZONE_NAME").toString() : null);
                     jitMaterialLine.setLot(materialLine.get("LOT") != null ? materialLine.get("LOT").toString() : null);

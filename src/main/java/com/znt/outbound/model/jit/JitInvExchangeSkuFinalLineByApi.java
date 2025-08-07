@@ -13,6 +13,9 @@ public class JitInvExchangeSkuFinalLineByApi {
     @JsonProperty("Product")
     private String product;     // 成品料號
 
+    @JsonProperty("MfSku")
+    private String mfSku;        // 原廠料號（必填）
+
     @JsonProperty("Qty")
     private Integer qty;        // 轉換數量（保持為正數）
                                // Exchange-換料情況下，Product指新料號，數量代表增加
