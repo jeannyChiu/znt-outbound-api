@@ -781,7 +781,8 @@ public class JitInvMoveOrTradeMappingService {
 
         try {
             // 步驟 1: 驗證必要欄位
-            if (!validateRequiredLineFields(row, sku)) {
+            String mfSku = getStringValue(row, "MF_SKU");
+            if (!validateRequiredLineFields(row, sku, mfSku)) {
                 return null;
             }
 
@@ -789,6 +790,7 @@ public class JitInvMoveOrTradeMappingService {
             JitInvMoveOrTradeLine line = new JitInvMoveOrTradeLine();
 
             line.setSku(sku);
+            line.setMfSku(mfSku);
             line.setQty(getNullableIntValue(row, "QTY"));
             line.setFromStorerCate(getStringValue(row, "FROM_STORER_CATE"));
             line.setToStorerCate(getStringValue(row, "TO_STORER_CATE"));
@@ -798,8 +800,8 @@ public class JitInvMoveOrTradeMappingService {
             line.setCoo(getStringValue(row, "COO"));
             line.setRemark(getStringValue(row, "LINE_REMARK"));
 
-            log.debug("成功建立 JitInvMoveOrTradeLine，SKU: {}, QTY: {}, FromStorerCate: {}, ToStorerCate: {}",
-                    sku, line.getQty(), line.getFromStorerCate(), line.getToStorerCate());
+            log.debug("成功建立 JitInvMoveOrTradeLine，SKU: {}, MfSku: {}, QTY: {}, FromStorerCate: {}, ToStorerCate: {}",
+                    sku, mfSku, line.getQty(), line.getFromStorerCate(), line.getToStorerCate());
 
             return line;
 
@@ -815,10 +817,16 @@ public class JitInvMoveOrTradeMappingService {
      * @param sku 料號
      * @return 驗證是否通過
      */
-    private boolean validateRequiredLineFields(Map<String, Object> row, String sku) {
-        // 檢查必要的字串欄位
+    private boolean validateRequiredLineFields(Map<String, Object> row, String sku, String mfSku) {
+        // 檢查必要的字串欄位 - SKU
         if (sku == null || sku.trim().isEmpty()) {
             log.error("SKU 為空或 null，無法建立明細行");
+            return false;
+        }
+        
+        // 檢查必要的字串欄位 - MfSku
+        if (mfSku == null || mfSku.trim().isEmpty()) {
+            log.error("MF_SKU 為空或 null，無法建立明細行，SKU: {}", sku);
             return false;
         }
 

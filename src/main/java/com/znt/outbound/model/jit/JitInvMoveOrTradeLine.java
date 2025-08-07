@@ -8,6 +8,9 @@ public class JitInvMoveOrTradeLine {
     @JsonProperty("Sku")
     private String sku;
 
+    @JsonProperty("MfSku")
+    private String mfSku;
+
     @JsonProperty("Qty")
     private Integer qty;
 

@@ -17,6 +17,7 @@ SELECT
 
     -- Line 欄位 (來自 JIT_MOVE_TRADE_LINE)
     l.SKU,
+    l.MF_SKU,
     l.QTY,
     l.FROM_STORER_CATE,
     l.TO_STORER_CATE,
