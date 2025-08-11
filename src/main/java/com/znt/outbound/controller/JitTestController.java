@@ -1,5 +1,6 @@
 package com.znt.outbound.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.znt.outbound.model.jit.JitAsnRequest;
 import com.znt.outbound.model.jit.JitInvMoveOrTradeRequest;
 import com.znt.outbound.scheduler.JitAsnScheduledTask;
@@ -19,7 +20,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -39,6 +42,7 @@ public class JitTestController {
     private final JitInvLocService jitInvLocService;
     private final JitInvExchangeService jitInvExchangeService;
     private final JdbcTemplate jdbcTemplate;
+    private final RestTemplate restTemplate;
     private final JitAuthService jitAuthService;
     private final ApiConfigService apiConfigService;
     private final JitAsnScheduledTask jitAsnScheduledTask;
@@ -1134,6 +1138,99 @@ public class JitTestController {
         }
     }
 
+    /**
+     * 除錯端點：取得 JIT 庫存查詢的原始 JSON 回應
+     * 用於檢查 JIT API 實際返回的 JSON 格式
+     */
+    @GetMapping(value = "/debug-inv-loc", produces = "application/json")
+    public ResponseEntity<String> debugInventoryLocation(
+            @RequestParam(required = false) String whName,
+            @RequestParam(required = false) String zoneName,
+            @RequestParam(required = false) String storerAbbrName,
+            @RequestParam(required = false) String sku) {
+        
+        log.info("=== 開始除錯 JIT 庫存查詢 API ===");
+        log.info("查詢參數: whName={}, zoneName={}, storerAbbrName={}, sku={}", 
+                whName, zoneName, storerAbbrName, sku);
+        
+        try {
+            // 取得 API URL
+            String url = apiConfigService.getInvLocApiUrl();
+            if (url == null || url.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .header("Content-Type", "application/json")
+                    .body("{\"error\": \"JIT 庫存查詢 API URL 未設定\"}");
+            }
+            
+            // 取得認證 Token
+            String authToken = jitAuthService.getAuthToken();
+            if (authToken == null) {
+                return ResponseEntity.badRequest()
+                    .header("Content-Type", "application/json")
+                    .body("{\"error\": \"無法獲取 JIT auth-token\"}");
+            }
+            
+            // 建立 URL 參數
+            StringBuilder urlWithParams = new StringBuilder(url);
+            urlWithParams.append("?");
+            
+            boolean hasParams = false;
+            if (whName != null && !whName.isEmpty()) {
+                urlWithParams.append("whName=").append(whName);
+                hasParams = true;
+            }
+            if (zoneName != null && !zoneName.isEmpty()) {
+                if (hasParams) urlWithParams.append("&");
+                urlWithParams.append("zoneName=").append(zoneName);
+                hasParams = true;
+            }
+            if (storerAbbrName != null && !storerAbbrName.isEmpty()) {
+                if (hasParams) urlWithParams.append("&");
+                urlWithParams.append("storerAbbrName=").append(storerAbbrName);
+                hasParams = true;
+            }
+            if (sku != null && !sku.isEmpty()) {
+                if (hasParams) urlWithParams.append("&");
+                urlWithParams.append("sku=").append(sku);
+                hasParams = true;
+            }
+            
+            // 設定 HTTP Headers
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("username", apiConfigService.getLoginUsername());
+            headers.set("auth-token", authToken);
+            
+            org.springframework.http.HttpEntity<Void> requestEntity = new org.springframework.http.HttpEntity<>(headers);
+            
+            log.info("準備發送請求到: {}", urlWithParams.toString());
+            
+            // 發送請求
+            org.springframework.http.ResponseEntity<String> response = restTemplate.exchange(
+                urlWithParams.toString(),
+                org.springframework.http.HttpMethod.GET,
+                requestEntity,
+                String.class
+            );
+            
+            String responseBody = response.getBody();
+            log.info("收到回應，狀態碼: {}", response.getStatusCode());
+            
+            // 直接返回原始的 JSON response body
+            // 設定 Content-Type 為 application/json
+            return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(responseBody);
+            
+        } catch (Exception e) {
+            log.error("除錯 JIT 庫存查詢時發生錯誤", e);
+            return ResponseEntity.badRequest()
+                .header("Content-Type", "application/json")
+                .body("{\"error\": \"" + e.getMessage() + "\"}");
+        } finally {
+            log.info("=== 除錯 JIT 庫存查詢結束 ===");
+        }
+    }
+    
     /**
      * 測試 JIT 庫內換料處理與發送
      */

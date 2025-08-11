@@ -188,7 +188,7 @@ public class JitInvLocService {
     }
 
     /**
-     * 嘗試調用 JIT API 查詢庫存
+     * 嘗試調用 JIT API 查詢庫存 (使用 GET 方法)
      */
     private ResponseEntity<String> attemptToCallJitInventoryApi(String operationId, String whName, String zoneName, 
                                                                String storerAbbrName, String sku, boolean isRetry) {
@@ -205,27 +205,49 @@ public class JitInvLocService {
             return null;
         }
 
-        // 建立請求物件
-        JitInvLocApiRequest apiRequest = JitInvLocApiRequest.builder()
-                .whName(whName)
-                .zoneName(zoneName)
-                .storerAbbrName(storerAbbrName)
-                .sku(sku)
-                .build();
+        // 建立 URL 參數
+        StringBuilder urlWithParams = new StringBuilder(url);
+        urlWithParams.append("?");
+        
+        // 添加查詢參數（如果有值）
+        boolean hasParams = false;
+        if (whName != null && !whName.isEmpty()) {
+            urlWithParams.append("whName=").append(whName);
+            hasParams = true;
+        }
+        if (zoneName != null && !zoneName.isEmpty()) {
+            if (hasParams) urlWithParams.append("&");
+            urlWithParams.append("zoneName=").append(zoneName);
+            hasParams = true;
+        }
+        if (storerAbbrName != null && !storerAbbrName.isEmpty()) {
+            if (hasParams) urlWithParams.append("&");
+            urlWithParams.append("storerAbbrName=").append(storerAbbrName);
+            hasParams = true;
+        }
+        if (sku != null && !sku.isEmpty()) {
+            if (hasParams) urlWithParams.append("&");
+            urlWithParams.append("sku=").append(sku);
+            hasParams = true;
+        }
 
-        // 設定 HTTP Headers
+        // 設定 HTTP Headers (移除 Content-Type，只保留認證相關 headers)
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("username", apiConfigService.getLoginUsername());
         headers.set("auth-token", authToken);
 
-        HttpEntity<JitInvLocApiRequest> requestEntity = new HttpEntity<>(apiRequest, headers);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         String attemptLog = isRetry ? "重試" : "首次嘗試";
-        log.info("[{}] ({}) 準備發送庫存查詢請求到 JIT API。URL: {}", operationId, attemptLog, url);
+        log.info("[{}] ({}) 準備發送庫存查詢請求到 JIT API (GET)。URL: {}", operationId, attemptLog, urlWithParams.toString());
 
         try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, requestEntity, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                urlWithParams.toString(), 
+                org.springframework.http.HttpMethod.GET, 
+                requestEntity, 
+                String.class
+            );
             log.info("[{}] ({}) 成功接收到 JIT API 的回應。Status: {}", operationId, attemptLog, responseEntity.getStatusCode());
             return responseEntity;
         } catch (HttpClientErrorException e) {
@@ -235,7 +257,7 @@ public class JitInvLocService {
             // 將 HttpClientErrorException 包裝成 ResponseEntity 回傳，以便上層判斷
             return new ResponseEntity<>(e.getResponseBodyAsString(), e.getStatusCode());
         } catch (RestClientException e) {
-            log.error("[{}] ({}) 發送庫存查詢到 JIT API 時發生連接錯誤。URL: {}", operationId, attemptLog, url, e);
+            log.error("[{}] ({}) 發送庫存查詢到 JIT API 時發生連接錯誤。URL: {}", operationId, attemptLog, urlWithParams.toString(), e);
             return null;
         }
     }
@@ -256,7 +278,8 @@ public class JitInvLocService {
             return apiResponse;
             
         } catch (JsonProcessingException e) {
-            log.error("[{}] JIT API 回應解析失敗", operationId, e);
+            log.error("[{}] JIT API 回應解析失敗", operationId);
+            log.error("[{}] 解析錯誤詳情: {}", operationId, e.getMessage());
             return null;
         }
     }
