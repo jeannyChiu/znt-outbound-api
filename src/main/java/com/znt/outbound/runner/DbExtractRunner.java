@@ -39,9 +39,27 @@ public class DbExtractRunner {
      * 排程任務：每週一至週六，從 08:15 到 20:45，每 30 分鐘執行一次。
      * Cron: 秒 分 時 日 月 週
      * 0 15/30 8-20 * * MON-SAT
+     * 
+     * 注意：此方法已被主排程器取代，保留但停用
      */
-    @Scheduled(cron = "0 15/30 8-20 * * MON-SAT", zone = "Asia/Taipei")
+    // @Scheduled(cron = "0 15/30 8-20 * * MON-SAT", zone = "Asia/Taipei")
     public void executeScheduledTask() {
+        // 暫時停用排程 - 測試期間使用
+        boolean schedulingEnabled = false;
+        if (!schedulingEnabled) {
+            log.debug("DB 抽取排程已暫停，跳過此次執行");
+            return;
+        }
+        
+        executeTask();
+    }
+    
+    /**
+     * 執行資料庫抽取任務
+     * 供主排程器或手動觸發使用
+     */
+    public void executeTask() {
+        
         log.info("========== 開始執行排程任務 ==========");
         try {
             log.info(">>> 開始執行資料庫抽取與載入任務...");

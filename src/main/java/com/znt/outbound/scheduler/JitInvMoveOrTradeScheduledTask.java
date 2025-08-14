@@ -21,16 +21,26 @@ public class JitInvMoveOrTradeScheduledTask {
      * 排程任務：每5分鐘執行一次JIT庫內移倉/交易處理
      * Cron: 秒 分 時 日 月 週
      * 表示每小時的第0、5、10、15、20、25、30、35、40、45、50、55分鐘執行
+     * 
+     * 注意：此方法已被主排程器取代，保留但停用
      */
-    @Scheduled(cron = "0 */5 * * * ?", zone = "Asia/Taipei")
+    // @Scheduled(cron = "0 */5 * * * ?", zone = "Asia/Taipei")
     public void executeJitInvMoveOrTradeProcessing() {
         // 暫時停用排程 - 測試期間使用
-        boolean schedulingEnabled = true;
+        boolean schedulingEnabled = false;
         if (!schedulingEnabled) {
             log.debug("JIT 庫內移倉/交易排程已暫停，跳過此次執行");
             return;
         }
         
+        executeTask();
+    }
+    
+    /**
+     * 執行JIT庫內移倉/交易處理任務
+     * 供主排程器或手動觸發使用
+     */
+    public void executeTask() {
         String taskId = generateTaskId();
         long startTime = System.currentTimeMillis();
 

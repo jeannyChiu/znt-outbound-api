@@ -63,6 +63,199 @@ public class JitAsnMappingService {
     }
 
     /**
+     * 從生產系統預處理移倉入庫資料到 JIT 中介表格
+     * 此方法執行移倉資料的 INSERT SQL，將最新的移倉入庫資料準備到中介表格中
+     */
+    public void prepareAsnDataFromSource() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行移倉入庫資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareAsnSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取預處理 SQL 查詢語句，終止作業。", operationId);
+                return;
+            }
+
+            log.info("[{}] 開始執行移倉入庫資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 移倉入庫資料預處理完成，執行時間: {}ms", operationId, duration);
+
+        } catch (DataAccessException e) {
+            log.error("[{}] 移倉入庫資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("移倉入庫資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 移倉入庫資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("移倉入庫資料預處理失敗", e);
+        }
+    }
+
+    /**
+     * 讀取預處理 SQL 查詢語句
+     */
+    private String loadPrepareAsnSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_asn_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取預處理 SQL 檔案: prepare_asn_data.sql", e);
+            return null;
+        }
+    }
+
+    /**
+     * 從生產系統預處理採購進貨資料到 JIT 中介表格
+     * 此方法執行採購進貨的 INSERT SQL，將最新的採購進貨資料準備到中介表格中
+     */
+    public void preparePurchaseAsnDataFromSource() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行採購進貨資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPreparePurchaseAsnSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取採購進貨預處理 SQL 查詢語句，終止作業。", operationId);
+                return;
+            }
+
+            log.info("[{}] 開始執行採購進貨資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 採購進貨資料預處理完成，執行時間: {}ms", operationId, duration);
+
+        } catch (DataAccessException e) {
+            log.error("[{}] 採購進貨資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("採購進貨資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 採購進貨資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("採購進貨資料預處理失敗", e);
+        }
+    }
+
+    /**
+     * 讀取採購進貨預處理 SQL 查詢語句
+     */
+    private String loadPreparePurchaseAsnSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_purchase_asn_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取採購進貨預處理 SQL 檔案: prepare_purchase_asn_data.sql", e);
+            return null;
+        }
+    }
+
+    /**
+     * 從生產系統預處理銷退入庫資料到 JIT 中介表格
+     * 此方法執行銷退入庫的 INSERT SQL，將最新的銷退入庫資料準備到中介表格中
+     */
+    public void prepareSalesReturnAsnDataFromSource() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行銷退入庫資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareSalesReturnAsnSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取銷退入庫預處理 SQL 查詢語句，終止作業。", operationId);
+                return;
+            }
+
+            log.info("[{}] 開始執行銷退入庫資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 銷退入庫資料預處理完成，執行時間: {}ms", operationId, duration);
+
+        } catch (DataAccessException e) {
+            log.error("[{}] 銷退入庫資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("銷退入庫資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 銷退入庫資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("銷退入庫資料預處理失敗", e);
+        }
+    }
+
+    /**
+     * 讀取銷退入庫預處理 SQL 查詢語句
+     */
+    private String loadPrepareSalesReturnAsnSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_sales_return_asn_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取銷退入庫預處理 SQL 檔案: prepare_sales_return_asn_data.sql", e);
+            return null;
+        }
+    }
+
+    /**
+     * 執行所有 ASN 資料預處理
+     * 包含移倉入庫、採購進貨和銷退入庫三種資料類型
+     */
+    public void prepareAllAsnData() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行所有 ASN 資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 執行移倉入庫資料預處理
+            log.info("[{}] 執行移倉入庫資料預處理...", operationId);
+            prepareAsnDataFromSource();
+            
+            // 執行採購進貨資料預處理
+            log.info("[{}] 執行採購進貨資料預處理...", operationId);
+            preparePurchaseAsnDataFromSource();
+            
+            // 執行銷退入庫資料預處理
+            log.info("[{}] 執行銷退入庫資料預處理...", operationId);
+            prepareSalesReturnAsnDataFromSource();
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 所有 ASN 資料預處理完成，總執行時間: {}ms", operationId, duration);
+
+        } catch (Exception e) {
+            log.error("[{}] ASN 資料預處理發生錯誤", operationId, e);
+            throw e;
+        }
+    }
+
+    /**
      * 處理並發送 JIT 入庫單 (ASN) 的主要方法。
      * 該方法將持續查詢並處理待處理的 ASN 資料，每次只處理一筆 ExternalId，
      * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalId 資料」的限制。
@@ -75,14 +268,18 @@ public class JitAsnMappingService {
         ProcessingStatistics stats = new ProcessingStatistics();
 
         try {
-            // 步驟 1: 讀取 SQL 查詢語句
+            // 步驟 1: 預處理所有 ASN 資料（從生產系統插入到中介表格）
+            log.info("[{}] 步驟 1: 執行所有 ASN 資料預處理...", operationId);
+            prepareAllAsnData();
+
+            // 步驟 2: 讀取 SQL 查詢語句
             String sql = loadSqlQuery();
             if (sql == null) {
                 log.error("[{}] 無法讀取 SQL 查詢語句，終止處理作業。", operationId);
                 return;
             }
 
-            // 步驟 2: 迴圈處理所有待處理的 ASN 資料
+            // 步驟 3: 迴圈處理所有待處理的 ASN 資料
             processAsnDataLoop(operationId, sql, stats);
 
         } catch (Exception e) {
@@ -111,11 +308,7 @@ public class JitAsnMappingService {
         int consecutiveErrors = 0;
         final int maxConsecutiveErrors = 5;
         
-        // 防止無限循環的機制
-        java.util.Set<String> recentlyFailedExternalNos = new java.util.HashSet<>();
-        String lastFailedExternalNo = null;
-        int sameDataFailCount = 0;
-        final int maxSameDataFails = 2; // 同一筆資料最多連續失敗2次就跳過
+        // SQL 現在只查詢 PENDING 狀態，不需要防止無限循環的機制
 
         while (true) {
             try {
@@ -151,29 +344,6 @@ public class JitAsnMappingService {
 
                 String externalId = getStringValue(rows.get(0), "EXTERNAL_ID");
                 
-                // 檢查是否為剛剛失敗的相同資料
-                if (externalId.equals(lastFailedExternalNo)) {
-                    sameDataFailCount++;
-                    log.warn("[{}] ExternalId: {} 連續失敗第 {} 次", 
-                            operationId, externalId, sameDataFailCount);
-                    
-                    if (sameDataFailCount >= maxSameDataFails) {
-                        log.warn("[{}] ExternalId: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
-                                operationId, externalId, sameDataFailCount);
-                        recentlyFailedExternalNos.add(externalId);
-                        // 因為SQL查詢會持續返回相同的失敗資料，所以直接結束處理
-                        log.info("[{}] 剩餘資料為連續失敗的資料，本次處理結束", operationId);
-                        break; // 結束處理循環
-                    }
-                }
-                
-                // 如果是本次已經跳過的資料，直接跳過
-                if (recentlyFailedExternalNos.contains(externalId)) {
-                    log.debug("[{}] ExternalId: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalId);
-                    log.info("[{}] 所有未跳過的資料已處理完畢，處理作業完成。", operationId);
-                    break; // 結束處理循環
-                }
-                
                 log.info("[{}] 開始處理第 {} 筆 ASN 資料，ExternalId: {}",
                         operationId, stats.processedCount, externalId);
 
@@ -186,18 +356,10 @@ public class JitAsnMappingService {
                     stats.successCount++;
                     log.info("[{}] ASN (ExternalId: {}) 處理成功，耗時: {}ms",
                             operationId, externalId, singleDuration);
-                    // 成功後重置失敗計數
-                    lastFailedExternalNo = null;
-                    sameDataFailCount = 0;
                 } else {
                     stats.failedCount++;
-                    log.error("[{}] ASN (ExternalId: {}) 處理失敗，耗時: {}ms",
+                    log.error("[{}] ASN (ExternalId: {}) 處理失敗，耗時: {}ms，狀態已更新為 FAILED",
                             operationId, externalId, singleDuration);
-                    // 記錄失敗的 ExternalId
-                    if (!externalId.equals(lastFailedExternalNo)) {
-                        lastFailedExternalNo = externalId;
-                        sameDataFailCount = 1;
-                    }
                 }
 
                 // 為避免過度頻繁的資料庫查詢，加入短暫延遲

@@ -82,14 +82,17 @@ public class JitInvExchangeService {
         ProcessingStatistics stats = new ProcessingStatistics();
 
         try {
-            // 步驟 1: 讀取 SQL 查詢語句
+            // 步驟 1: 準備庫內換料數據
+            prepareInvExchangeData(operationId);
+            
+            // 步驟 2: 讀取 SQL 查詢語句
             String sql = loadSqlQuery();
             if (sql == null) {
                 log.error("[{}] 無法讀取 SQL 查詢語句，終止處理作業。", operationId);
                 return;
             }
 
-            // 步驟 2: 迴圈處理所有待處理的庫內換料資料
+            // 步驟 3: 迴圈處理所有待處理的庫內換料資料
             processInvExchangeDataLoop(operationId, sql, stats);
 
         } catch (Exception e) {
@@ -114,11 +117,7 @@ public class JitInvExchangeService {
      * 處理庫內換料資料的主要迴圈
      */
     private void processInvExchangeDataLoop(String operationId, String sql, ProcessingStatistics stats) {
-        // 防止無限循環的機制
-        Set<String> recentlyFailedExternalIds = new HashSet<>();
-        String lastFailedExternalId = null;
-        int sameDataFailCount = 0;
-        final int maxSameDataFails = 2;
+        // SQL 現在只查詢 PENDING 狀態，不需要防止無限循環的機制
 
         while (true) {
             try {
@@ -136,35 +135,15 @@ public class JitInvExchangeService {
                 Map<String, Object> header = pendingHeaders.get(0);
                 String externalId = extractString(header, "EXTERNAL_ID");
                 Long headerId = extractLong(header, "HEADER_ID");
-                
-                // 檢查是否最近已經失敗過
-                if (recentlyFailedExternalIds.contains(externalId)) {
-                    log.warn("[{}] ExternalId: {} 在本次執行中已經失敗過，跳過處理", operationId, externalId);
-                    break;
-                }
-
-                // 檢查是否連續處理相同的失敗數據
-                if (externalId != null && externalId.equals(lastFailedExternalId)) {
-                    sameDataFailCount++;
-                    if (sameDataFailCount >= maxSameDataFails) {
-                        log.warn("[{}] ExternalId: {} 連續失敗 {} 次，本次執行跳過", 
-                                operationId, externalId, sameDataFailCount);
-                        recentlyFailedExternalIds.add(externalId);
-                        break; // 結束處理循環
-                    }
-                } else {
-                    sameDataFailCount = 0;
-                }
 
                 // 處理單個換料單
                 boolean success = processSingleExchangeOrder(operationId, header, headerId, stats);
                 
                 if (!success) {
-                    lastFailedExternalId = externalId;
                     stats.failedCount++;
+                    log.error("[{}] 庫內換料 (ExternalId: {}) 處理失敗，狀態已更新為 FAILED", operationId, externalId);
                 } else {
-                    lastFailedExternalId = null;
-                    sameDataFailCount = 0;
+                    log.info("[{}] 庫內換料 (ExternalId: {}) 處理成功", operationId, externalId);
                 }
 
                 stats.processedCount++;
@@ -519,6 +498,219 @@ public class JitInvExchangeService {
     }
 
     /**
+     * 準備庫內換料數據
+     * 執行 prepare_inv_exchange_data.sql 和 prepare_inv_exchange_separate_data.sql 來插入待處理的數據
+     */
+    private void prepareInvExchangeData(String operationId) {
+        log.info("[{}] 開始執行庫內換料資料預處理作業...", operationId);
+        
+        long startTime = System.currentTimeMillis();
+        
+        try {
+            // 步驟 1: 執行雜項收發資料預處理 (Miscellaneous 類型) (20250808新增)
+            log.info("[{}] 執行雜項收發資料預處理...", operationId);
+            prepareMiscellaneousTypeData(operationId);
+            
+            // 步驟 2: 執行共用料換料資料預處理 (Exchange 類型)
+            log.info("[{}] 執行共用料換料資料預處理...", operationId);
+            prepareExchangeTypeData(operationId);
+            
+            // 步驟 3: 執行拆解工單資料預處理 (Separate 類型)
+            log.info("[{}] 執行拆解工單資料預處理...", operationId);
+            prepareSeparateTypeData(operationId);
+            
+            // 步驟 4: 執行組合工單資料預處理 (Combine 類型)
+            log.info("[{}] 執行組合工單資料預處理...", operationId);
+            prepareCombineTypeData(operationId);
+            
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            
+            log.info("[{}] 所有庫內換料資料預處理完成，總執行時間: {}ms", operationId, duration);
+            
+        } catch (Exception e) {
+            log.error("[{}] 庫內換料資料預處理發生錯誤", operationId, e);
+            throw e;
+        }
+    }
+    
+    /**
+     * 準備 Exchange 類型的換料數據
+     */
+    private void prepareExchangeTypeData(String operationId) {
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareInvExchangeSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取共用料換料預處理 SQL 查詢語句，終止作業。", operationId);
+                throw new RuntimeException("無法讀取共用料換料預處理 SQL");
+            }
+            
+            log.info("[{}] 開始執行共用料換料資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+            
+            log.info("[{}] 共用料換料資料預處理完成", operationId);
+            
+        } catch (DataAccessException e) {
+            log.error("[{}] 共用料換料資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("共用料換料資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 共用料換料資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("共用料換料資料預處理失敗", e);
+        }
+    }
+    
+    /**
+     * 準備 Separate 類型的拆解工單數據
+     */
+    private void prepareSeparateTypeData(String operationId) {
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareSeparateSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取拆解工單預處理 SQL 查詢語句，終止作業。", operationId);
+                throw new RuntimeException("無法讀取拆解工單預處理 SQL");
+            }
+            
+            log.info("[{}] 開始執行拆解工單資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+            
+            log.info("[{}] 拆解工單資料預處理完成", operationId);
+            
+        } catch (DataAccessException e) {
+            log.error("[{}] 拆解工單資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("拆解工單資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 拆解工單資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("拆解工單資料預處理失敗", e);
+        }
+    }
+    
+    /**
+     * 讀取庫內換料預處理 SQL 查詢語句
+     */
+    private String loadPrepareInvExchangeSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_exchange_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取庫內換料預處理 SQL 檔案: prepare_inv_exchange_data.sql", e);
+            return null;
+        }
+    }
+    
+    /**
+     * 準備 Combine 類型的組合工單數據
+     */
+    private void prepareCombineTypeData(String operationId) {
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareCombineSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取組合工單預處理 SQL 查詢語句，終止作業。", operationId);
+                throw new RuntimeException("無法讀取組合工單預處理 SQL");
+            }
+            
+            log.info("[{}] 開始執行組合工單資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+            
+            log.info("[{}] 組合工單資料預處理完成", operationId);
+            
+        } catch (DataAccessException e) {
+            log.error("[{}] 組合工單資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("組合工單資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 組合工單資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("組合工單資料預處理失敗", e);
+        }
+    }
+    
+    /**
+     * 讀取拆解工單預處理 SQL 查詢語句
+     */
+    private String loadPrepareSeparateSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_exchange_separate_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取拆解工單預處理 SQL 檔案: prepare_inv_exchange_separate_data.sql", e);
+            return null;
+        }
+    }
+    
+    /**
+     * 讀取組合工單預處理 SQL 查詢語句
+     */
+    private String loadPrepareCombineSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_exchange_combine_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取組合工單預處理 SQL 檔案: prepare_inv_exchange_combine_data.sql", e);
+            return null;
+        }
+    }
+    
+    /**
+     * 準備 Miscellaneous 類型的雜項收發數據 (20250808新增)
+     */
+    private void prepareMiscellaneousTypeData(String operationId) {
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareMiscellaneousSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取雜項收發預處理 SQL 查詢語句，終止作業。", operationId);
+                throw new RuntimeException("無法讀取雜項收發預處理 SQL");
+            }
+            
+            log.info("[{}] 開始執行雜項收發資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+            
+            log.info("[{}] 雜項收發資料預處理完成", operationId);
+            
+        } catch (DataAccessException e) {
+            log.error("[{}] 雜項收發資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("雜項收發資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 雜項收發資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("雜項收發資料預處理失敗", e);
+        }
+    }
+    
+    /**
+     * 讀取雜項收發預處理 SQL 查詢語句 (20250808新增)
+     */
+    private String loadPrepareMiscellaneousSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_exchange_miscellaneous_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取雜項收發預處理 SQL 檔案: prepare_inv_exchange_miscellaneous_data.sql", e);
+            return null;
+        }
+    }
+    
+    /**
      * 載入 SQL 查詢語句
      */
     private String loadSqlQuery() {
@@ -529,7 +721,7 @@ public class JitInvExchangeService {
         } catch (Exception e) {
             log.error("載入 SQL 查詢語句時發生錯誤", e);
             // 如果無法載入文件，使用預設的 SQL
-            return "SELECT * FROM JIT_INV_EXCHANGE_HEADER WHERE STATUS IN ('PENDING', 'FAILED') ORDER BY CREATED_AT";
+            return "SELECT * FROM JIT_INV_EXCHANGE_HEADER WHERE STATUS = 'PENDING' ORDER BY CREATED_AT";
         }
     }
 

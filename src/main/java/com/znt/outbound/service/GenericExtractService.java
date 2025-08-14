@@ -42,11 +42,10 @@ public class GenericExtractService {
 
         // 步驟 2: 執行各個腳本的 INSERT 操作，每個腳本都在自己的交易中
         List<String> sqlScripts = List.of(
-                "mi_extract.sql",
-                "mv_extract.sql",
-                "om_extract.sql",
-                "rt_extract.sql",
-                "st_extract.sql"
+                "prepare_sample_out_data.sql",
+                "prepare_warehouse_transfer_outbound_data.sql",
+                "prepare_sales_outbound_data.sql",
+                "prepare_purchase_return_outbound_data.sql"
         );
 
         for (String scriptName : sqlScripts) {

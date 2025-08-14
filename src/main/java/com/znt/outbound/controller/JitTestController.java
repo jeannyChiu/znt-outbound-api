@@ -603,6 +603,57 @@ public class JitTestController {
     }
 
     /**
+     * 執行庫內移倉資料預處理（從生產系統插入到中介表格）
+     */
+    @GetMapping("/prepare-inv-move-data")
+    public ResponseEntity<?> prepareInvMoveData() {
+        try {
+            log.info("收到庫內移倉資料預處理請求");
+
+            jitInvMoveOrTradeMappingService.prepareInvMoveDataFromSource();
+
+            return ResponseEntity.ok("庫內移倉資料預處理執行完成");
+        } catch (Exception e) {
+            log.error("庫內移倉資料預處理執行失敗", e);
+            return ResponseEntity.internalServerError().body("庫內移倉資料預處理執行失敗: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 執行關係人交易資料預處理（從生產系統插入到中介表格）
+     */
+    @GetMapping("/prepare-inv-trade-data")
+    public ResponseEntity<?> prepareInvTradeData() {
+        try {
+            log.info("收到關係人交易資料預處理請求");
+
+            jitInvMoveOrTradeMappingService.prepareInvTradeDataFromSource();
+
+            return ResponseEntity.ok("關係人交易資料預處理執行完成");
+        } catch (Exception e) {
+            log.error("關係人交易資料預處理執行失敗", e);
+            return ResponseEntity.internalServerError().body("關係人交易資料預處理執行失敗: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 執行所有庫內移倉/交易資料預處理（包含移倉和關係人交易）
+     */
+    @GetMapping("/prepare-all-inv-data")
+    public ResponseEntity<?> prepareAllInvData() {
+        try {
+            log.info("收到所有庫內移倉/交易資料預處理請求");
+
+            jitInvMoveOrTradeMappingService.prepareAllInvData();
+
+            return ResponseEntity.ok("所有庫內移倉/交易資料預處理執行完成");
+        } catch (Exception e) {
+            log.error("所有庫內移倉/交易資料預處理執行失敗", e);
+            return ResponseEntity.internalServerError().body("所有庫內移倉/交易資料預處理執行失敗: " + e.getMessage());
+        }
+    }
+
+    /**
      * 執行完整的 JIT 庫內移倉/交易處理流程（包含發送到外部 API）
      * 請謹慎使用，確保在測試環境中執行
      */

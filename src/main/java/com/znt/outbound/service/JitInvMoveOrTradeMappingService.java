@@ -60,6 +60,142 @@ public class JitInvMoveOrTradeMappingService {
     }
 
     /**
+     * 從生產系統預處理庫內移倉資料到 JIT 中介表格
+     * 此方法執行同事提供的 INSERT SQL，將最新的庫內移倉資料準備到中介表格中
+     */
+    public void prepareInvMoveDataFromSource() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行庫內移倉資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取預處理 SQL 查詢語句，終止作業。", operationId);
+                return;
+            }
+
+            log.info("[{}] 開始執行庫內移倉資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 庫內移倉資料預處理完成，執行時間: {}ms", operationId, duration);
+
+        } catch (DataAccessException e) {
+            log.error("[{}] 庫內移倉資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("庫內移倉資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 庫內移倉資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("庫內移倉資料預處理失敗", e);
+        }
+    }
+
+    /**
+     * 讀取預處理 SQL 查詢語句
+     */
+    private String loadPrepareSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_move_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取預處理 SQL 檔案: prepare_inv_move_data.sql", e);
+            return null;
+        }
+    }
+
+    /**
+     * 從生產系統預處理關係人交易資料到 JIT 中介表格
+     * 此方法執行關係人交易的 INSERT SQL，將最新的交易資料準備到中介表格中
+     */
+    public void prepareInvTradeDataFromSource() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行關係人交易資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 讀取預處理 SQL
+            String sql = loadPrepareTradeDataSqlQuery();
+            if (sql == null) {
+                log.error("[{}] 無法讀取關係人交易預處理 SQL 查詢語句，終止作業。", operationId);
+                return;
+            }
+
+            log.info("[{}] 開始執行關係人交易資料預處理 SQL...", operationId);
+            
+            // 執行預處理 SQL（包含 BEGIN...END 區塊）
+            jdbcTemplate.execute(sql);
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 關係人交易資料預處理完成，執行時間: {}ms", operationId, duration);
+
+        } catch (DataAccessException e) {
+            log.error("[{}] 關係人交易資料預處理資料庫操作失敗", operationId, e);
+            throw new RuntimeException("關係人交易資料預處理失敗", e);
+        } catch (Exception e) {
+            log.error("[{}] 關係人交易資料預處理發生未預期錯誤", operationId, e);
+            throw new RuntimeException("關係人交易資料預處理失敗", e);
+        }
+    }
+
+    /**
+     * 讀取關係人交易預處理 SQL 查詢語句
+     */
+    private String loadPrepareTradeDataSqlQuery() {
+        try {
+            Reader reader = new InputStreamReader(
+                    getClass().getClassLoader().getResourceAsStream("sql/prepare_inv_trade_data.sql"),
+                    StandardCharsets.UTF_8
+            );
+            return FileCopyUtils.copyToString(reader);
+        } catch (Exception e) {
+            log.error("無法讀取關係人交易預處理 SQL 檔案: prepare_inv_trade_data.sql", e);
+            return null;
+        }
+    }
+
+    /**
+     * 執行所有庫內移倉/交易資料預處理
+     * 包含庫內移倉和關係人交易兩種資料類型
+     */
+    public void prepareAllInvData() {
+        String operationId = generateOperationId();
+        log.info("[{}] 開始執行所有庫內移倉/交易資料預處理作業...", operationId);
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 執行庫內移倉資料預處理
+            log.info("[{}] 執行庫內移倉資料預處理...", operationId);
+            prepareInvMoveDataFromSource();
+            
+            // 執行關係人交易資料預處理
+            log.info("[{}] 執行關係人交易資料預處理...", operationId);
+            prepareInvTradeDataFromSource();
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            log.info("[{}] 所有庫內移倉/交易資料預處理完成，總執行時間: {}ms", operationId, duration);
+
+        } catch (Exception e) {
+            log.error("[{}] 庫內移倉/交易資料預處理發生錯誤", operationId, e);
+            throw e;
+        }
+    }
+
+    /**
      * 處理並發送 JIT 庫內移倉/交易的主要方法。
      * 該方法將持續查詢並處理待處理的庫內移倉/交易資料，每次只處理一筆 ExternalId，
      * 符合 JIT 系統「每次 API 調用只能傳送一筆 ExternalId 資料」的限制。
@@ -72,14 +208,18 @@ public class JitInvMoveOrTradeMappingService {
         ProcessingStatistics stats = new ProcessingStatistics();
 
         try {
-            // 步驟 1: 讀取 SQL 查詢語句
+            // 步驟 1: 預處理所有庫內移倉/交易資料（從生產系統插入到中介表格）
+            log.info("[{}] 步驟 1: 執行所有庫內移倉/交易資料預處理...", operationId);
+            prepareAllInvData();
+
+            // 步驟 2: 讀取 SQL 查詢語句
             String sql = loadSqlQuery();
             if (sql == null) {
                 log.error("[{}] 無法讀取 SQL 查詢語句，終止處理作業。", operationId);
                 return;
             }
 
-            // 步驟 2: 迴圈處理所有待處理的庫內移倉/交易資料
+            // 步驟 3: 迴圈處理所有待處理的庫內移倉/交易資料
             processInvMoveOrTradeDataLoop(operationId, sql, stats);
 
         } catch (Exception e) {
@@ -108,11 +248,7 @@ public class JitInvMoveOrTradeMappingService {
         int consecutiveErrors = 0;
         final int maxConsecutiveErrors = 5;
         
-        // 防止無限循環的機制
-        java.util.Set<String> recentlyFailedExternalIds = new java.util.HashSet<>();
-        String lastFailedExternalId = null;
-        int sameDataFailCount = 0;
-        final int maxSameDataFails = 2; // 同一筆資料最多連續失敗2次就跳過
+        // SQL 現在只查詢 PENDING 狀態，不需要防止無限循環的機制
 
         while (true) {
             try {
@@ -148,29 +284,6 @@ public class JitInvMoveOrTradeMappingService {
 
                 String externalId = getStringValue(rows.get(0), "EXTERNAL_ID");
                 
-                // 檢查是否為剛剛失敗的相同資料
-                if (externalId.equals(lastFailedExternalId)) {
-                    sameDataFailCount++;
-                    log.warn("[{}] ExternalId: {} 連續失敗第 {} 次", 
-                            operationId, externalId, sameDataFailCount);
-                    
-                    if (sameDataFailCount >= maxSameDataFails) {
-                        log.warn("[{}] ExternalId: {} 連續失敗 {} 次，本次執行跳過，等下次排程再處理", 
-                                operationId, externalId, sameDataFailCount);
-                        recentlyFailedExternalIds.add(externalId);
-                        // 因為SQL查詢會持續返回相同的失敗資料，所以直接結束處理
-                        log.info("[{}] 剩餘資料為連續失敗的資料，本次處理結束", operationId);
-                        break; // 結束處理循環
-                    }
-                }
-                
-                // 如果是本次已經跳過的資料，直接跳過
-                if (recentlyFailedExternalIds.contains(externalId)) {
-                    log.debug("[{}] ExternalId: {} 本次執行已跳過，查詢沒有更多可處理的資料，結束處理", operationId, externalId);
-                    log.info("[{}] 所有未跳過的資料已處理完畢，處理作業完成。", operationId);
-                    break; // 結束處理循環
-                }
-                
                 log.info("[{}] 開始處理第 {} 筆庫內移倉/交易資料，ExternalId: {}",
                         operationId, stats.processedCount, externalId);
 
@@ -183,18 +296,10 @@ public class JitInvMoveOrTradeMappingService {
                     stats.successCount++;
                     log.info("[{}] 庫內移倉/交易 (ExternalId: {}) 處理成功，耗時: {}ms",
                             operationId, externalId, singleDuration);
-                    // 成功後重置失敗計數
-                    lastFailedExternalId = null;
-                    sameDataFailCount = 0;
                 } else {
                     stats.failedCount++;
-                    log.error("[{}] 庫內移倉/交易 (ExternalId: {}) 處理失敗，耗時: {}ms",
+                    log.error("[{}] 庫內移倉/交易 (ExternalId: {}) 處理失敗，耗時: {}ms，狀態已更新為 FAILED",
                             operationId, externalId, singleDuration);
-                    // 記錄失敗的 ExternalId
-                    if (!externalId.equals(lastFailedExternalId)) {
-                        lastFailedExternalId = externalId;
-                        sameDataFailCount = 1;
-                    }
                 }
 
                 // 為避免過度頻繁的資料庫查詢，加入短暫延遲

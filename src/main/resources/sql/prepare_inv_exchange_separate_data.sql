@@ -1,0 +1,225 @@
+BEGIN
+    INSERT INTO JIT_INV_EXCHANGE_HEADER
+    (
+        EXTERNAL_ID,
+        EXTERNAL_NO,
+        WH_NAME,
+        STORER,
+        EXCHANGE_TYPE,
+        APPLY_DATE,
+        REF_NO,
+        REMARK
+    )
+    SELECT DISTINCT
+        we.WIP_ENTITY_NAME,
+        we.WIP_ENTITY_NAME,
+        'GT',
+        DECODE(mmt.ORGANIZATION_ID, 169, 'ZCSH', 'ZTSH') AS STORER,
+        'Separate',
+        CURRENT_TIMESTAMP AS APPLY_DATE,
+        we.WIP_ENTITY_NAME,
+        NULL AS REMARK
+    FROM 
+        MTL_MATERIAL_TRANSACTIONS@PROD2 mmt,
+        APPS.MTL_ITEM_LOCATIONS@PROD2 mil,
+        WIP_ENTITIES@PROD2 we
+    WHERE 
+        mmt.TRANSACTION_TYPE_ID = 35
+        AND mmt.TRANSACTION_SOURCE_ID = we.WIP_ENTITY_ID
+        AND mmt.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+        AND TRUNC(mmt.TRANSACTION_DATE) = TRUNC(SYSDATE)
+        AND mmt.ORGANIZATION_ID IN (169, 209)
+        AND mmt.TRANSACTION_QUANTITY < 0
+        AND mmt.ORGANIZATION_ID = mil.ORGANIZATION_ID(+)
+        AND mmt.SUBINVENTORY_CODE = mil.SUBINVENTORY_CODE(+)
+        AND mmt.LOCATOR_ID = mil.INVENTORY_LOCATION_ID(+)
+        AND mmt.SUBINVENTORY_CODE = '外存倉'
+        AND (mil.SEGMENT1 LIKE '%基通%' OR mil.SEGMENT2 LIKE '%基通%')
+        AND mil.ATTRIBUTE3 = 'JIT'
+        AND EXISTS (
+            SELECT 1
+            FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
+                 APPS.MTL_ITEM_LOCATIONS@PROD2 mil1,
+                 WIP_ENTITIES@PROD2 we1
+            WHERE mmt1.TRANSACTION_TYPE_ID = 38
+                AND mmt1.TRANSACTION_SOURCE_ID = we1.WIP_ENTITY_ID
+                AND mmt1.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+                AND TRUNC(mmt1.TRANSACTION_DATE) = TRUNC(SYSDATE)
+                AND mmt1.ORGANIZATION_ID IN (169, 209)
+                AND mmt1.TRANSACTION_QUANTITY > 0
+                AND we.WIP_ENTITY_NAME = we1.WIP_ENTITY_NAME
+                AND mmt.ORGANIZATION_ID = mmt1.ORGANIZATION_ID
+                AND mmt1.ORGANIZATION_ID = mil1.ORGANIZATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = mil1.SUBINVENTORY_CODE(+)
+                AND mmt1.LOCATOR_ID = mil1.INVENTORY_LOCATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = '外存倉'
+                AND (mil1.SEGMENT1 LIKE '%基通%' OR mil1.SEGMENT2 LIKE '%基通%')
+                AND mil1.ATTRIBUTE3 = 'JIT'
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM JIT_INV_EXCHANGE_HEADER
+            WHERE EXTERNAL_ID = we.WIP_ENTITY_NAME
+        );
+
+    INSERT INTO JIT_INV_EXCHANGE_FINAL
+    (
+        HEADER_ID,
+        PRODUCT,
+        QTY,
+        MF_SKU,
+        ZONE_NAME
+    )
+    SELECT
+        jieh.HEADER_ID,
+        msi.SEGMENT1,
+        ABS(mmt.TRANSACTION_QUANTITY),
+        NVL(ZEN_GET_WMS_ITEM_F(msi.SEGMENT1), msi.SEGMENT1) AS MF_SKU,
+        DECODE(mil.SEGMENT1, '', '',
+            (mil.SEGMENT1 || '.' || mil.SEGMENT2)) AS SUBINVENTORY_CODE
+    FROM 
+        MTL_MATERIAL_TRANSACTIONS@PROD2 mmt,
+        APPS.MTL_ITEM_LOCATIONS@PROD2 mil,
+        WIP_ENTITIES@PROD2 we,
+        MTL_SYSTEM_ITEMS_B@PROD2 msi,
+        JIT_INV_EXCHANGE_HEADER jieh
+    WHERE 
+        mmt.TRANSACTION_TYPE_ID = 35
+        AND mmt.TRANSACTION_SOURCE_ID = we.WIP_ENTITY_ID
+        AND mmt.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+        AND TRUNC(mmt.TRANSACTION_DATE) = TRUNC(SYSDATE)
+        AND mmt.ORGANIZATION_ID IN (169, 209)
+        AND mmt.TRANSACTION_QUANTITY < 0
+        AND mmt.INVENTORY_ITEM_ID = msi.INVENTORY_ITEM_ID
+        AND mmt.ORGANIZATION_ID = msi.ORGANIZATION_ID
+        AND mmt.ORGANIZATION_ID = mil.ORGANIZATION_ID(+)
+        AND mmt.SUBINVENTORY_CODE = mil.SUBINVENTORY_CODE(+)
+        AND mmt.LOCATOR_ID = mil.INVENTORY_LOCATION_ID(+)
+        AND (mil.SEGMENT1 LIKE '%基通%' OR mil.SEGMENT2 LIKE '%基通%')
+        AND mil.ATTRIBUTE3 = 'JIT'
+        AND jieh.EXTERNAL_ID = we.WIP_ENTITY_NAME
+        AND jieh.STATUS = 'PENDING'
+        AND EXISTS (
+            SELECT 1
+            FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
+                 APPS.MTL_ITEM_LOCATIONS@PROD2 mil1,
+                 WIP_ENTITIES@PROD2 we1
+            WHERE mmt1.TRANSACTION_TYPE_ID = 38
+                AND mmt1.TRANSACTION_SOURCE_ID = we1.WIP_ENTITY_ID
+                AND mmt1.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+                AND TRUNC(mmt1.TRANSACTION_DATE) = TRUNC(SYSDATE)
+                AND mmt1.ORGANIZATION_ID IN (169, 209)
+                AND mmt1.TRANSACTION_QUANTITY > 0
+                AND we.WIP_ENTITY_NAME = we1.WIP_ENTITY_NAME
+                AND mmt.ORGANIZATION_ID = mmt1.ORGANIZATION_ID
+                AND mmt1.ORGANIZATION_ID = mil1.ORGANIZATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = mil1.SUBINVENTORY_CODE(+)
+                AND mmt1.LOCATOR_ID = mil1.INVENTORY_LOCATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = '外存倉'
+                AND (mil1.SEGMENT1 LIKE '%基通%' OR mil1.SEGMENT2 LIKE '%基通%')
+                AND mil1.ATTRIBUTE3 = 'JIT'
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM JIT_INV_EXCHANGE_FINAL jief
+            WHERE jief.HEADER_ID = jieh.HEADER_ID
+        );
+
+    INSERT INTO JIT_INV_EXCHANGE_MATERIAL
+    (
+        FINAL_ID,
+        MATERIAL,
+        QTY,
+        MF_SKU,
+        ZONE_NAME
+    )
+    SELECT
+        jief.FINAL_ID,
+        TRX_OUT.SEGMENT1,
+        TRX_OUT.TRANSACTION_QUANTITY,
+        TRX_OUT.MF_SKU,
+        TRX_OUT.SUBINVENTORY_CODE
+    FROM
+        (
+            SELECT 
+                jieh.HEADER_ID,
+                msi.ORGANIZATION_ID,
+                msi.SEGMENT1 AS ITEM_NO,
+                mmt.TRANSACTION_QUANTITY,
+                mmt.TRANSACTION_SOURCE_ID
+            FROM 
+                MTL_MATERIAL_TRANSACTIONS@PROD2 mmt,
+                APPS.MTL_ITEM_LOCATIONS@PROD2 mil,
+                WIP_ENTITIES@PROD2 we,
+                MTL_SYSTEM_ITEMS_B@PROD2 msi,
+                JIT_INV_EXCHANGE_HEADER jieh
+            WHERE 
+                mmt.TRANSACTION_TYPE_ID = 35
+                AND mmt.TRANSACTION_SOURCE_ID = we.WIP_ENTITY_ID
+                AND mmt.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+                AND TRUNC(mmt.TRANSACTION_DATE) = TRUNC(SYSDATE)
+                AND mmt.ORGANIZATION_ID IN (169, 209)
+                AND mmt.TRANSACTION_QUANTITY < 0
+                AND mmt.INVENTORY_ITEM_ID = msi.INVENTORY_ITEM_ID
+                AND mmt.ORGANIZATION_ID = msi.ORGANIZATION_ID
+                AND mmt.ORGANIZATION_ID = mil.ORGANIZATION_ID(+)
+                AND mmt.SUBINVENTORY_CODE = mil.SUBINVENTORY_CODE(+)
+                AND mmt.LOCATOR_ID = mil.INVENTORY_LOCATION_ID(+)
+                AND mmt.SUBINVENTORY_CODE = '外存倉'
+                AND (mil.SEGMENT1 LIKE '%基通%' OR mil.SEGMENT2 LIKE '%基通%')
+                AND mil.ATTRIBUTE3 = 'JIT'
+                AND jieh.EXTERNAL_ID = we.WIP_ENTITY_NAME
+                AND jieh.STATUS = 'PENDING'
+        ) TRX_IN,
+        (
+            SELECT 
+                jieh.HEADER_ID,
+                msi1.ORGANIZATION_ID,
+                msi1.SEGMENT1,
+                ABS(mmt1.TRANSACTION_QUANTITY) AS TRANSACTION_QUANTITY,
+                mmt1.TRANSACTION_SOURCE_ID,
+                DECODE(mil1.SEGMENT1, '', '',
+                    (mil1.SEGMENT1 || '.' || mil1.SEGMENT2)) AS SUBINVENTORY_CODE,
+                NVL(ZEN_GET_WMS_ITEM_F(msi1.SEGMENT1), msi1.SEGMENT1) AS MF_SKU
+            FROM 
+                MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
+                APPS.MTL_ITEM_LOCATIONS@PROD2 mil1,
+                WIP_ENTITIES@PROD2 we1,
+                MTL_SYSTEM_ITEMS_B@PROD2 msi1,
+                JIT_INV_EXCHANGE_HEADER jieh
+            WHERE 
+                mmt1.TRANSACTION_SOURCE_ID = we1.WIP_ENTITY_ID
+                AND mmt1.TRANSACTION_TYPE_ID = 38
+                AND mmt1.TRANSACTION_DATE >= TO_DATE('2025/07/01', 'YYYY/MM/DD')
+                AND TRUNC(mmt1.TRANSACTION_DATE) = TRUNC(SYSDATE)
+                AND mmt1.ORGANIZATION_ID IN (169, 209)
+                AND mmt1.TRANSACTION_QUANTITY > 0
+                AND mmt1.INVENTORY_ITEM_ID = msi1.INVENTORY_ITEM_ID
+                AND mmt1.ORGANIZATION_ID = msi1.ORGANIZATION_ID
+                AND mmt1.ORGANIZATION_ID = mil1.ORGANIZATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = mil1.SUBINVENTORY_CODE(+)
+                AND mmt1.LOCATOR_ID = mil1.INVENTORY_LOCATION_ID(+)
+                AND mmt1.SUBINVENTORY_CODE = '外存倉'
+                AND (mil1.SEGMENT1 LIKE '%基通%' OR mil1.SEGMENT2 LIKE '%基通%')
+                AND mil1.ATTRIBUTE3 = 'JIT'
+                AND jieh.EXTERNAL_ID = we1.WIP_ENTITY_NAME
+                AND jieh.STATUS = 'PENDING'
+        ) TRX_OUT,
+        JIT_INV_EXCHANGE_FINAL jief
+    WHERE 
+        TRX_IN.TRANSACTION_SOURCE_ID = TRX_OUT.TRANSACTION_SOURCE_ID
+        AND TRX_IN.ORGANIZATION_ID = TRX_OUT.ORGANIZATION_ID
+        AND TRX_IN.HEADER_ID = TRX_OUT.HEADER_ID
+        AND TRX_IN.HEADER_ID = jief.HEADER_ID
+        AND TRX_IN.ITEM_NO = jief.PRODUCT
+        AND NOT EXISTS (
+            SELECT 1
+            FROM JIT_INV_EXCHANGE_HEADER jeh,
+                 JIT_INV_EXCHANGE_FINAL jef,
+                 JIT_INV_EXCHANGE_MATERIAL jim
+            WHERE jeh.HEADER_ID = jef.HEADER_ID
+                AND TRX_OUT.HEADER_ID = jeh.HEADER_ID
+                AND jief.FINAL_ID = jef.FINAL_ID
+                AND jef.FINAL_ID = jim.FINAL_ID
+        );
+END;
