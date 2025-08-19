@@ -44,8 +44,6 @@ BEGIN
                     OR c.PARTNO IS NULL
                     OR c.BRAND IS NULL
                     OR c.QTY IS NULL
-                    OR c.PRICE IS NULL
-                    OR c.PRICE_TOTAL IS NULL
                     OR msi.ATTRIBUTE1 IS NULL
                     OR d.SUBINVCODE IS NULL
                     OR d.LOCATOR IS NULL
@@ -79,8 +77,8 @@ BEGIN
             'SG' AS STATUS1,
             c.BRAND AS BRAND,
             c.QTY AS QUANTITY,
-            c.PRICE AS UNIT_PRICE,
-            c.PRICE_TOTAL AS AMOUNT,
+            NULL AS UNIT_PRICE,
+            NULL AS AMOUNT,
             '' AS CUST_PO,
             '' AS CUST_PO2,
             '' AS CUST_POLINE,
@@ -163,8 +161,6 @@ BEGIN
                                 OR c.PARTNO IS NULL
                                 OR c.BRAND IS NULL
                                 OR c.QTY IS NULL
-                                OR c.PRICE IS NULL
-                                OR c.PRICE_TOTAL IS NULL
                                 OR msi.ATTRIBUTE1 IS NULL
                                 OR d.SUBINVCODE IS NULL
                                 OR d.LOCATOR IS NULL

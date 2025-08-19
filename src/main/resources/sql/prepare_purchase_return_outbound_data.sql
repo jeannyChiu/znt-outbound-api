@@ -16,8 +16,6 @@ from (
         OR MSI.SEGMENT1 IS NULL
         OR PVSA.VENDOR_SITE_CODE IS NULL
         OR zpr.QUANTITY IS NULL
-        OR zpr.RETURN_PRICE IS NULL
-        OR zpr.QUANTITY * zpr.RETURN_PRICE IS NULL
         OR MSI.ATTRIBUTE1 IS NULL
         OR zpr.SUBINVENTORY_CODE IS NULL
         OR mil.segment1 IS NULL
@@ -52,8 +50,8 @@ from (
       'Approved' as STATUS1,
       PVSA.VENDOR_SITE_CODE as BRAND,
       zpr.QUANTITY as QUANTITY,
-      TO_CHAR(zpr.RETURN_PRICE,'FM9999999999999990.99999999999999999999') as UNIT_PRICE,
-      zpr.QUANTITY * zpr.RETURN_PRICE as AMOUNT,
+      NULL as UNIT_PRICE,
+      NULL as AMOUNT,
       '' as CUST_PO,
       '' as CUST_PO2,
       '' as CUST_POLINE,
@@ -120,8 +118,6 @@ from (
                 OR MSI.SEGMENT1 IS NULL
                 OR PVSA.VENDOR_SITE_CODE IS NULL
                 OR zpr.QUANTITY IS NULL
-                OR zpr.RETURN_PRICE IS NULL
-                OR zpr.QUANTITY * zpr.RETURN_PRICE IS NULL
                 OR MSI.ATTRIBUTE1 IS NULL
                 OR zpr.SUBINVENTORY_CODE IS NULL
                 OR mil.segment1 IS NULL

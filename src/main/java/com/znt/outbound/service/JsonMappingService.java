@@ -119,7 +119,7 @@ public class JsonMappingService {
     private List<FeiliksOrderList> getOrderListsByInvoiceNo(String invoiceNo) {
         String sql = "SELECT CUST_PN, ITEM_MODE, BRAND, ITEM_DESC, QUANTITY, UNIT_PRICE, " +
                      "AMOUNT, CUST_PO, CUST_POLINE, INVOICE_NO, INVOICE_DATE, ZT_PART_NO, " +
-                     "SHIP_NOTICE, SEGMENT2, CUST_PN2, CUST_PO2, ORDER_NO, PO_REMARK, " +
+                     "SHIP_NOTICE, SEGMENT1, SEGMENT2, CUST_PN2, CUST_PO2, ORDER_NO, PO_REMARK, " +
                      "INV_SPLIT, CUST_PART_NO2, INV_AND_PAC, DEPT, RMA_NUMBER, ORI_PO_NO " +
                      "FROM ZEN_B2B_JSON_SO WHERE INVOICE_NO = ? AND STATUS = 'W' ORDER BY SEQ_ID";
 
@@ -151,7 +151,7 @@ public class JsonMappingService {
                         .invoiceDate(toEmpty(dto.getInvoiceDate()))
                         .relabelSkuCode(toEmpty(dto.getZtPartNo()))
                         .note(toEmpty(dto.getShipNotice()))
-                        .ext1(toEmpty(dto.getSegment2()))
+                        .ext1(concatenateSegments(dto.getSegment1(), dto.getSegment2()))
                         .ext3(toEmpty(dto.getCustPn2()))
                         .ext4(toEmpty(dto.getCustPo2()))
                         .dnNo(toEmpty(dto.getOrderNo()))
@@ -215,5 +215,25 @@ public class JsonMappingService {
 
     private String toEmpty(String s) {
         return s == null ? "" : s;
+    }
+    
+    private String concatenateSegments(String segment1, String segment2) {
+        // 如果兩個值都有，則用點號連接
+        if (segment1 != null && !segment1.trim().isEmpty() && 
+            segment2 != null && !segment2.trim().isEmpty()) {
+            return segment1.trim() + "." + segment2.trim();
+        }
+        // 如果只有 segment1 有值
+        else if (segment1 != null && !segment1.trim().isEmpty()) {
+            return segment1.trim();
+        }
+        // 如果只有 segment2 有值
+        else if (segment2 != null && !segment2.trim().isEmpty()) {
+            return segment2.trim();
+        }
+        // 如果兩個都沒有值
+        else {
+            return "";
+        }
     }
 } 

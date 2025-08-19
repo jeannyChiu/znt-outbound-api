@@ -92,7 +92,7 @@ select  JIEH.HEADER_ID,
  AND mmt.LOCATOR_ID = mil.inventory_location_id (+) 
  AND (mil.segment1 like '%基通%' OR mil.segment2 like '%基通%')
  AND mil.attribute3='JIT'
- AND JIEH.EXTERNAL_ID = we.WIP_ENTITY_NAME
+ AND JIEH.EXTERNAL_ID = to_char(we.WIP_ENTITY_ID)
  AND JIEH.status ='PENDING'
  and exists ( select 1  
   FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
@@ -158,7 +158,7 @@ select  jieh.header_id,
 AND (mil.segment1 like '%基通%' OR mil.segment2 like '%基通%')
 AND mil.attribute3='JIT'
  and mmt.organization_id = msi.ORGANIZATION_ID
- AND JIEH.EXTERNAL_ID = we.WIP_ENTITY_NAME
+ AND JIEH.EXTERNAL_ID = to_char(we.WIP_ENTITY_ID)
 AND JIEH.status ='PENDING'  ) TRX_IN ,
  ( select jieh.header_id,MSI1.ORGANIZATION_ID,
         MSI1.SEGMENT1,
@@ -186,7 +186,7 @@ AND JIEH.status ='PENDING'  ) TRX_IN ,
  AND mmt1.LOCATOR_ID = mil1.inventory_location_id (+) 
  AND (mil1.segment1 like '%基通%' OR mil1.segment2 like '%基通%')
  AND mil1.attribute3='JIT'
- AND JIEH.EXTERNAL_ID = we1.WIP_ENTITY_NAME
+ AND JIEH.EXTERNAL_ID = to_char(we1.WIP_ENTITY_ID)
  AND JIEH.status ='PENDING'  
   ) TRX_OUT,
   JIT_INV_EXCHANGE_FINAL JIEF 

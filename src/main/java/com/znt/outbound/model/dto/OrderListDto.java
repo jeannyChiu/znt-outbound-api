@@ -17,6 +17,7 @@ public class OrderListDto {
     private String invoiceDate;
     private String ztPartNo;
     private String shipNotice;
+    private String segment1;
     private String segment2;
     private String custPn2;
     private String custPo2;

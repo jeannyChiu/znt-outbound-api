@@ -845,12 +845,6 @@ begin
                                        '銷貨折讓',
                                        wdd.requested_quantity * -1,
                                        wdd.requested_quantity) IS NULL
-                             OR l.UNIT_SELLING_PRICE IS NULL
-                             OR DECODE(mtls.segment1,
-                                       '銷貨折讓',
-                                       wdd.requested_quantity * -1,
-                                       wdd.requested_quantity) *
-                             l.UNIT_SELLING_PRICE IS NULL
                              OR mtls.attribute1 IS NULL
                              OR zs.FROM_SUBINVENTORY_CODE IS NULL
                              OR mil.segment1 IS NULL
@@ -1223,12 +1217,6 @@ begin
                                        '銷貨折讓',
                                        wdd.requested_quantity * -1,
                                        wdd.requested_quantity) IS NULL
-                             OR l.UNIT_SELLING_PRICE IS NULL
-                             OR DECODE(mtls.segment1,
-                                       '銷貨折讓',
-                                       wdd.requested_quantity * -1,
-                                       wdd.requested_quantity) *
-                             l.UNIT_SELLING_PRICE IS NULL
                              OR mtls.attribute1 IS NULL
                              OR zs.FROM_SUBINVENTORY_CODE IS NULL
                              OR mil.segment1 IS NULL

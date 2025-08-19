@@ -79,7 +79,7 @@ public class NotificationService {
                 String originalSubject = "Send Order ID#[" + error.id() + "] To [" + error.receiverCode() + "] Error !";
                 message.setSubject(subjectPrefix + originalSubject);
                 message.setText(
-                    "請至EC Info Cloud → B2B管理 → EDI管理 → E.16.FEILIKS EDI → E.16.1.Send Data Check \n" +
+                    // "請至EC Info Cloud → B2B管理 → EDI管理 → E.16.FEILIKS EDI → E.16.1.Send Data Check \n" +
                     "確認錯誤訂單並至相關系統修改有空值的訂單資料\n" +
                     "***EDI系統自動通知請勿回覆!***"
                 );
