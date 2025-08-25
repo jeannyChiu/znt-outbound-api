@@ -46,6 +46,16 @@ public class StatusNotificationService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendNotification(String seqId) {
+        sendNotification(seqId, null);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendNotification(String seqId, String jsonContent) {
+        sendNotification(seqId, jsonContent, null);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendNotification(String seqId, String requestJson, String responseJson) {
         log.info("準備為 SEQ_ID: {} 發送狀態通知郵件。", seqId);
 
         EnvelopeInfo envelopeInfo;
@@ -88,8 +98,26 @@ public class StatusNotificationService {
                     transFlagEnglish,
                     envelopeInfo.docNo());
 
-            textBody = String.format("ExternalId : %s\n***EDI系統自動通知請勿回覆!***",
-                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+            StringBuilder textBodyBuilder = new StringBuilder();
+            textBodyBuilder.append(String.format("ExternalId : %s\n", 
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A"));
+            
+            // 如果有提供請求 JSON 內容，加入到郵件中
+            if (requestJson != null && !requestJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 請求 JSON 內容 ===\n");
+                textBodyBuilder.append(requestJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            // 如果有提供回應 JSON 內容，加入到郵件中
+            if (responseJson != null && !responseJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 回應 JSON 內容 ===\n");
+                textBodyBuilder.append(responseJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            textBodyBuilder.append("***EDI系統自動通知請勿回覆!***");
+            textBody = textBodyBuilder.toString();
         } else if ("MOVE_TRADE".equals(envelopeInfo.b2bMsgType())) {
             // 庫內移倉/交易的郵件格式
             originalSubject = String.format("Send Inventory Move/Trade To [%s] %s ! (DOC_NO: %s)",
@@ -97,8 +125,26 @@ public class StatusNotificationService {
                     transFlagEnglish,
                     envelopeInfo.docNo());
 
-            textBody = String.format("ExternalId : %s\n交易類型 : 庫內移倉/交易\n***EDI系統自動通知請勿回覆!***",
-                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+            StringBuilder textBodyBuilder = new StringBuilder();
+            textBodyBuilder.append(String.format("ExternalId : %s\n交易類型 : 庫內移倉/交易\n", 
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A"));
+            
+            // 如果有提供請求 JSON 內容，加入到郵件中
+            if (requestJson != null && !requestJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 請求 JSON 內容 ===\n");
+                textBodyBuilder.append(requestJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            // 如果有提供回應 JSON 內容，加入到郵件中
+            if (responseJson != null && !responseJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 回應 JSON 內容 ===\n");
+                textBodyBuilder.append(responseJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            textBodyBuilder.append("***EDI系統自動通知請勿回覆!***");
+            textBody = textBodyBuilder.toString();
         } else if ("INV_EXCHANGE".equals(envelopeInfo.b2bMsgType())) {
             // 庫內換料的郵件格式
             originalSubject = String.format("Send Inventory Exchange To [%s] %s ! (DOC_NO: %s)",
@@ -106,8 +152,26 @@ public class StatusNotificationService {
                     transFlagEnglish,
                     envelopeInfo.docNo());
 
-            textBody = String.format("ExternalId : %s\n交易類型 : 庫內換料\n***EDI系統自動通知請勿回覆!***",
-                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+            StringBuilder textBodyBuilder = new StringBuilder();
+            textBodyBuilder.append(String.format("ExternalId : %s\n交易類型 : 庫內換料\n", 
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A"));
+            
+            // 如果有提供請求 JSON 內容，加入到郵件中
+            if (requestJson != null && !requestJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 請求 JSON 內容 ===\n");
+                textBodyBuilder.append(requestJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            // 如果有提供回應 JSON 內容，加入到郵件中
+            if (responseJson != null && !responseJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 回應 JSON 內容 ===\n");
+                textBodyBuilder.append(responseJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            textBodyBuilder.append("***EDI系統自動通知請勿回覆!***");
+            textBody = textBodyBuilder.toString();
         } else if ("INV_LOC".equals(envelopeInfo.b2bMsgType())) {
             // 庫存查詢的郵件格式
             originalSubject = String.format("Send Inventory Location Query To [%s] %s ! (DOC_NO: %s)",
@@ -115,16 +179,53 @@ public class StatusNotificationService {
                     transFlagEnglish,
                     envelopeInfo.docNo());
 
-            textBody = String.format("RequestId : %s\n查詢類型 : 庫存查詢\n***EDI系統自動通知請勿回覆!***",
-                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A");
+            StringBuilder textBodyBuilder = new StringBuilder();
+            textBodyBuilder.append(String.format("RequestId : %s\n查詢類型 : 庫存查詢\n", 
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A"));
+            
+            // 如果有提供請求 JSON 內容，加入到郵件中
+            if (requestJson != null && !requestJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 請求 JSON 內容 ===\n");
+                textBodyBuilder.append(requestJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            // 如果有提供回應 JSON 內容，加入到郵件中
+            if (responseJson != null && !responseJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 回應 JSON 內容 ===\n");
+                textBodyBuilder.append(responseJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            textBodyBuilder.append("***EDI系統自動通知請勿回覆!***");
+            textBody = textBodyBuilder.toString();
         } else {
-            // 出庫單 (ORDERS) 的郵件格式 (保持原有格式)
+            // 出庫單 (ORDERS) 的郵件格式
             originalSubject = String.format("Send Orders To [%s] %s ! (DOC_NO: %s)",
                     envelopeInfo.receiverCode(),
                     transFlagEnglish,
                     envelopeInfo.docNo());
 
-            textBody = "***EDI系統自動通知請勿回覆!***";
+            StringBuilder textBodyBuilder = new StringBuilder();
+            textBodyBuilder.append(String.format("ConversationId : %s\n訂單類型 : 出庫單\n", 
+                    envelopeInfo.conversationId() != null ? envelopeInfo.conversationId() : "N/A"));
+            
+            // 如果有提供請求 JSON 內容，加入到郵件中
+            if (requestJson != null && !requestJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 請求 JSON 內容 ===\n");
+                textBodyBuilder.append(requestJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            // 如果有提供回應 JSON 內容，加入到郵件中
+            if (responseJson != null && !responseJson.trim().isEmpty()) {
+                textBodyBuilder.append("\n=== 回應 JSON 內容 ===\n");
+                textBodyBuilder.append(responseJson);
+                textBodyBuilder.append("\n=====================\n");
+            }
+            
+            textBodyBuilder.append("***EDI系統自動通知請勿回覆!***");
+            textBody = textBodyBuilder.toString();
         }
 
         String subject = subjectPrefix + originalSubject;

@@ -69,7 +69,7 @@ from (
       MSI.SEGMENT1 as SUPPLIER_PARTNO,
       '' as INV_AND_PAC,
       '' as CUST_PART_NO2,
-      NVL(NVL(zpr.vendor_material_info,ZEN_GET_WMS_ITEM_F(MSI.SEGMENT1)),MSI.SEGMENT1) as PO_REMARK,
+      NVL(NVL(zpr.vendor_material_info,ZEN_GET_WMS_ITEM_F(MSI.SEGMENT1,zpr.ORGANIZATION_ID)),MSI.SEGMENT1) as PO_REMARK,
       PH.SEGMENT1||'-'||PL.LINE_NUM as ORI_PO_NO,
       zprh.RMA_NUM as RMA_NUMBER,
       '0' as ORD_TYPE,

@@ -74,7 +74,7 @@ BEGIN
         jieh.HEADER_ID,
         msi.SEGMENT1,
         ABS(mmt.TRANSACTION_QUANTITY),
-        NVL(ZEN_GET_WMS_ITEM_F(msi.SEGMENT1), msi.SEGMENT1) AS MF_SKU,
+        NVL(ZEN_GET_WMS_ITEM_F(msi.SEGMENT1,mmt.ORGANIZATION_ID), msi.SEGMENT1) AS MF_SKU,
         DECODE(mil.SEGMENT1, '', '',
             (mil.SEGMENT1 || '.' || mil.SEGMENT2)) AS SUBINVENTORY_CODE
     FROM 
@@ -180,7 +180,7 @@ BEGIN
                 mmt1.TRANSACTION_SOURCE_ID,
                 DECODE(mil1.SEGMENT1, '', '',
                     (mil1.SEGMENT1 || '.' || mil1.SEGMENT2)) AS SUBINVENTORY_CODE,
-                NVL(ZEN_GET_WMS_ITEM_F(msi1.SEGMENT1), msi1.SEGMENT1) AS MF_SKU
+                NVL(ZEN_GET_WMS_ITEM_F(msi1.SEGMENT1,mmt1.ORGANIZATION_ID), msi1.SEGMENT1) AS MF_SKU
             FROM 
                 MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
                 APPS.MTL_ITEM_LOCATIONS@PROD2 mil1,

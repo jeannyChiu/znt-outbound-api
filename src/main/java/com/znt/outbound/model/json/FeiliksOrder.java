@@ -1,12 +1,19 @@
 package com.znt.outbound.model.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Data;
 import java.util.List;
 
 @Data
 @Builder
+@JsonPropertyOrder({
+    "ord_type", "busi_date", "ref_no", 
+    "consignee_company", "bill_to", "ref_consignee_code", 
+    "consignee_tel", "consignee_contact", "consignee_addr",
+    "OrderLists", "ShippingInstructions"
+})
 public class FeiliksOrder {
     @JsonProperty("ord_type")
     private String ordType;

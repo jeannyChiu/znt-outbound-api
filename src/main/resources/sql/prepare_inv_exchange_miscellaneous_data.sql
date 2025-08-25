@@ -15,7 +15,7 @@ BEGIN
         mmt.TRANSACTION_SOURCE_NAME as external_no,
         'GT' as WhName,
         DECODE(mmt.organization_id, 169, 'ZCSH', 'ZTSH') as Storer,
-        'Exchange' as ExchangeType,
+        'Combine' as ExchangeType,
         CURRENT_TIMESTAMP as ApplyDate,
         WMT.kind_memo as RefNo,
         mmt.ATTRIBUTE4
@@ -65,7 +65,7 @@ BEGIN
                substr(mmt.ATTRIBUTE12, 2, 4) LINE_NO,
                msi.SEGMENT1 ITEM_NO,
                mmt.TRANSACTION_QUANTITY QTY,
-               nvl(nvl(wmt.VENDOR_MATERIAL_INFO, ZEN_GET_WMS_ITEM_F(msi.SEGMENT1)), msi.SEGMENT1) as mf_sku,
+               nvl(nvl(wmt.VENDOR_MATERIAL_INFO, ZEN_GET_WMS_ITEM_F(msi.SEGMENT1,mmt.ORGANIZATION_ID)), msi.SEGMENT1) as mf_sku,
                DECODE(mil.segment1, '', '', (mil.segment1 || '.' || mil.segment2)) as subinventory_code
         FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt,
              apps.mtl_item_locations@PROD2 mil,
@@ -104,7 +104,7 @@ BEGIN
     SELECT JIEF.FINAL_ID,
            msi.SEGMENT1 ITEM_NO,
            ABS(mmt.TRANSACTION_QUANTITY) QTY,
-           nvl(nvl(wmt.VENDOR_MATERIAL_INFO, ZEN_GET_WMS_ITEM_F(msi.SEGMENT1)), msi.SEGMENT1) as mf_sku,
+           nvl(nvl(wmt.VENDOR_MATERIAL_INFO, ZEN_GET_WMS_ITEM_F(msi.SEGMENT1,mmt.ORGANIZATION_ID)), msi.SEGMENT1) as mf_sku,
            DECODE(mil.segment1, '', '', (mil.segment1 || '.' || mil.segment2)) as subinventory_code
     FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt,
          apps.mtl_item_locations@PROD2 mil,

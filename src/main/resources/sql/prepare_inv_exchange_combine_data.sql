@@ -70,7 +70,7 @@ Insert into JIT_INV_EXCHANGE_FINAL
 select  JIEH.HEADER_ID,
         MSI.SEGMENT1,
         MMT.TRANSACTION_QUANTITY,
-        NVL(ZEN_GET_WMS_ITEM_F(MSI.SEGMENT1),MSI.SEGMENT1),
+        NVL(ZEN_GET_WMS_ITEM_F(MSI.SEGMENT1,mmt.ORGANIZATION_ID),MSI.SEGMENT1),
         DECODE (mil.segment1,
                   '', '',
                   (mil.segment1 || '.' || mil.segment2)) as subinventory_code
@@ -167,7 +167,7 @@ AND JIEH.status ='PENDING'  ) TRX_IN ,
         DECODE (mil1.segment1,
                   '', '',
                   (mil1.segment1 || '.' || mil1.segment2)) as subinventory_code,
-        NVL(ZEN_GET_WMS_ITEM_F(MSI1.SEGMENT1) ,MSI1.SEGMENT1) AS mf_sku         
+        NVL(ZEN_GET_WMS_ITEM_F(MSI1.SEGMENT1,mmt1.ORGANIZATION_ID) ,MSI1.SEGMENT1) AS mf_sku         
   FROM MTL_MATERIAL_TRANSACTIONS@PROD2 mmt1,
       apps.mtl_item_locations@PROD2 mil1,
        WIP_ENTITIES@PROD2 WE1 ,

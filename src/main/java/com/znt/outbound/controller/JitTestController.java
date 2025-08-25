@@ -1469,6 +1469,56 @@ public class JitTestController {
     }
 
     /**
+     * 測試 FeiliksRequest JSON 序列化順序
+     */
+    @GetMapping("/test-feiliks-json-order")
+    public ResponseEntity<TestResponse> testFeiliksJsonOrder() {
+        try {
+            // 創建測試 FeiliksData
+            com.znt.outbound.model.json.FeiliksData testData = 
+                com.znt.outbound.model.json.FeiliksData.builder()
+                    .orders(java.util.Collections.emptyList())
+                    .build();
+            
+            // 創建測試 FeiliksRequest
+            com.znt.outbound.model.json.FeiliksRequest testRequest = 
+                com.znt.outbound.model.json.FeiliksRequest.builder()
+                    .sign("test_sign_12345")
+                    .partCode("TEST_PART")
+                    .requestTime("2025-01-20 15:30:00")
+                    .data(testData)
+                    .build();
+            
+            // 序列化為 JSON 並檢查欄位順序
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writeValueAsString(testRequest);
+            
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("feiliksRequest", testRequest);
+            result.put("jsonString", jsonString);
+            result.put("expectedOrder", "sign → part_code → request_time → data");
+            
+            // 檢查實際順序
+            String[] fields = jsonString.replaceAll("[{}\"]", "").split(",");
+            java.util.List<String> actualOrder = new java.util.ArrayList<>();
+            for (String field : fields) {
+                if (field.contains(":")) {
+                    actualOrder.add(field.split(":")[0].trim());
+                }
+            }
+            result.put("actualOrder", actualOrder);
+            
+            return ResponseEntity.ok()
+                .body(new TestResponse(true, "FeiliksRequest JSON 序列化順序測試", result));
+                
+        } catch (Exception e) {
+            log.error("測試 FeiliksRequest JSON 序列化順序時發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "測試失敗: " + e.getMessage(), null));
+        }
+    }
+
+    /**
      * 測試回應物件
      */
     public static class TestResponse {

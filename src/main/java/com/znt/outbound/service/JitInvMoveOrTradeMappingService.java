@@ -2,6 +2,7 @@ package com.znt.outbound.service;
 
 import com.znt.outbound.model.jit.JitInvMoveOrTradeRequest;
 import com.znt.outbound.model.jit.JitInvMoveOrTradeLine;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -29,6 +30,7 @@ public class JitInvMoveOrTradeMappingService {
     private final EnvelopeService envelopeService;
     private final ApiConfigService apiConfigService;
     private final StatusNotificationService statusNotificationService;
+    private final ObjectMapper objectMapper;
 
     // 狀態常數定義
     private static final String STATUS_PENDING = "PENDING";
@@ -552,9 +554,10 @@ public class JitInvMoveOrTradeMappingService {
             } catch (Exception e) {
                 log.error("調用 JIT API 時發生異常，ExternalId: {}", externalId, e);
 
-                // 更新封套狀態為失敗
+                // 更新封套狀態為失敗，包含請求JSON內容（沒有回應JSON）
                 try {
-                    envelopeService.updateEnvelopeStatus(seqId, "F");
+                    String jsonContent = convertRequestToJson(requestToSend);
+                    envelopeService.updateEnvelopeStatusWithJson(seqId, "F", jsonContent, null);
                 } catch (Exception envelopeError) {
                     log.error("更新封套狀態為失敗時也發生錯誤，SEQ_ID: {}", seqId, envelopeError);
                 }
@@ -565,7 +568,8 @@ public class JitInvMoveOrTradeMappingService {
 
             // 步驟 5: 根據 API 回應更新狀態
             currentStep = "結果處理";
-            return handleApiResponse(externalId, seqId, response);
+            String jsonContent = convertRequestToJson(requestToSend);
+            return handleApiResponse(externalId, seqId, response, jsonContent);
 
         } catch (Exception e) {
             // 處理過程中發生未預期的異常
@@ -579,19 +583,28 @@ public class JitInvMoveOrTradeMappingService {
     }
 
     /**
+     * 將 JitInvMoveOrTradeRequest 轉換為 JSON 字符串
+     */
+    private String convertRequestToJson(JitInvMoveOrTradeRequest request) {
+        try {
+            return objectMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            log.warn("無法將請求轉換為 JSON，將傳送空內容。ExternalId: {}", request.getExternalId(), e);
+            return null;
+        }
+    }
+
+    /**
      * 處理 API 回應並更新相應狀態
      */
-    private boolean handleApiResponse(String externalId, String seqId, ResponseEntity<String> response) {
+    private boolean handleApiResponse(String externalId, String seqId, ResponseEntity<String> response, String jsonContent) {
         try {
             if (response != null && response.getStatusCode().is2xxSuccessful()) {
                 // 成功情況
-                envelopeService.updateEnvelopeStatus(seqId, "S"); // Success
+                String responseJson = response.getBody();
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "S", jsonContent, responseJson); // Success
                 updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_COMPLETED, "成功發送到 JIT");
                 log.info("庫內移倉/交易 (ExternalId: {}) 成功發送到 JIT，HTTP Status: {}", externalId, response.getStatusCode());
-
-                // 發送成功通知郵件
-                sendNotificationSafely(seqId, "成功");
-
                 return true;
             } else {
                 // 失敗情況
@@ -599,13 +612,10 @@ public class JitInvMoveOrTradeMappingService {
                     String.format("HTTP Status: %s, Response: %s", response.getStatusCode(), response.getBody()) :
                     "API 回應為 null";
 
-                envelopeService.updateEnvelopeStatus(seqId, "F"); // Failed
+                String responseJson = response != null ? response.getBody() : null;
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "F", jsonContent, responseJson); // Failed
                 updateInvMoveOrTradeStatusWithRetry(externalId, STATUS_FAILED, errorMsg);
                 log.error("庫內移倉/交易 (ExternalId: {}) 發送失敗：{}", externalId, errorMsg);
-
-                // 發送失敗通知郵件
-                sendNotificationSafely(seqId, "失敗");
-
                 return false;
             }
         } catch (Exception e) {
@@ -615,19 +625,6 @@ public class JitInvMoveOrTradeMappingService {
         }
     }
 
-    /**
-     * 安全地發送郵件通知，確保郵件發送失敗不會影響主要業務流程
-     */
-    private void sendNotificationSafely(String seqId, String statusDescription) {
-        try {
-            log.info("準備為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
-            statusNotificationService.sendNotification(seqId);
-            log.info("已成功為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
-        } catch (Exception e) {
-            // 郵件發送失敗不應該影響主要業務流程，只記錄錯誤
-            log.error("為 SEQ_ID: {} 發送 {} 通知郵件時發生錯誤，但不影響主要業務流程", seqId, statusDescription, e);
-        }
-    }
 
     /**
      * 錯誤發生時的清理工作
@@ -637,9 +634,7 @@ public class JitInvMoveOrTradeMappingService {
             // 更新封套狀態
             if (seqId != null) {
                 try {
-                    envelopeService.updateEnvelopeStatus(seqId, "F");
-                    // 發送失敗通知郵件
-                    sendNotificationSafely(seqId, "失敗");
+                    envelopeService.updateEnvelopeStatusWithJson(seqId, "F", null, null);
                 } catch (Exception e) {
                     log.error("清理封套狀態時發生錯誤，SEQ_ID: {}", seqId, e);
                 }

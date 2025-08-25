@@ -38,6 +38,7 @@ public class JitInvLocService {
     private final JitAuthService jitAuthService;
     private final EnvelopeService envelopeService;
     private final StatusNotificationService statusNotificationService;
+    private final ObjectMapper objectMapper;
 
     // 狀態常數定義
     private static final String STATUS_PENDING = "PENDING";
@@ -64,6 +65,7 @@ public class JitInvLocService {
 
         Long requestId = null;
         String seqId = null;
+        String requestJson = convertQueryParamsToJson(whName, zoneName, storerAbbrName, sku);
         try {
             // 步驟 1: 寫入請求記錄到 JIT_INV_LOC_REQUEST 表
             requestId = insertRequestRecord(operationId, whName, zoneName, storerAbbrName, sku);
@@ -89,8 +91,7 @@ public class JitInvLocService {
             JitInvLocApiResponse apiResponse = callJitInventoryApi(operationId, whName, zoneName, storerAbbrName, sku);
             if (apiResponse == null || apiResponse.getInvLocs() == null || apiResponse.getInvLocs().isEmpty()) {
                 updateRequestStatus(requestId, STATUS_FAILED);
-                envelopeService.updateEnvelopeStatus(seqId, "F");
-                sendNotificationSafely(seqId, "失敗");
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "F", requestJson, null);
                 return "JIT API 查詢失敗或無庫存資料";
             }
 
@@ -98,14 +99,14 @@ public class JitInvLocService {
             int insertedCount = insertInventoryLocationData(operationId, requestId, apiResponse.getInvLocs());
             if (insertedCount > 0) {
                 updateRequestStatus(requestId, STATUS_COMPLETED);
-                envelopeService.updateEnvelopeStatus(seqId, "S");
-                sendNotificationSafely(seqId, "成功");
+                // 將 API 回應轉換為 JSON 用於郵件通知
+                String responseJson = convertApiResponseToJson(apiResponse);
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "S", requestJson, responseJson);
                 log.info("[{}] 庫存查詢作業完成。成功寫入 {} 筆庫存資料", operationId, insertedCount);
                 return String.format("庫存查詢成功，共找到 %d 筆庫存資料", insertedCount);
             } else {
                 updateRequestStatus(requestId, STATUS_FAILED);
-                envelopeService.updateEnvelopeStatus(seqId, "F");
-                sendNotificationSafely(seqId, "失敗");
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "F", requestJson, null);
                 return "庫存資料寫入失敗";
             }
 
@@ -115,8 +116,7 @@ public class JitInvLocService {
                 updateRequestStatus(requestId, STATUS_FAILED);
             }
             if (seqId != null) {
-                envelopeService.updateEnvelopeStatus(seqId, "F");
-                sendNotificationSafely(seqId, "失敗");
+                envelopeService.updateEnvelopeStatusWithJson(seqId, "F", requestJson, null);
             }
             return "庫存查詢失敗: " + e.getMessage();
         }
@@ -269,9 +269,6 @@ public class JitInvLocService {
         log.debug("[{}] 開始解析 JIT API 回應", operationId);
         
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules(); // 註冊 JavaTimeModule
-            
             JitInvLocApiResponse apiResponse = objectMapper.readValue(responseBody, JitInvLocApiResponse.class);
             log.info("[{}] JIT API 回應解析成功，找到 {} 筆庫存資料", operationId, 
                     apiResponse.getInvLocs() != null ? apiResponse.getInvLocs().size() : 0);
@@ -423,6 +420,18 @@ public class JitInvLocService {
     }
 
     /**
+     * 轉換 API 回應為 JSON 字串 (用於郵件通知)
+     */
+    private String convertApiResponseToJson(JitInvLocApiResponse apiResponse) {
+        try {
+            return objectMapper.writeValueAsString(apiResponse);
+        } catch (Exception e) {
+            log.error("轉換 API 回應為 JSON 時發生錯誤", e);
+            return "JSON 轉換失敗: " + e.getMessage();
+        }
+    }
+
+    /**
      * 產生操作ID
      */
     private String generateOperationId() {
@@ -430,18 +439,19 @@ public class JitInvLocService {
     }
 
     /**
-     * 安全地發送通知，確保異常不會影響主流程
-     * @param seqId 封套序列ID
-     * @param statusDescription 狀態描述
+     * 轉換查詢參數為 JSON 字串 (用於郵件通知)
      */
-    private void sendNotificationSafely(String seqId, String statusDescription) {
+    private String convertQueryParamsToJson(String whName, String zoneName, String storerAbbrName, String sku) {
         try {
-            log.info("準備為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
-            statusNotificationService.sendNotification(seqId);
-            log.info("已成功為 SEQ_ID: {} 發送 {} 通知郵件", seqId, statusDescription);
+            Map<String, String> params = new java.util.HashMap<>();
+            params.put("whName", whName);
+            params.put("zoneName", zoneName);
+            params.put("storerAbbrName", storerAbbrName);
+            params.put("sku", sku);
+            return objectMapper.writeValueAsString(params);
         } catch (Exception e) {
-            log.error("為 SEQ_ID: {} 發送 {} 通知郵件時發生錯誤", seqId, statusDescription, e);
-            // 不重新拋出異常，以免影響主流程
+            log.error("轉換查詢參數為 JSON 時發生錯誤", e);
+            return "JSON 轉換失敗: " + e.getMessage();
         }
     }
 }

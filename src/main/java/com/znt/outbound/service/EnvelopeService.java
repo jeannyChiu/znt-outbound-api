@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +18,7 @@ public class EnvelopeService {
 
     private final JdbcTemplate jdbcTemplate;
     private final ApiConfigService apiConfigService;
+    private final StatusNotificationService statusNotificationService;
 
     @Transactional
     public String createOutboundEnvelope(String partCode, String sign) {
@@ -266,6 +269,16 @@ public class EnvelopeService {
 
     @Transactional
     public void updateEnvelopeStatus(String seqId, String status) {
+        updateEnvelopeStatusWithJson(seqId, status, null);
+    }
+
+    @Transactional
+    public void updateEnvelopeStatusWithJson(String seqId, String status, String requestJson) {
+        updateEnvelopeStatusWithJson(seqId, status, requestJson, null);
+    }
+
+    @Transactional
+    public void updateEnvelopeStatusWithJson(String seqId, String status, String requestJson, String responseJson) {
         if (seqId == null || status == null) {
             log.warn("SEQ_ID 或狀態為空，無法更新 B2B 封套狀態。");
             return;
@@ -278,10 +291,37 @@ public class EnvelopeService {
                 log.info("B2B 封套 (SEQ_ID: {}) 狀態更新成功。", seqId);
             } else {
                 log.warn("找不到要更新的 B2B 封套，SEQ_ID: {}", seqId);
+                return;
             }
         } catch (Exception e) {
             log.error("更新 ZEN_B2B_ENVELOPE (SEQ_ID: {}) 時發生錯誤。", seqId, e);
             // 不重新拋出異常，以避免影響主流程的狀態判斷
+            return;
+        }
+        
+        // 註冊事務同步回調，確保通知在事務提交後發送
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    log.debug("事務已提交，準備發送狀態通知。SEQ_ID: {}", seqId);
+                    sendNotificationAfterTransactionCommit(seqId, requestJson, responseJson);
+                }
+            });
+        } else {
+            // 如果沒有活動事務，直接發送
+            sendNotificationAfterTransactionCommit(seqId, requestJson, responseJson);
+        }
+    }
+    
+    /**
+     * 在事務提交後發送通知，確保能讀取到最新的狀態
+     */
+    private void sendNotificationAfterTransactionCommit(String seqId, String requestJson, String responseJson) {
+        try {
+            statusNotificationService.sendNotification(seqId, requestJson, responseJson);
+        } catch (Exception e) {
+            log.error("發送狀態通知郵件失敗，但不影響主流程。SEQ_ID: {}", seqId, e);
         }
     }
 } 
