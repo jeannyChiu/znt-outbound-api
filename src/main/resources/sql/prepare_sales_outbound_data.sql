@@ -117,12 +117,12 @@ from (
                          OR d.attribute12 IS NULL
                          OR
                           (SELECT ffvt.description
-                           FROM HZ_CUST_SITE_USES_ALL@PROD2 rsua,
-                                jtf_rs_salesreps@PROD2      jrs,
-                                gl_code_combinations@PROD2  gcc,
-                                fnd_id_flex_segments@PROD2  fifs,
-                                fnd_flex_values@PROD2       ffv,
-                                fnd_flex_values_tl@PROD2    ffvt
+                           FROM HZ_CUST_SITE_USES_ALL@ZENPROD rsua,
+                                jtf_rs_salesreps@ZENPROD      jrs,
+                                gl_code_combinations@ZENPROD  gcc,
+                                fnd_id_flex_segments@ZENPROD  fifs,
+                                fnd_flex_values@ZENPROD       ffv,
+                                fnd_flex_values_tl@ZENPROD    ffvt
                            WHERE rsua.site_use_code = 'SHIP_TO'
                              AND rsua.site_use_id = ship_su.site_use_id
                              AND jrs.salesrep_id = rsua.primary_salesrep_id
@@ -149,7 +149,7 @@ from (
                                    NULL) IS NULL
                          OR
                           (SELECT mcb.segment1
-                           FROM mtl_item_categories@PROD2 mic, mtl_categories_b@PROD2 mcb
+                           FROM mtl_item_categories@ZENPROD mic, mtl_categories_b@ZENPROD mcb
                            WHERE mic.category_set_id = 1
                              AND mic.category_id = mcb.category_id
                              AND mic.organization_id = mtls.organization_id
@@ -178,18 +178,16 @@ from (
                  d.ATTRIBUTE5 as INV_SPLIT,
                  d.NAME || '-'|| DECODE(D.ORGANIZATION_ID,169,'ZSH','SHC') as INVOICE_NO,
                  NULL as INVOICE_DATE,
-                 TO_CHAR(TO_DATE(d.attribute12,
-                                 'DD-MON-YYYY',
-                                 'NLS_DATE_LANGUAGE=AMERICAN'),
+                 TO_CHAR(d.INITIAL_PICKUP_DATE,
                          'yyyy/mm/dd') as EXP_SHIP_DATE,
                  cust_acct.account_number as CUST_NO,
                  (SELECT ffvt.description
-                  FROM HZ_CUST_SITE_USES_ALL@PROD2 rsua,
-                       jtf_rs_salesreps@PROD2      jrs,
-                       gl_code_combinations@PROD2  gcc,
-                       fnd_id_flex_segments@PROD2  fifs,
-                       fnd_flex_values@PROD2       ffv,
-                       fnd_flex_values_tl@PROD2    ffvt
+                  FROM HZ_CUST_SITE_USES_ALL@ZENPROD rsua,
+                       jtf_rs_salesreps@ZENPROD      jrs,
+                       gl_code_combinations@ZENPROD  gcc,
+                       fnd_id_flex_segments@ZENPROD  fifs,
+                       fnd_flex_values@ZENPROD       ffv,
+                       fnd_flex_values_tl@ZENPROD    ffvt
                   WHERE rsua.site_use_code = 'SHIP_TO'
                     AND rsua.site_use_id = ship_su.site_use_id
                     AND jrs.salesrep_id = rsua.primary_salesrep_id
@@ -203,14 +201,14 @@ from (
                  party.party_name as CUST_NAME,
                  bill_loc.address1 as INVOICE_ADDRESS,
                  ship_ps.party_site_number as SHIP_TO_NO,
-                 NVL(d.attribute8, ship_loc.address1) as DELIVERY_ADDRESS,
+                 DECODE(D.ORGANIZATION_ID,169,NVL(d.attribute8, ship_loc.address1),NVL(d.attribute13, ship_loc.address1)) as DELIVERY_ADDRESS,
                  (SELECT first_name || last_name
-                  FROM ZEN_RA_CONTACTS_V@PROD2 rcs
+                  FROM ZEN_RA_CONTACTS_V@ZENPROD rcs
                   WHERE rcs.customer_id = l.sold_to_org_id
                     AND rcs.address_id = ship_cas.cust_acct_site_id
                     AND rcs.contact_id =
                         (SELECT MIN(contact_id)
-                         FROM ZEN_RA_CONTACTS_V@PROD2 rcs
+                         FROM ZEN_RA_CONTACTS_V@ZENPROD rcs
                          WHERE rcs.customer_id = l.sold_to_org_id
                            AND rcs.address_id = ship_cas.cust_acct_site_id
                            AND rcs.status = 'A')) as SHIP_TO_CONTACT,
@@ -218,10 +216,10 @@ from (
                                 NULL,
                                 a.phone_number,
                                 a.phone_area_code || '-' || a.phone_number)
-                  FROM zen_ra_phones_v@PROD2 a
+                  FROM zen_ra_phones_v@ZENPROD a
                   WHERE a.phone_id =
                         (SELECT MAX(b.phone_id)
-                         FROM zen_ra_phones_v@PROD2 b
+                         FROM zen_ra_phones_v@ZENPROD b
                          WHERE a.customer_id = b.customer_id
                            AND a.address_id = b.address_id
                            AND b.phone_line_type = 'GEN'
@@ -242,63 +240,63 @@ from (
                  l.attribute2 ||
                  DECODE(l.attribute1, NULL, NULL, '-' || l.attribute1) as CUSTOMER_PO,
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute1) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute2) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute3) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute4) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute5) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute6) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute7) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute8) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute9) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute10) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute11) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute14) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute15) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute16) || ' ' ||
                  (SELECT value_description
-                  FROM zen_fnd_flex_values_v@PROD2
+                  FROM zen_fnd_flex_values_v@ZENPROD
                   WHERE flex_value_set_name = 'ZEN_ADDRESS_ATTRIBUTE'
                     AND flex_value = ship_cas.attribute17) || ' ' || CASE
                                                                          WHEN (NVL(d.ATTRIBUTE6, ship_su.ATTRIBUTE22)) IS NOT NULL THEN
@@ -326,7 +324,7 @@ from (
                         'X',
                         'NA') as STATUS1,
                  (SELECT mcb.segment1
-                  FROM mtl_item_categories@PROD2 mic, mtl_categories_b@PROD2 mcb
+                  FROM mtl_item_categories@ZENPROD mic, mtl_categories_b@ZENPROD mcb
                   WHERE mic.category_set_id = 1
                     AND mic.category_id = mcb.category_id
                     AND mic.organization_id = mtls.organization_id
@@ -354,12 +352,12 @@ from (
                  '撿貨單' as KIND,
                  CASE
                      WHEN (SELECT msi.attribute9
-                           FROM mtl_system_items@PROD2 msi
+                           FROM mtl_system_items@ZENPROD msi
                            WHERE msi.organization_id = 3
                              AND msi.inventory_item_id =
                                  mtls.inventory_item_id) IS NOT NULL THEN
                          (SELECT msi.attribute9
-                          FROM mtl_system_items@PROD2 msi
+                          FROM mtl_system_items@ZENPROD msi
                           WHERE msi.organization_id = 3
                             AND msi.inventory_item_id = mtls.inventory_item_id)
                      ELSE
@@ -369,27 +367,27 @@ from (
                  MCI.ATTRIBUTE2 as CUST_PART_NO2,
                  nvl(nvl(l.ATTRIBUTE16,ZEN_GET_WMS_ITEM_F(mtls.segment1,D.ORGANIZATION_ID)),mtls.segment1) as PO_REMARK,
                  '' as RMA_NUMBER,
-                 '0' as ORD_TYPE,
+                 DECODE(D.ORGANIZATION_ID,169,'ZSH','SHC') as ORD_TYPE,
                  'TY' as QC_TYPE
-         FROM apps.wsh_new_deliveries@PROD2       d,
-              apps.wsh_delivery_assignments@PROD2 wda,
-              apps.wsh_delivery_details@PROD2     wdd,
-              apps.mtl_system_items_b@PROD2      mtls,
-              apps.mtl_item_locations@PROD2       mil,
-              apps.oe_order_headers_all@PROD2     h,
-              apps.oe_order_lines_all@PROD2       l,
-              apps.ZEN_WSH_PICK_SLIP_V@PROD2      zs,
-              apps.hz_cust_accounts@PROD2         cust_acct,
-              apps.hz_parties@PROD2              party,
-              apps.hz_locations@PROD2             bill_loc,
-              apps.hz_party_sites@PROD2           bill_ps,
-              apps.hz_cust_acct_sites_all@PROD2   bill_cas,
-              apps.hz_cust_site_uses_all@PROD2    bill_su,
-              apps.hz_locations@PROD2             ship_loc,
-              apps.hz_party_sites@PROD2           ship_ps,
-              apps.hz_cust_acct_sites_all@PROD2   ship_cas,
-              apps.hz_cust_site_uses_all@PROD2    ship_su,
-              apps.MTL_CUSTOMER_ITEMS@PROD2       MCI
+         FROM apps.wsh_new_deliveries@ZENPROD       d,
+              apps.wsh_delivery_assignments@ZENPROD wda,
+              apps.wsh_delivery_details@ZENPROD     wdd,
+              apps.mtl_system_items_b@ZENPROD      mtls,
+              apps.mtl_item_locations@ZENPROD       mil,
+              apps.oe_order_headers_all@ZENPROD     h,
+              apps.oe_order_lines_all@ZENPROD       l,
+              apps.ZEN_WSH_PICK_SLIP_V@ZENPROD      zs,
+              apps.hz_cust_accounts@ZENPROD         cust_acct,
+              apps.hz_parties@ZENPROD              party,
+              apps.hz_locations@ZENPROD             bill_loc,
+              apps.hz_party_sites@ZENPROD           bill_ps,
+              apps.hz_cust_acct_sites_all@ZENPROD   bill_cas,
+              apps.hz_cust_site_uses_all@ZENPROD    bill_su,
+              apps.hz_locations@ZENPROD             ship_loc,
+              apps.hz_party_sites@ZENPROD           ship_ps,
+              apps.hz_cust_acct_sites_all@ZENPROD   ship_cas,
+              apps.hz_cust_site_uses_all@ZENPROD    ship_su,
+              apps.MTL_CUSTOMER_ITEMS@ZENPROD       MCI
          WHERE
              ( D.ORGANIZATION_ID = 169
                  OR (D.ORGANIZATION_ID = 209 AND h.SOLD_TO_ORG_ID not in (1366747,32228,39440)))
@@ -430,12 +428,12 @@ from (
                                        OR d.attribute12 IS NULL
                                        OR
                                         (SELECT ffvt.description
-                                         FROM HZ_CUST_SITE_USES_ALL@PROD2 rsua,
-                                              jtf_rs_salesreps@PROD2      jrs,
-                                              gl_code_combinations@PROD2  gcc,
-                                              fnd_id_flex_segments@PROD2  fifs,
-                                              fnd_flex_values@PROD2       ffv,
-                                              fnd_flex_values_tl@PROD2    ffvt
+                                         FROM HZ_CUST_SITE_USES_ALL@ZENPROD rsua,
+                                              jtf_rs_salesreps@ZENPROD      jrs,
+                                              gl_code_combinations@ZENPROD  gcc,
+                                              fnd_id_flex_segments@ZENPROD  fifs,
+                                              fnd_flex_values@ZENPROD       ffv,
+                                              fnd_flex_values_tl@ZENPROD    ffvt
                                          WHERE rsua.site_use_code = 'SHIP_TO'
                                            AND rsua.site_use_id = ship_su.site_use_id
                                            AND jrs.salesrep_id = rsua.primary_salesrep_id
@@ -462,8 +460,8 @@ from (
                                                  NULL) IS NULL
                                        OR
                                         (SELECT mcb.segment1
-                                         FROM mtl_item_categories@PROD2 mic,
-                                              mtl_categories_b@PROD2    mcb
+                                         FROM mtl_item_categories@ZENPROD mic,
+                                              mtl_categories_b@ZENPROD    mcb
                                          WHERE mic.category_set_id = 1
                                            AND mic.category_id = mcb.category_id
                                            AND mic.organization_id = mtls.organization_id
@@ -510,7 +508,7 @@ from (
                          OR party.party_name IS NULL
                          OR bill_loc.address1 IS NULL
                          OR ship_ps.party_site_number IS NULL
-                         OR NVL(d.attribute8, ship_loc.address1) IS NULL
+                         OR NVL(d.attribute13, ship_loc.address1) IS NULL
                          OR mtls.segment1 ||
                             DECODE(l.attribute8,
                                    NULL,
@@ -551,9 +549,7 @@ from (
                  d.ATTRIBUTE5 as INV_SPLIT,
                  d.NAME || '-'||'JY' as INVOICE_NO,
                  NULL as INVOICE_DATE,
-                 TO_CHAR(TO_DATE(d.attribute12,
-                                 'DD-MON-YYYY',
-                                 'NLS_DATE_LANGUAGE=AMERICAN'),
+                 TO_CHAR(d.INITIAL_PICKUP_DATE,
                          'yyyy/mm/dd') as EXP_SHIP_DATE,
                  cust_acct.account_number as CUST_NO,
                  (SELECT ffvt.description
@@ -576,32 +572,9 @@ from (
                  party.party_name as CUST_NAME,
                  bill_loc.address1 as INVOICE_ADDRESS,
                  ship_ps.party_site_number as SHIP_TO_NO,
-                 NVL(d.attribute8, ship_loc.address1) as DELIVERY_ADDRESS,
-                 (SELECT first_name || last_name
-                  FROM ZEN_RA_CONTACTS_V@jy rcs
-                  WHERE rcs.customer_id = l.sold_to_org_id
-                    AND rcs.address_id = ship_cas.cust_acct_site_id
-                    AND rcs.contact_id =
-                        (SELECT MIN(contact_id)
-                         FROM ZEN_RA_CONTACTS_V@jy rcs
-                         WHERE rcs.customer_id = l.sold_to_org_id
-                           AND rcs.address_id = ship_cas.cust_acct_site_id
-                           AND rcs.status = 'A')) as SHIP_TO_CONTACT,
-                 (SELECT DECODE(a.phone_area_code,
-                                NULL,
-                                a.phone_number,
-                                a.phone_area_code || '-' || a.phone_number)
-                  FROM zen_ra_phones_v@jy a
-                  WHERE a.phone_id =
-                        (SELECT MAX(b.phone_id)
-                         FROM zen_ra_phones_v@jy b
-                         WHERE a.customer_id = b.customer_id
-                           AND a.address_id = b.address_id
-                           AND b.phone_line_type = 'GEN'
-                         GROUP BY b.customer_id, b.address_id)
-                    AND a.phone_line_type = 'GEN'
-                    AND a.customer_id = l.sold_to_org_id
-                    AND a.address_id = ship_cas.cust_acct_site_id) as SHIP_TO_PHONE,
+                 NVL(d.attribute13, ship_loc.address1) as DELIVERY_ADDRESS,
+                 ZEN_JY_GET_PROD_DATA_PKG.GET_CONTACT_F(cust_acct.account_number,ship_cas.cust_acct_site_id) as SHIP_TO_CONTACT,
+                 ZEN_JY_GET_PROD_DATA_PKG.GET_TEL_F(cust_acct.account_number,ship_cas.cust_acct_site_id) as SHIP_TO_PHONE,
                  mtls.segment1 ||
                  DECODE(l.attribute8,
                         NULL,
@@ -742,7 +715,7 @@ from (
                  MCI.ATTRIBUTE2 as CUST_PART_NO2,
                  nvl(nvl(l.ATTRIBUTE16,ZEN_GET_WMS_ITEM_F(mtls.segment1,D.ORGANIZATION_ID)),mtls.segment1) as PO_REMARK,
                  '' as RMA_NUMBER,
-                 '0' as ORD_TYPE,
+                 'JY' as ORD_TYPE,
                  'TY' as QC_TYPE
          FROM apps.wsh_new_deliveries@jy       d,
               apps.wsh_delivery_assignments@jy wda,
@@ -823,7 +796,7 @@ from (
                                        OR party.party_name IS NULL
                                        OR bill_loc.address1 IS NULL
                                        OR ship_ps.party_site_number IS NULL
-                                       OR NVL(d.attribute8, ship_loc.address1) IS NULL
+                                       OR NVL(d.attribute13, ship_loc.address1) IS NULL
                                        OR mtls.segment1 ||
                                           DECODE(l.attribute8,
                                                  NULL,
@@ -883,7 +856,7 @@ from (
                         OR party.party_name IS NULL
                         OR bill_loc.address1 IS NULL
                         OR ship_ps.party_site_number IS NULL
-                        OR NVL(d.attribute8, ship_loc.address1) IS NULL
+                        OR NVL(d.attribute13, ship_loc.address1) IS NULL
                         OR mtls.segment1 ||
                            DECODE(l.attribute8,
                                   NULL,
@@ -924,9 +897,7 @@ from (
                 d.ATTRIBUTE5 as INV_SPLIT,
                 d.NAME || '-'||'HHW' as INVOICE_NO,
                 NULL as INVOICE_DATE,
-                TO_CHAR(TO_DATE(d.attribute12,
-                                'DD-MON-YYYY',
-                                'NLS_DATE_LANGUAGE=AMERICAN'),
+                TO_CHAR(d.INITIAL_PICKUP_DATE,
                         'yyyy/mm/dd') as EXP_SHIP_DATE,
                 cust_acct.account_number as CUST_NO,
                 (SELECT ffvt.description
@@ -949,32 +920,9 @@ from (
                 party.party_name as CUST_NAME,
                 bill_loc.address1 as INVOICE_ADDRESS,
                 ship_ps.party_site_number as SHIP_TO_NO,
-                NVL(d.attribute8, ship_loc.address1) as DELIVERY_ADDRESS,
-                (SELECT first_name || last_name
-                 FROM ZEN_RA_CONTACTS_V@SHCTRADING0 rcs
-                 WHERE rcs.customer_id = l.sold_to_org_id
-                   AND rcs.address_id = ship_cas.cust_acct_site_id
-                   AND rcs.contact_id =
-                       (SELECT MIN(contact_id)
-                        FROM ZEN_RA_CONTACTS_V@SHCTRADING0 rcs
-                        WHERE rcs.customer_id = l.sold_to_org_id
-                          AND rcs.address_id = ship_cas.cust_acct_site_id
-                          AND rcs.status = 'A')) as SHIP_TO_CONTACT,
-                (SELECT DECODE(a.phone_area_code,
-                               NULL,
-                               a.phone_number,
-                               a.phone_area_code || '-' || a.phone_number)
-                 FROM zen_ra_phones_v@SHCTRADING0 a
-                 WHERE a.phone_id =
-                       (SELECT MAX(b.phone_id)
-                        FROM zen_ra_phones_v@SHCTRADING0 b
-                        WHERE a.customer_id = b.customer_id
-                          AND a.address_id = b.address_id
-                          AND b.phone_line_type = 'GEN'
-                        GROUP BY b.customer_id, b.address_id)
-                   AND a.phone_line_type = 'GEN'
-                   AND a.customer_id = l.sold_to_org_id
-                   AND a.address_id = ship_cas.cust_acct_site_id) as SHIP_TO_PHONE,
+                NVL(d.attribute13, ship_loc.address1) as DELIVERY_ADDRESS,
+                ZEN_HHW_GET_PROD_DATA_PKG.GET_CONTACT_F(cust_acct.account_number,ship_cas.cust_acct_site_id) as SHIP_TO_CONTACT,
+                ZEN_HHW_GET_PROD_DATA_PKG.GET_TEL_F(cust_acct.account_number,ship_cas.cust_acct_site_id) as SHIP_TO_PHONE,
                 mtls.segment1 ||
                 DECODE(l.attribute8,
                        NULL,
@@ -1115,7 +1063,7 @@ from (
                 MCI.ATTRIBUTE2 as CUST_PART_NO2,
                 nvl(nvl(l.ATTRIBUTE16,ZEN_GET_WMS_ITEM_F(mtls.segment1,D.ORGANIZATION_ID)),mtls.segment1) as PO_REMARK,
                 '' as RMA_NUMBER,
-                '0' as ORD_TYPE,
+                'HHW' as ORD_TYPE,
                 'TY' as QC_TYPE
          FROM apps.wsh_new_deliveries@SHCTRADING0       d,
               apps.wsh_delivery_assignments@SHCTRADING0 wda,
@@ -1196,7 +1144,7 @@ from (
                                        OR party.party_name IS NULL
                                        OR bill_loc.address1 IS NULL
                                        OR ship_ps.party_site_number IS NULL
-                                       OR NVL(d.attribute8, ship_loc.address1) IS NULL
+                                       OR NVL(d.attribute13, ship_loc.address1) IS NULL
                                        OR mtls.segment1 ||
                                           DECODE(l.attribute8,
                                                  NULL,

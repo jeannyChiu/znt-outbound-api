@@ -37,7 +37,7 @@ public class MasterScheduledTask {
     private final DbExtractRunner dbExtractRunner;
     
     // 配置開關 - 可透過 application.properties 設定
-    @Value("${master.scheduler.enabled:false}")
+    @Value("${master.scheduler.enabled:true}")
     private boolean masterSchedulerEnabled;
     
     @Value("${master.scheduler.asn.enabled:true}")

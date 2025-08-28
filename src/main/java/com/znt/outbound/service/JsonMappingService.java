@@ -83,11 +83,12 @@ public class JsonMappingService {
 
     private List<SoHeaderDto> getHeadersToProcess() {
         try {
+            String providerName = apiConfigService.getProviderName();
             Resource resource = resourceLoader.getResource("classpath:sql/select_so_for_mapping.sql");
             String sql = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-            log.info("正在執行查詢以獲取待映射的訂單標頭。");
-            List<SoHeaderDto> headers = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SoHeaderDto.class));
-            log.info("查詢到 {} 筆待映射的訂單標頭。", headers.size());
+            log.info("正在執行查詢以獲取待映射的訂單標頭 (RECEIVER_CODE: {})。", providerName);
+            List<SoHeaderDto> headers = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SoHeaderDto.class), providerName);
+            log.info("查詢到 {} 筆待映射的訂單標頭 (RECEIVER_CODE: {})。", headers.size(), providerName);
             return headers;
         } catch (IOException e) {
             log.error("讀取 select_so_for_mapping.sql 失敗", e);
@@ -117,22 +118,23 @@ public class JsonMappingService {
     }
 
     private List<FeiliksOrderList> getOrderListsByInvoiceNo(String invoiceNo) {
+        String providerName = apiConfigService.getProviderName();
         String sql = "SELECT CUST_PN, ITEM_MODE, BRAND, ITEM_DESC, QUANTITY, UNIT_PRICE, " +
                      "AMOUNT, CUST_PO, CUST_POLINE, INVOICE_NO, INVOICE_DATE, ZT_PART_NO, " +
                      "SHIP_NOTICE, SEGMENT1, SEGMENT2, CUST_PN2, CUST_PO2, ORDER_NO, PO_REMARK, " +
                      "INV_SPLIT, CUST_PART_NO2, INV_AND_PAC, DEPT, RMA_NUMBER, ORI_PO_NO " +
-                     "FROM ZEN_B2B_JSON_SO WHERE INVOICE_NO = ? AND STATUS = 'W' ORDER BY SEQ_ID";
+                     "FROM ZEN_B2B_JSON_SO WHERE RECEIVER_CODE = ? AND INVOICE_NO = ? AND STATUS = 'W' ORDER BY SEQ_ID";
 
-        log.debug("查詢 OrderLists for invoice_no: {}", invoiceNo);
+        log.debug("查詢 OrderLists for invoice_no: {} (RECEIVER_CODE: {})", invoiceNo, providerName);
 
         List<OrderListDto> dtoList = jdbcTemplate.query(
                 sql,
-                new Object[]{invoiceNo},
+                new Object[]{providerName, invoiceNo},
                 new BeanPropertyRowMapper<>(OrderListDto.class)
         );
 
         if (dtoList.isEmpty()) {
-            log.warn("找不到 invoice_no: {} 的 OrderLists。", invoiceNo);
+            log.warn("找不到 invoice_no: {} 的 OrderLists (RECEIVER_CODE: {})。", invoiceNo, providerName);
             return Collections.emptyList();
         }
 
@@ -167,17 +169,18 @@ public class JsonMappingService {
     }
 
     private List<FeiliksShippingInstruction> getShippingInstructionsByInvoiceNo(String invoiceNo) {
-        String sql = "SELECT DISTINCT SHIP_NOTES, QC_TYPE FROM ZEN_B2B_JSON_SO WHERE INVOICE_NO = ? AND STATUS = 'W'";
-        log.debug("查詢 ShippingInstructions for invoice_no: {}", invoiceNo);
+        String providerName = apiConfigService.getProviderName();
+        String sql = "SELECT DISTINCT SHIP_NOTES, QC_TYPE FROM ZEN_B2B_JSON_SO WHERE RECEIVER_CODE = ? AND INVOICE_NO = ? AND STATUS = 'W'";
+        log.debug("查詢 ShippingInstructions for invoice_no: {} (RECEIVER_CODE: {})", invoiceNo, providerName);
 
         List<ShippingInstructionDto> dtoList = jdbcTemplate.query(
                 sql,
-                new Object[]{invoiceNo},
+                new Object[]{providerName, invoiceNo},
                 new BeanPropertyRowMapper<>(ShippingInstructionDto.class)
         );
 
         if(dtoList.isEmpty()) {
-            log.warn("找不到 invoice_no: {} 的 ShippingInstructions。 ", invoiceNo);
+            log.warn("找不到 invoice_no: {} 的 ShippingInstructions (RECEIVER_CODE: {})。 ", invoiceNo, providerName);
             return Collections.emptyList();
         }
 

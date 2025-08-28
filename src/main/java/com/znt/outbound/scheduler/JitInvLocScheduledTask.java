@@ -21,14 +21,13 @@ public class JitInvLocScheduledTask {
     private final JitInvLocService jitInvLocService;
 
     /**
-     * 排程任務：每日凌晨2:00執行庫存查詢
+     * 排程任務：每日18:30執行庫存查詢
      * Cron: 秒 分 時 日 月 週
-     * 表示每日凌晨2:00執行
+     * 表示每日18:30執行
      */
-    @Scheduled(cron = "0 0 2 * * ?", zone = "Asia/Taipei")
+    @Scheduled(cron = "0 30 18 * * ?", zone = "Asia/Taipei")
     public void executeJitInventoryLocationQuery() {
-        // 暫時停用排程 - JIT 庫存查詢 API 尚未開放測試
-        boolean schedulingEnabled = false;
+        boolean schedulingEnabled = true;
         if (!schedulingEnabled) {
             log.debug("JIT 庫存查詢排程已暫停，跳過此次執行");
             return;

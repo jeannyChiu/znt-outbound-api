@@ -22,7 +22,9 @@ FROM
         status,
         ROW_NUMBER() OVER (PARTITION BY invoice_no ORDER BY SEQ_ID DESC) AS rn
     FROM
-        ZEN_B2B_JSON_SO)
+        ZEN_B2B_JSON_SO
+    WHERE
+        RECEIVER_CODE = ?)
 WHERE
     rn = 1
 AND

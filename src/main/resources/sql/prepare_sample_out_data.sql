@@ -38,8 +38,8 @@ FROM (
                      OR mmt.transaction_date IS NULL
                      OR a.DEP_NAME IS NULL
                      OR b.ENAME IS NULL
-                     OR b.CADDR IS NULL
-                     OR c.USER_NAME IS NULL
+                     OR c.DELIVERY_ADDRESS IS NULL
+                     OR c.RECIPIENT_NAME IS NULL
                      OR c.EXT_NO IS NULL
                      OR c.PARTNO IS NULL
                      OR c.BRAND IS NULL
@@ -64,11 +64,11 @@ FROM (
              '' AS CUST_NO,
              a.DEP_NAME AS DEPT,
              b.ENAME AS CUST_NAME,
-             b.CADDR AS INVOICE_ADDRESS,
+             nvl(c.DELIVERY_ADDRESS,b.CADDR) AS INVOICE_ADDRESS,
              '' AS SHIP_TO_NO,
-             b.CADDR AS DELIVERY_ADDRESS,
-             c.USER_NAME AS SHIP_TO_CONTACT,
-             c.EXT_NO AS SHIP_TO_PHONE,
+             nvl(c.DELIVERY_ADDRESS,b.CADDR) AS DELIVERY_ADDRESS,
+             nvl(c.RECIPIENT_NAME,c.USER_NAME) AS SHIP_TO_CONTACT,
+             nvl(c.RECIPIENT_PHONE,c.EXT_NO) AS SHIP_TO_PHONE,
              c.PARTNO AS ZT_PART_NO,
              '' AS CUST_PART_NO,
              '' AS CUSTOMER_PO,
@@ -98,15 +98,15 @@ FROM (
              '' AS CUST_PART_NO2,
              NVL(NVL(c.VENDOR_MATERIAL_INFO, ZEN_GET_WMS_ITEM_F(c.PARTNO,mmt.organization_id)), c.PARTNO) AS PO_REMARK, -- 原廠來料訊息
              '' AS RMA_NUMBER,
-             '0' AS ORD_TYPE,
+             DECODE(mmt.organization_id,169,'ZSH','SHC') AS ORD_TYPE,
              'TY' AS QC_TYPE
          FROM
              OA_DEPTALL@hr a,
              OA_COMPANY@hr b,
-             zenoanew.WEB015_SAMPLE_LINE@ZENOADBT1ZENWMSHR c,
-             zenoanew.WEB015_SAMPLE_LINED1@ZENOADBT1ZENWMSHR d,
-             mtl_material_transactions@PROD2 mmt,
-             mtl_system_items_b@PROD2 msi
+             zenoanew.WEB015_SAMPLE_LINE@hr c,
+             zenoanew.WEB015_SAMPLE_LINED1@hr d,
+             mtl_material_transactions@ZENPROD mmt,
+             mtl_system_items_b@ZENPROD msi
          WHERE
              a.CPNYID = b.CPNYID
            AND a.DEP_NO = c.DEPT_NO
@@ -117,7 +117,7 @@ FROM (
            AND msi.inventory_item_id = mmt.inventory_item_id
            AND EXISTS (
              SELECT 1
-             FROM zenoanew.WEB015_SAMPLE_LINED1@ZENOADBT1ZENWMSHR
+             FROM zenoanew.WEB015_SAMPLE_LINED1@hr
              WHERE
                  SEQ_MISFORM = c.SEQ_MISFORM
                AND SEQS = c.SEQS
@@ -127,7 +127,7 @@ FROM (
          )
            AND EXISTS (
              SELECT 1
-             FROM zenoanew.WEB015_SAMPLE_LINE_FLOWC@ZENOADBT1ZENWMSHR
+             FROM zenoanew.WEB015_SAMPLE_LINE_FLOWC@hr
              WHERE
                  SEQ_MISFORM = c.SEQ_MISFORM
                AND SEQS = c.SEQS
@@ -155,8 +155,8 @@ FROM (
                              OR mmt.transaction_date IS NULL
                              OR a.DEP_NAME IS NULL
                              OR b.ENAME IS NULL
-                             OR b.CADDR IS NULL
-                             OR c.USER_NAME IS NULL
+                             OR c.DELIVERY_ADDRESS IS NULL
+                             OR c.RECIPIENT_NAME IS NULL
                              OR c.EXT_NO IS NULL
                              OR c.PARTNO IS NULL
                              OR c.BRAND IS NULL

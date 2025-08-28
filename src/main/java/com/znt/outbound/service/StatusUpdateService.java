@@ -15,9 +15,11 @@ import java.time.format.DateTimeFormatter;
 public class StatusUpdateService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ApiConfigService apiConfigService;
 
     @Transactional
     public void updateStatus(String seqId, String transFlag) {
+        String providerName = apiConfigService.getProviderName();
         String formattedTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         // 1. 更新 ZEN_B2B_ENVELOPE
@@ -27,28 +29,31 @@ public class StatusUpdateService {
 
         // 2. 更新 ZEN_B2B_JSON_SO
         String soSql = "UPDATE ZEN_B2B_JSON_SO so SET so.STATUS = ?, so.LAST_UPDATE_DATE = ? " +
-                     "WHERE EXISTS (SELECT 1 FROM ZEN_B2B_JSON_SO_TMP tmp WHERE tmp.ID = so.ID) " +
+                     "WHERE so.RECEIVER_CODE = ? " +
+                     "AND EXISTS (SELECT 1 FROM ZEN_B2B_JSON_SO_TMP tmp WHERE tmp.ID = so.ID AND tmp.RECEIVER_CODE = ?) " +
                      "AND so.STATUS = 'W'";
-        int updatedSoRows = jdbcTemplate.update(soSql, transFlag, formattedTimestamp);
-        log.info("ZEN_B2B_JSON_SO 表狀態已更新。共 {} 筆訂單狀態更新為 '{}'", updatedSoRows, transFlag);
+        int updatedSoRows = jdbcTemplate.update(soSql, transFlag, formattedTimestamp, providerName, providerName);
+        log.info("ZEN_B2B_JSON_SO 表狀態已更新 (RECEIVER_CODE: {})。共 {} 筆訂單狀態更新為 '{}'", providerName, updatedSoRows, transFlag);
 
         // 3. 新增：清理成功的訂單中，狀態為 'F' 的過時紀錄
         String cleanupSql = "DELETE FROM ZEN_B2B_JSON_SO " +
-                            "WHERE ID IN ( " +
+                            "WHERE RECEIVER_CODE = ? " +
+                            "AND ID IN ( " +
                             "    SELECT DISTINCT ID " +
                             "    FROM ( " +
                             "        SELECT ID, " +
                             "               COUNT(*) OVER (PARTITION BY ID) AS id_count, " +
                             "               FIRST_VALUE(STATUS) OVER (PARTITION BY ID ORDER BY SEQ_ID DESC) AS max_status " +
                             "        FROM ZEN_B2B_JSON_SO " +
+                            "        WHERE RECEIVER_CODE = ? " +
                             "    ) " +
                             "    WHERE id_count > 1 " +
                             "    AND max_status = 'S' " +
                             ") " +
                             "AND STATUS = 'F'";
-        int deletedRows = jdbcTemplate.update(cleanupSql);
+        int deletedRows = jdbcTemplate.update(cleanupSql, providerName, providerName);
         if (deletedRows > 0) {
-            log.info("成功清理了 {} 筆狀態為 'F' 的過時訂單紀錄。", deletedRows);
+            log.info("成功清理了 {} 筆狀態為 'F' 的過時訂單紀錄 (RECEIVER_CODE: {})。", deletedRows, providerName);
         }
     }
 } 

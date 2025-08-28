@@ -18,8 +18,11 @@ public class ApiConfigService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Value("${logistics.provider.name:FEILIKS}")
+    @Value("${logistics.provider.name:JIT}")
     private String providerName;
+
+    @Value("${logistics.environment:prod}")
+    private String environment;
 
     private String partCode;
     private String secretKey;
@@ -34,7 +37,11 @@ public class ApiConfigService {
 
     @PostConstruct
     public void init() {
-        log.info("正在為物流商 '{}' 從資料庫載入 API 設定...", providerName);
+        log.info("正在為物流商 '{}' 環境 '{}' 從資料庫載入 API 設定...", providerName, environment);
+        
+        // 根據環境決定 URL 後綴
+        String urlSuffix = "test".equalsIgnoreCase(environment) ? "URLT" : "URL";
+        
         String sql = "SELECT TD_NO, TD_NAME FROM ZEN_B2B_TAB_D WHERE T_NO = 'JSON_SYS_INFO'";
         try {
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
@@ -49,12 +56,12 @@ public class ApiConfigService {
 
             this.partCode = configMap.get(providerName + "-APPID");
             this.secretKey = configMap.get(providerName + "-APPKEY");
-            this.apiUrl = configMap.get(providerName + "-SO_URLT");
-            this.asnApiUrl = configMap.get(providerName + "-ASN_URLT");
-            this.moveTradeApiUrl = configMap.get(providerName + "-MOVE_TRADE_URLT");
-            this.invLocApiUrl = configMap.get(providerName + "-INV_LOC_URLT");
-            this.invExchangeApiUrl = configMap.get(providerName + "-INV_EXCHANGE_URLT");
-            this.loginApiUrl = configMap.get(providerName + "-LOGIN_URLT");
+            this.apiUrl = configMap.get(providerName + "-SO_" + urlSuffix);
+            this.asnApiUrl = configMap.get(providerName + "-ASN_" + urlSuffix);
+            this.moveTradeApiUrl = configMap.get(providerName + "-MOVE_TRADE_" + urlSuffix);
+            this.invLocApiUrl = configMap.get(providerName + "-INV_LOC_" + urlSuffix);
+            this.invExchangeApiUrl = configMap.get(providerName + "-INV_EXCHANGE_" + urlSuffix);
+            this.loginApiUrl = configMap.get(providerName + "-LOGIN_" + urlSuffix);
             this.loginUsername = configMap.get(providerName + "-LOGIN_USERNAME");
             this.loginPassword = configMap.get(providerName + "-LOGIN_PASSWORD");
 
@@ -62,8 +69,8 @@ public class ApiConfigService {
                 log.warn("物流商 '{}' 的部分 API 設定 (APPID 或 APPKEY) 未找到，部分功能可能受限。", providerName);
                 // 這不再是一個會中斷啟動的錯誤，因為某些 provider 可能不需要它
             }
-            log.info("API 設定載入成功。Provider: {}, Part Code: {}",
-                    providerName, this.partCode);
+            log.info("API 設定載入成功。Provider: {}, Environment: {}, URL Suffix: {}, Part Code: {}",
+                    providerName, environment, urlSuffix, this.partCode);
             log.info("SO_URL: {}, ASN_URL: {}, MOVE_TRADE_URL: {}, INV_LOC_URL: {}, INV_EXCHANGE_URL: {}, LOGIN_URL: {}", 
                     this.apiUrl, this.asnApiUrl, this.moveTradeApiUrl, this.invLocApiUrl, this.invExchangeApiUrl, this.loginApiUrl);
             log.info("Login Username: {}", this.loginUsername);

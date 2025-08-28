@@ -20,6 +20,7 @@ public class NotificationService {
 
     private final JavaMailSender mailSender;
     private final JdbcTemplate jdbcTemplate;
+    private final ApiConfigService apiConfigService;
 
     @Value("${spring.datasource.url}")
     private String databaseUrl;
@@ -47,17 +48,18 @@ public class NotificationService {
     }
 
     public void sendErrorNotifications() {
-        log.info("開始檢查並寄送錯誤通知郵件...");
+        String providerName = apiConfigService.getProviderName();
+        log.info("開始檢查並寄送錯誤通知郵件 (RECEIVER_CODE: {})...", providerName);
 
-        String findErrorsSql = "SELECT ID, RECEIVER_CODE FROM ZEN_B2B_JSON_SO WHERE STATUS = 'N'";
-        List<ErrorNotificationData> errors = jdbcTemplate.query(findErrorsSql, new ErrorNotificationDataMapper());
+        String findErrorsSql = "SELECT ID, RECEIVER_CODE FROM ZEN_B2B_JSON_SO WHERE STATUS = 'N' AND RECEIVER_CODE = ?";
+        List<ErrorNotificationData> errors = jdbcTemplate.query(findErrorsSql, new ErrorNotificationDataMapper(), providerName);
 
         if (errors.isEmpty()) {
-            log.info("沒有狀態為 'N' 的錯誤資料，無需寄送通知。");
+            log.info("沒有狀態為 'N' 的錯誤資料 (RECEIVER_CODE: {})，無需寄送通知。", providerName);
             return;
         }
 
-        log.info("發現 {} 筆狀態為 'N' 的錯誤資料，開始處理...", errors.size());
+        log.info("發現 {} 筆狀態為 'N' 的錯誤資料 (RECEIVER_CODE: {})，開始處理...", errors.size(), providerName);
 
         String subjectPrefix = getSubjectPrefix();
 
@@ -91,6 +93,6 @@ public class NotificationService {
                 log.error("處理訂單 ID '{}' 的錯誤通知時發生例外狀況，此筆郵件可能未寄出: {}", error.id(), e.getMessage(), e);
             }
         }
-        log.info("錯誤通知郵件寄送處理完成。");
+        log.info("錯誤通知郵件寄送處理完成 (RECEIVER_CODE: {})。", providerName);
     }
 } 

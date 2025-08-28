@@ -13,6 +13,7 @@ import com.znt.outbound.service.JitInvLocService;
 import com.znt.outbound.service.JitInvExchangeService;
 import com.znt.outbound.service.JitAuthService;
 import com.znt.outbound.service.ApiConfigService;
+import com.znt.outbound.service.JitApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,7 @@ public class JitTestController {
     private final JitInvMoveOrTradeScheduledTask jitInvMoveOrTradeScheduledTask;
     private final JitInvLocScheduledTask jitInvLocScheduledTask;
     private final JitInvExchangeScheduledTask jitInvExchangeScheduledTask;
+    private final JitApiClient jitApiClient;
 
     /**
      * 健康檢查端點
@@ -1465,6 +1467,118 @@ public class JitTestController {
             log.error("獲取庫內換料排程任務資訊時發生錯誤", e);
             return ResponseEntity.internalServerError()
                 .body(new TestResponse(false, "獲取任務資訊失敗: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * 直接讀取 SQL 並發送到 JIT API
+     * 使用 JitAsnMappingService 的相關方法進行資料映射和發送
+     */
+    @GetMapping("/direct-sql-send")
+    public ResponseEntity<?> directSqlSend() {
+        log.info("=== 直接 SQL 查詢並發送到 JIT API 開始 ===");
+        try {
+            // 1. 使用 JitAsnMappingService 的 loadSqlQuery() 方法讀取 SQL
+            String sql;
+            try (Reader reader = new InputStreamReader(
+                    this.getClass().getResourceAsStream("/sql/select_asn_for_jit.sql"),
+                    StandardCharsets.UTF_8)) {
+                sql = FileCopyUtils.copyToString(reader);
+                log.info("成功讀取 SQL 檔案");
+            } catch (Exception e) {
+                log.error("讀取 SQL 檔案失敗", e);
+                return ResponseEntity.internalServerError()
+                    .body(new TestResponse(false, "讀取 SQL 檔案失敗: " + e.getMessage(), null));
+            }
+
+            // 2. 執行查詢
+            log.info("開始執行資料庫查詢...");
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+            log.info("查詢完成，共找到 {} 筆資料", rows.size());
+
+            if (rows.isEmpty()) {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "沒有找到 STATUS='PENDING' 的 ASN 資料", null));
+            }
+
+            // 3. 使用 JitAsnMappingService 的 mapDataToJitAsnRequest 方法進行資料映射
+            String externalId = rows.get(0).get("EXTERNAL_ID") != null ? rows.get(0).get("EXTERNAL_ID").toString() : null;
+            
+            if (externalId == null) {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "EXTERNAL_ID 不能為空", null));
+            }
+
+            log.info("準備映射資料，ExternalId: {}", externalId);
+            
+            // 使用反射調用 JitAsnMappingService 的私有方法 mapDataToJitAsnRequest
+            JitAsnRequest jitRequest;
+            try {
+                java.lang.reflect.Method method = JitAsnMappingService.class
+                    .getDeclaredMethod("mapDataToJitAsnRequest", List.class);
+                method.setAccessible(true);
+                jitRequest = (JitAsnRequest) method.invoke(jitAsnMappingService, rows);
+            } catch (Exception e) {
+                log.error("調用資料映射方法失敗", e);
+                return ResponseEntity.internalServerError()
+                    .body(new TestResponse(false, "資料映射失敗: " + e.getMessage(), null));
+            }
+
+            if (jitRequest == null) {
+                return ResponseEntity.ok()
+                    .body(new TestResponse(false, "資料映射返回 null，無法產生有效請求", null));
+            }
+
+            log.info("資料映射成功，ExternalId: {}, Lines: {}", 
+                    jitRequest.getExternalId(), jitRequest.getLines().size());
+
+            // 4. 使用 JitApiClient 發送到 JIT API (模擬 JitAsnMappingService 的方式)
+            log.info("準備發送資料到 JIT API，ExternalId: {}", externalId);
+            
+            try {
+                // 使用 JitApiClient 的 sendAsn 方法
+                org.springframework.http.ResponseEntity<String> response = jitApiClient.sendAsn(jitRequest);
+                
+                log.info("JIT API 回應狀態: {}", response.getStatusCode());
+                log.info("JIT API 回應內容: {}", response.getBody());
+
+                // 5. 更新資料庫狀態（使用類似 JitAsnMappingService 的方式）
+                String updateSql = "UPDATE B2B.JIT_ASN_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_ID = ?";
+                
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    jdbcTemplate.update(updateSql, "COMPLETED", externalId);
+                    log.info("ExternalId: {} 狀態更新為 COMPLETED", externalId);
+                    
+                    return ResponseEntity.ok()
+                        .body(new TestResponse(true, "直接 SQL 查詢並發送到 JIT API 成功", 
+                            "ExternalId: " + externalId + ", 狀態: " + response.getStatusCode() + ", 回應: " + response.getBody()));
+                } else {
+                    jdbcTemplate.update(updateSql, "FAILED", externalId);
+                    log.error("ExternalId: {} 狀態更新為 FAILED", externalId);
+                    
+                    return ResponseEntity.ok()
+                        .body(new TestResponse(false, "JIT API 調用失敗", 
+                            "ExternalId: " + externalId + ", 狀態: " + response.getStatusCode() + ", 回應: " + response.getBody()));
+                }
+
+            } catch (Exception e) {
+                log.error("發送到 JIT API 時發生異常，ExternalId: {}", externalId, e);
+                
+                // 更新狀態為失敗
+                String updateSql = "UPDATE B2B.JIT_ASN_HEADER SET STATUS = ?, UPDATED_AT = SYSDATE WHERE EXTERNAL_ID = ?";
+                jdbcTemplate.update(updateSql, "FAILED", externalId);
+                
+                return ResponseEntity.internalServerError()
+                    .body(new TestResponse(false, "API 調用異常: " + e.getMessage(), 
+                        "ExternalId: " + externalId));
+            }
+
+        } catch (Exception e) {
+            log.error("直接 SQL 查詢並發送過程中發生錯誤", e);
+            return ResponseEntity.internalServerError()
+                .body(new TestResponse(false, "處理過程中發生錯誤: " + e.getMessage(), null));
+        } finally {
+            log.info("=== 直接 SQL 查詢並發送到 JIT API 結束 ===");
         }
     }
 

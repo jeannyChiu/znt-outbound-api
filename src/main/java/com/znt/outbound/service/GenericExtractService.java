@@ -22,6 +22,7 @@ public class GenericExtractService {
     private final JdbcTemplate jdbcTemplate;
     private final ResourceLoader resourceLoader;
     private final PlatformTransactionManager transactionManager;
+    private final ApiConfigService apiConfigService;
 
     /**
      * 執行 SQL scripts，將當日單據資料寫入 ZEN_B2B_JSON_SO_TMP
@@ -31,14 +32,15 @@ public class GenericExtractService {
      */
     public int extract() {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        String providerName = apiConfigService.getProviderName();
 
         // 步驟 1: 在一個獨立的專用交易中，優先清空暫存表
-        log.info("Cleaning ZEN_B2B_JSON_SO_TMP table in a dedicated transaction.");
+        log.info("Cleaning ZEN_B2B_JSON_SO_TMP table for RECEIVER_CODE: {} in a dedicated transaction.", providerName);
         transactionTemplate.execute(status -> {
-            jdbcTemplate.update("DELETE FROM ZEN_B2B_JSON_SO_TMP");
+            jdbcTemplate.update("DELETE FROM ZEN_B2B_JSON_SO_TMP WHERE RECEIVER_CODE = ?", providerName);
             return null;
         });
-        log.info("Temp table cleaned successfully.");
+        log.info("Temp table cleaned successfully for RECEIVER_CODE: {}.", providerName);
 
         // 步驟 2: 執行各個腳本的 INSERT 操作，每個腳本都在自己的交易中
         List<String> sqlScripts = List.of(
@@ -81,16 +83,17 @@ public class GenericExtractService {
                 """
                 SELECT COUNT(*)
                 FROM   ZEN_B2B_JSON_SO_TMP
-                WHERE  TO_DATE(CREATION_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                WHERE  RECEIVER_CODE = ?
+                  AND  TO_DATE(CREATION_DATE, 'YYYY-MM-DD HH24:MI:SS')
                           >= TRUNC(SYSDATE)
                   AND  TO_DATE(CREATION_DATE, 'YYYY-MM-DD HH24:MI:SS')
                           <  TRUNC(SYSDATE) + 1
                 """,
-                Integer.class);
+                Integer.class, providerName);
 
         int inserted = cnt != null ? cnt : 0;
-        log.info("[{}] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP 共 {} 筆",
-                LocalDateTime.now(), inserted);
+        log.info("[{}] 抽取單據完成，寫入 ZEN_B2B_JSON_SO_TMP (RECEIVER_CODE: {}) 共 {} 筆",
+                LocalDateTime.now(), providerName, inserted);
 
         return inserted;
     }

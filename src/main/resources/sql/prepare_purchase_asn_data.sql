@@ -38,9 +38,9 @@ SELECT DISTINCT
     NULL AS UserDef3,
     NULL AS UserDef4,
     NULL AS UserDef5
-FROM ZEN_SHIPPING_NOTICE_HEADERS_V@PROD2 zshv,
-     zen_shipping_notice_lines_v@PROD2 zslv,
-     apps.mtl_item_locations@PROD2 mil
+FROM ZEN_SHIPPING_NOTICE_HEADERS_V@ZENPROD zshv,
+     zen_shipping_notice_lines_v@ZENPROD zslv,
+     apps.mtl_item_locations@ZENPROD mil
 WHERE zshv.shipping_no = zslv.shipping_no
   AND zslv.subinventory_code = '外存倉'
   AND mil.organization_id(+) = zslv.organization_id
@@ -49,6 +49,7 @@ WHERE zshv.shipping_no = zslv.shipping_no
   AND zshv.organization_id IN (169, 209)
   AND zshv.status = 'Complete'
   AND zslv.status = 'Open'
+  AND NVL(zshv.EXT_WH_FLAG,'N') ='Y'
   AND (mil.segment1 LIKE '%基通%' OR mil.segment2 LIKE '%基通%')
   AND mil.attribute3 = 'JIT'
   AND ZSHV.supplier_id NOT IN (1098625,823139,16645)
@@ -197,13 +198,13 @@ SELECT
     NULL AS lot_attr18,
     NULL AS lot_attr19,
     NULL AS lot_attr20
-FROM ZEN_SHIPPING_NOTICE_HEADERS_V@PROD2 zshv,
-     zen_shipping_notice_lines_v@PROD2 zslv,
-     apps.mtl_item_locations@PROD2 mil,
+FROM ZEN_SHIPPING_NOTICE_HEADERS_V@ZENPROD zshv,
+     zen_shipping_notice_lines_v@ZENPROD zslv,
+     apps.mtl_item_locations@ZENPROD mil,
      jit_asn_header jah,
-     mtl_system_items_b@PROD2 msi,
-     apps.mtl_item_categories@PROD2 w,
-     apps.mtl_categories_b@PROD2 s1
+     mtl_system_items_b@ZENPROD msi,
+     apps.mtl_item_categories@ZENPROD w,
+     apps.mtl_categories_b@ZENPROD s1
 WHERE zshv.shipping_no = zslv.shipping_no
   AND zslv.subinventory_code = '外存倉'
   AND mil.organization_id(+) = zslv.organization_id
@@ -212,6 +213,7 @@ WHERE zshv.shipping_no = zslv.shipping_no
   AND zshv.organization_id IN (169, 209)
   AND zshv.status = 'Complete'
   AND zslv.status = 'Open'
+  AND NVL(zshv.EXT_WH_FLAG,'N') ='Y'
   AND (mil.segment1 LIKE '%基通%' OR mil.segment2 LIKE '%基通%')
   AND mil.attribute3 = 'JIT'
   AND ZSHV.supplier_id NOT IN (1098625,823139,16645)
