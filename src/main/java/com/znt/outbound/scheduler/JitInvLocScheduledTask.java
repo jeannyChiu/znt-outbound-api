@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * JIT 庫存查詢排程任務
- * 每日凌晨自動執行庫存資料撈取
+ * 每整點自動執行庫存資料撈取
  */
 @Component
 @RequiredArgsConstructor
@@ -21,11 +21,11 @@ public class JitInvLocScheduledTask {
     private final JitInvLocService jitInvLocService;
 
     /**
-     * 排程任務：每日18:30執行庫存查詢
+     * 排程任務：每整點執行庫存查詢
      * Cron: 秒 分 時 日 月 週
-     * 表示每日18:30執行
+     * 表示每小時的00分執行
      */
-    @Scheduled(cron = "0 30 18 * * ?", zone = "Asia/Taipei")
+    @Scheduled(cron = "0 0 * * * ?", zone = "Asia/Taipei")
     public void executeJitInventoryLocationQuery() {
         boolean schedulingEnabled = true;
         if (!schedulingEnabled) {
@@ -41,10 +41,10 @@ public class JitInvLocScheduledTask {
 
         try {
             // 執行庫存查詢 (查詢所有庫存資料)
-            log.info("[{}] 開始執行每日庫存查詢作業...", taskId);
+            log.info("[{}] 開始執行每小時庫存查詢作業...", taskId);
             String result = jitInvLocService.queryInventoryLocation(null, null, null, null);
             
-            log.info("[{}] 每日庫存查詢作業完成: {}", taskId, result);
+            log.info("[{}] 每小時庫存查詢作業完成: {}", taskId, result);
 
             // 記錄成功完成資訊
             long executionTime = System.currentTimeMillis() - startTime;
